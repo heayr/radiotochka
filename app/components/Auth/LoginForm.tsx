@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Button from "@/app/components/Button";
-import { Alert } from "@/app/components/ui/Alert";
 import { AuthFormWrapper } from "@/app/components/auth/AuthFormWrapper";
 
 export default function LoginForm() {
@@ -75,14 +73,7 @@ export default function LoginForm() {
     <AuthFormWrapper
       title="Вход в систему"
       error={error}
-      footer={
-        <Link
-          href="/auth/register"
-          className="text-black font-medium hover:underline"
-        >
-          Зарегистрироваться
-        </Link>
-      }
+      footer={null}
     >
       <form onSubmit={onSubmit} className="space-y-4">
         <div>

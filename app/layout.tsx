@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Navbar from "./components/Navbar";
 import SessionProvider from "./components/SessionProvider";
+import { CookieConsent } from "./components/CookieConsent";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -107,6 +108,7 @@ export default function RootLayout({
           <main id="main-content" className="mx-auto w-full px-fluid-container">
             {children}
           </main>
+          <CookieConsent />
         </SessionProvider>
       </body>
     </html>
