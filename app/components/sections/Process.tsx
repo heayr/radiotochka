@@ -61,17 +61,17 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
         />
       </div>
 
-      {/* Базовый темный градиент для читаемости текста */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/95 via-black/50 to-black/20" />
+      {/* Мягкая нижняя подсветка только под текстом, без затемнения верхней части фото */}
+      <div className="absolute inset-x-0 bottom-0 h-1/2 z-10 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
 
-      {/* Коралловая мягкая подложка под текстом при hover, повышающая контраст и читаемость */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/40 via-black/85 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
+      {/* Коралловый акцент под текстом при hover */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/40 via-[#ea5670]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
 
       {/* Содержимое карточки: жестко выровненные по вертикали элементы */}
       <div className="relative z-20 h-full flex flex-col justify-between p-6 sm:p-7 select-none">
         {/* Верхняя зона: воздушный тонкий номер на фиксированной высоте */}
         <div className="h-[90px] flex items-start justify-end">
-          <span className="text-7xl sm:text-8xl lg:text-[84px] font-extralight tracking-tight text-white/50 group-hover:text-white/95 transition-colors duration-500 leading-none">
+          <span className="text-7xl sm:text-8xl lg:text-[84px] font-extralight tracking-tight text-white/70 group-hover:text-white transition-colors duration-500 leading-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
             {step.number}
           </span>
         </div>
@@ -79,12 +79,12 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
         {/* Нижняя зона: заголовок и текст строго в одну горизонтальную линию без плавания */}
         <div className="flex flex-col justify-end">
           <div className="h-[36px] flex items-end mb-3">
-            <h3 className="text-2xl sm:text-[25px] font-bold text-white tracking-tight leading-tight transition-colors duration-300">
+            <h3 className="text-2xl sm:text-[25px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               {step.title}
             </h3>
           </div>
           <div className="h-[96px] flex items-start">
-            <p className="text-sm sm:text-[14px] text-white/75 leading-[1.55] font-normal">
+            <p className="text-sm sm:text-[14px] text-white/90 leading-[1.55] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {step.description}
             </p>
           </div>
