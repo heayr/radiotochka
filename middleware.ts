@@ -19,7 +19,7 @@ export default auth((req) => {
   ];
 
   const isPublicRoute = publicRoutes.some((route) =>
-    nextUrl.pathname.startsWith(route)
+    route === "/" ? nextUrl.pathname === "/" : nextUrl.pathname.startsWith(route)
   );
 
   // API маршруты (кроме auth) — не блокируем middleware, защита будет внутри
