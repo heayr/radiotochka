@@ -48,7 +48,7 @@ interface ProcessCardProps {
 
 const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
   return (
-    <div className="group relative w-full h-[420px] sm:h-[450px] lg:h-[440px] xl:h-[460px] rounded-[24px] sm:rounded-[28px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform pointer-events-auto">
+    <div className="group relative w-full h-[440px] sm:h-[470px] lg:h-[460px] xl:h-[480px] rounded-[24px] sm:rounded-[28px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform pointer-events-auto">
       {/* Фоновое атмосферное изображение без зума */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -64,27 +64,27 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
       {/* Мягкая нижняя подсветка только под текстом, без затемнения верхней части фото */}
       <div className="absolute inset-x-0 bottom-0 h-1/2 z-10 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
 
-      {/* Коралловый акцент под текстом при hover */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/40 via-[#ea5670]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
+      {/* Выразительный коралловый акцент под текстом при hover для максимальной читаемости и контраста */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/80 via-[#ea5670]/30 via-40% to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
 
-      {/* Содержимое карточки: жестко выровненные по вертикали элементы */}
+      {/* Содержимое карточки: жестко выровненные по вертикали элементы с комфортным запасом высоты */}
       <div className="relative z-20 h-full flex flex-col justify-between p-6 sm:p-7 select-none">
         {/* Верхняя зона: воздушный тонкий номер на фиксированной высоте */}
-        <div className="h-[90px] flex items-start justify-end">
+        <div className="h-[64px] flex items-start justify-end">
           <span className="text-7xl sm:text-8xl lg:text-[84px] font-extralight tracking-tight text-white/70 group-hover:text-white transition-colors duration-500 leading-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
             {step.number}
           </span>
         </div>
 
-        {/* Нижняя зона: заголовок и текст строго в одну горизонтальную линию без плавания */}
+        {/* Нижняя зона: заголовок и текст строго в одну горизонтальную линию с запасом пространства */}
         <div className="flex flex-col justify-end">
-          <div className="h-[36px] flex items-end mb-3">
-            <h3 className="text-2xl sm:text-[25px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <div className="h-[32px] flex items-end mb-2.5">
+            <h3 className="text-2xl sm:text-[24px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               {step.title}
             </h3>
           </div>
-          <div className="h-[96px] flex items-start">
-            <p className="text-sm sm:text-[14px] text-white/90 leading-[1.55] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+          <div className="h-[116px] flex items-start">
+            <p className="text-sm sm:text-[13.5px] lg:text-[13.5px] xl:text-[14px] text-white/90 leading-[1.5] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {step.description}
             </p>
           </div>
@@ -116,8 +116,8 @@ function BaseProcess() {
       }
 
       const listRect = list.getBoundingClientRect();
-      const cardHeight = window.innerWidth >= 1280 ? 460 : 440;
-      const stickyTop = window.innerWidth >= 1280 ? 250 : 220;
+      const cardHeight = window.innerWidth >= 1280 ? 480 : 460;
+      const stickyTop = window.innerWidth >= 1280 ? 245 : 220;
       const headerTop = window.innerWidth >= 1280 ? 85 : 70;
 
       // Точка, где полностью пристыкованные карточки начинают подниматься наверх
@@ -223,26 +223,26 @@ function BaseProcess() {
         {/* На десктопе: аутентичный каскадный CSS Sticky Stacking из Framer Our Process */}
         <div
           ref={listRef}
-          className="hidden lg:block w-full relative z-20 h-[1760px] xl:h-[1840px]"
+          className="hidden lg:block w-full relative z-20 h-[1840px] xl:h-[1920px]"
         >
-          {/* Слой 01: прилипает на top-[220px], остается на месте пока остальные слои приплывают */}
-          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px] pointer-events-none">
+          {/* Слой 01: прилипает на top-[220px]/[245px], остается на месте пока остальные слои приплывают */}
+          <div className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none">
             <ProcessCard step={STEPS[0]} idx={0} />
             <div />
             <div />
             <div />
           </div>
 
-          {/* Слой 02: приплывает снизу ровно через 440px скролла и прилипает рядом с шагом 01 */}
-          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px] pointer-events-none">
+          {/* Слой 02: приплывает снизу ровно через высоту карточки скролла и прилипает рядом с шагом 01 */}
+          <div className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none">
             <div />
             <ProcessCard step={STEPS[1]} idx={1} />
             <div />
             <div />
           </div>
 
-          {/* Слой 03: приплывает снизу ровно через 440px скролла и прилипает рядом с шагом 02 */}
-          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px] pointer-events-none">
+          {/* Слой 03: приплывает снизу ровно через высоту карточки скролла и прилипает рядом с шагом 02 */}
+          <div className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none">
             <div />
             <div />
             <ProcessCard step={STEPS[2]} idx={2} />
@@ -250,7 +250,7 @@ function BaseProcess() {
           </div>
 
           {/* Слой 04: приплывает снизу и замыкает 4-колоночный ряд; после чего весь блок дружно уходит наверх */}
-          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px] pointer-events-none">
+          <div className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none">
             <div />
             <div />
             <div />
