@@ -54,6 +54,27 @@ input[type="reset"] {
   animation-play-state: paused;
 }
 
+/* Бегущие карточки клиентов в стиле Framer Awwwards */
+@keyframes cards-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-cards-marquee {
+  display: flex;
+  width: max-content;
+  animation: cards-marquee 36s linear infinite;
+  will-change: transform;
+}
+
+.animate-cards-marquee:hover {
+  animation-play-state: paused;
+}
+
 /* Эквалайзер / Звуковая волна радиостанции (Compositing Layer Only: transform scaleY) */
 @keyframes soundwave-1 {
   0%, 100% { transform: scaleY(0.25); }

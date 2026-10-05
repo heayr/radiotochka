@@ -95,10 +95,12 @@ function BaseStats() {
             </a>
 
             <a
-              href="#calculator"
+              href="https://t.me/+79271370750"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 text-white font-semibold text-sm sm:text-base backdrop-blur-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Получить расчет ↗</span>
+              <span>Обсудить в Telegram ↗</span>
             </a>
           </div>
         </div>
