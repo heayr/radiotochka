@@ -294,6 +294,7 @@ export interface FooterSectionData {
   email: string;
   vkUrl: string;
   telegramUrl: string;
+  maxUrl: string;
   legalInfo: string;
 }
 
@@ -306,6 +307,8 @@ export const DEFAULT_FOOTER_DATA: FooterSectionData = {
   email: "j.chur@inbox.ru",
   vkUrl: "https://vk.com/radiotochka_balakovo",
   telegramUrl: "https://t.me/+79271370750",
+  maxUrl: "#",
   legalInfo:
     "ИП Чуркина Ю.А. • ОГРНИП 318645100085392 • ИНН 643904996901",
 };
+
