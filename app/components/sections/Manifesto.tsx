@@ -1,25 +1,154 @@
-import React, { memo } from "react";
+"use client";
+
+import React, { memo, useEffect, useRef } from "react";
+
+const WORDS = [
+  "Мы",
+  "не",
+  "делаем",
+  "рекламу",
+  "«ради",
+  "галочки».",
+  "Каждая",
+  "кампания",
+  "на",
+  "радио",
+  "и",
+  "городских",
+  "экранах",
+  "строится",
+  "под",
+  "конкретные",
+  "цифры",
+  "и",
+  "продажи,",
+  "пока",
+  "показатели",
+  "бизнеса",
+  "реально",
+  "не",
+  "пойдут",
+  "вверх.",
+];
 
 function BaseManifesto() {
+  const containerRef = useRef<HTMLElement>(null);
+  const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const wordEls = wordsRef.current;
+    const totalWords = WORDS.length;
+    let rafId: number | null = null;
+    let isIntersecting = false;
+
+    const updateWords = () => {
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      // Скролл-прогресс: раскрытие начинается при входе блока в область видимости
+      const startY = windowHeight * 0.85;
+      const endY = windowHeight * 0.35;
+      const totalDist = startY - endY;
+      const progress = Math.min(Math.max((startY - rect.top) / totalDist, 0), 1);
+
+      for (let i = 0; i < totalWords; i++) {
+        const el = wordEls[i];
+        if (!el) continue;
+
+        const wordStart = i / totalWords;
+        const wordEnd = (i + 1) / totalWords;
+
+        let wordProgress = 0;
+        if (progress >= wordEnd) {
+          wordProgress = 1;
+        } else if (progress <= wordStart) {
+          wordProgress = 0;
+        } else {
+          wordProgress = (progress - wordStart) / (wordEnd - wordStart);
+        }
+
+        // Аппаратная анимация прозрачности от элегантного серого (0.24) до глубокого черного (1.0)
+        const opacity = 0.24 + 0.76 * wordProgress;
+        el.style.opacity = opacity.toFixed(3);
+      }
+    };
+
+    const onScroll = () => {
+      if (!isIntersecting) return;
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        updateWords();
+        rafId = null;
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        isIntersecting = entry.isIntersecting;
+        if (isIntersecting) {
+          updateWords();
+          window.addEventListener("scroll", onScroll, { passive: true });
+          window.addEventListener("resize", onScroll, { passive: true });
+        } else {
+          window.removeEventListener("scroll", onScroll);
+          window.removeEventListener("resize", onScroll);
+          if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+        }
+      },
+      { rootMargin: "100px 0px 100px 0px" }
+    );
+
+    observer.observe(container);
+    updateWords();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+    };
+  }, []);
+
   return (
     <section
+      ref={containerRef}
       id="manifesto"
       className="w-full bg-[#F4F0EB] px-[20px] sm:px-[30px] lg:px-[60px] pt-16 sm:pt-24 pb-12 sm:pb-16"
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
-        {/* Левая колонка со списком городов и годом основания в стиле референса */}
-        <div className="lg:col-span-3 flex flex-col gap-1.5 text-xs sm:text-[13px] font-medium tracking-wider text-[#7E7971] uppercase select-none">
+        {/* Левая колонка со списком городов и годом основания */}
+        <div className="lg:col-span-3 flex flex-col gap-1.5 text-xs sm:text-[13px] font-normal tracking-[0.16em] text-[#8C8780] uppercase select-none pt-1">
           <span>SINCE 2004</span>
           <span>БАЛАКОВО</span>
           <span>САРАТОВ</span>
           <span>ВОЛЬСК</span>
         </div>
 
-        {/* Правая колонка: Текст манифеста с элегантным затемнением завершения */}
+        {/* Правая колонка: Элегантная скругленная типографика с пословным проявлением при скролле */}
         <div className="lg:col-span-9">
-          <p className="text-2xl sm:text-4xl lg:text-[45px] font-bold text-[#0A0A0A] leading-[1.18] tracking-[-0.02em] max-w-4xl">
-            Мы не делаем рекламу «ради галочки». Каждая кампания на радио и городских экранах строится под конкретные цифры и продажи,{" "}
-            <span className="text-[#9E988F]">пока показатели бизнеса реально не пойдут вверх.</span>
+          <p className="text-2xl sm:text-3xl lg:text-[38px] xl:text-[40px] font-medium text-[#0A0A0A] leading-[1.36] tracking-[-0.02em] max-w-4xl">
+            {WORDS.map((word, idx) => (
+              <span
+                key={`word-${idx}`}
+                ref={(el) => {
+                  wordsRef.current[idx] = el;
+                }}
+                className="inline-block mr-[0.28em] transition-opacity duration-150 will-change-[opacity]"
+                style={{ opacity: 0.24 }}
+              >
+                {word}
+              </span>
+            ))}
           </p>
         </div>
       </div>
