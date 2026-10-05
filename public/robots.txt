@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /_next/
+Disallow: /private/
+
+Sitemap: https://radiotochka.nologs.site/sitemap.xml
+# Host: https://radiotochka.nologs.site

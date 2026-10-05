@@ -3,10 +3,23 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_ACCESS_KEY_WEB_FORM: ${NEXT_PUBLIC_ACCESS_KEY_WEB_FORM:-}
     platform: linux/amd64
-    command: yarn start
+    command: sh -c "npx prisma migrate deploy && npm start"
     container_name: radiotochka-web
     restart: always
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://REDACTED_DB_USER:REDACTED_DB_PASSWORD@db:5432/REDACTED_DB_NAME?schema=public
+      - NEXTAUTH_URL=https://radiotochka.nologs.site
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-change-me-in-production}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - AUTH_TRUST_HOST=true
+      - NEXT_PUBLIC_ACCESS_KEY_WEB_FORM=${NEXT_PUBLIC_ACCESS_KEY_WEB_FORM:-}
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - proxy
     labels:
@@ -14,7 +27,29 @@ services:
       - "traefik.http.routers.radiotochka.rule=Host(`radiotochka.nologs.site`)"
       - "traefik.http.routers.radiotochka.entrypoints=websecure"
       - "traefik.http.routers.radiotochka.tls=true"
+      - "traefik.http.routers.radiotochka.tls.certresolver=letsencrypt"
       - "traefik.http.services.radiotochka.loadbalancer.server.port=3000"
+
+  db:
+    image: postgres:16-alpine
+    container_name: radiotochka-db
+    environment:
+      POSTGRES_USER: REDACTED_DB_USER
+      POSTGRES_PASSWORD: REDACTED_DB_PASSWORD
+      POSTGRES_DB: REDACTED_DB_NAME
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U REDACTED_DB_USER -d REDACTED_DB_NAME"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - proxy
+
+volumes:
+  pgdata:
 
 networks:
   proxy:

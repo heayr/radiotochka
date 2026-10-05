@@ -1,21 +1,22 @@
-import Image from "next/image";
-import MainSection from "./components/MainSection";
-import LogoSection from "./components/LogoSection";
+import Hero from "./components/sections/Hero";
+import Stats from "./components/sections/Stats";
+import Marquee from "./components/sections/Marquee";
+import Manifesto from "./components/sections/Manifesto";
+import Process from "./components/sections/Process";
 import Services from "./components/Services";
-import Proposal from "./components/Proposal";
-import Cases from "./components/Cases";
-import Form from "./components/Form";
+import Work from "./components/sections/Work";
 import Footer from "./components/Footer";
 
 export default function Home() {
   return (
-    <div className=" mx-auto ">
-      <MainSection />
-      <LogoSection />
+    <div className="w-full overflow-x-clip">
+      <Hero />
+      <Stats />
+      <Marquee />
+      <Manifesto />
+      <Process />
       <Services />
-      <Proposal />
-      <Cases />
-      <Form />
+      <Work />
       <Footer />
     </div>
   );
