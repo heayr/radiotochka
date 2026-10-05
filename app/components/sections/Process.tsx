@@ -48,40 +48,46 @@ interface ProcessCardProps {
 
 const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
   return (
-    <div className="group relative w-full h-[420px] sm:h-[450px] lg:h-[440px] xl:h-[460px] rounded-[24px] sm:rounded-[28px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform">
-      {/* Фоновое атмосферное изображение */}
+    <div className="group relative w-full h-[420px] sm:h-[450px] lg:h-[440px] xl:h-[460px] rounded-[24px] sm:rounded-[28px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform pointer-events-auto">
+      {/* Фоновое атмосферное изображение без зума */}
       <div className="absolute inset-0 z-0">
         <Image
           src={step.imageSrc}
           alt={step.title}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+          className="object-cover object-center"
           priority={idx < 2}
         />
       </div>
 
-      {/* Темный градиентный слой для идеальной читаемости текста */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/95 via-black/40 to-black/20" />
+      {/* Базовый темный градиент для читаемости текста */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/95 via-black/50 to-black/20" />
 
-      {/* Акцентная форма-вспышка (Shape), активирующаяся при наведении в стиле Framer */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-br from-[#ea5670]/60 via-[#824e98]/40 to-transparent opacity-0 group-hover:opacity-60 transition-opacity duration-500 ease-out mix-blend-color-dodge pointer-events-none" />
+      {/* Коралловая мягкая подложка под текстом при hover, повышающая контраст и читаемость */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/40 via-black/85 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
 
-      {/* Содержимое карточки: только номер и русский текст */}
+      {/* Содержимое карточки: жестко выровненные по вертикали элементы */}
       <div className="relative z-20 h-full flex flex-col justify-between p-6 sm:p-7 select-none">
-        <div className="flex justify-end">
-          <span className="text-6xl sm:text-7xl lg:text-[76px] font-black tracking-tighter text-white/95 leading-none transition-transform duration-500 group-hover:-translate-y-1.5">
+        {/* Верхняя зона: воздушный тонкий номер на фиксированной высоте */}
+        <div className="h-[90px] flex items-start justify-end">
+          <span className="text-7xl sm:text-8xl lg:text-[84px] font-extralight tracking-tight text-white/50 group-hover:text-white/95 transition-colors duration-500 leading-none">
             {step.number}
           </span>
         </div>
 
-        <div>
-          <h3 className="text-2xl sm:text-[25px] font-bold text-white tracking-tight mb-2.5 transition-colors duration-300 group-hover:text-white">
-            {step.title}
-          </h3>
-          <p className="text-sm sm:text-[14px] text-white/75 leading-relaxed font-normal">
-            {step.description}
-          </p>
+        {/* Нижняя зона: заголовок и текст строго в одну горизонтальную линию без плавания */}
+        <div className="flex flex-col justify-end">
+          <div className="h-[36px] flex items-end mb-3">
+            <h3 className="text-2xl sm:text-[25px] font-bold text-white tracking-tight leading-tight transition-colors duration-300">
+              {step.title}
+            </h3>
+          </div>
+          <div className="h-[96px] flex items-start">
+            <p className="text-sm sm:text-[14px] text-white/75 leading-[1.55] font-normal">
+              {step.description}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -220,34 +226,34 @@ function BaseProcess() {
           className="hidden lg:block w-full relative z-20 h-[1760px] xl:h-[1840px]"
         >
           {/* Слой 01: прилипает на top-[220px], остается на месте пока остальные слои приплывают */}
-          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px]">
+          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px] pointer-events-none">
             <ProcessCard step={STEPS[0]} idx={0} />
-            <div className="pointer-events-none" />
-            <div className="pointer-events-none" />
-            <div className="pointer-events-none" />
+            <div />
+            <div />
+            <div />
           </div>
 
           {/* Слой 02: приплывает снизу ровно через 440px скролла и прилипает рядом с шагом 01 */}
-          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px]">
-            <div className="pointer-events-none" />
+          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px] pointer-events-none">
+            <div />
             <ProcessCard step={STEPS[1]} idx={1} />
-            <div className="pointer-events-none" />
-            <div className="pointer-events-none" />
+            <div />
+            <div />
           </div>
 
           {/* Слой 03: приплывает снизу ровно через 440px скролла и прилипает рядом с шагом 02 */}
-          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px]">
-            <div className="pointer-events-none" />
-            <div className="pointer-events-none" />
+          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px] pointer-events-none">
+            <div />
+            <div />
             <ProcessCard step={STEPS[2]} idx={2} />
-            <div className="pointer-events-none" />
+            <div />
           </div>
 
           {/* Слой 04: приплывает снизу и замыкает 4-колоночный ряд; после чего весь блок дружно уходит наверх */}
-          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px]">
-            <div className="pointer-events-none" />
-            <div className="pointer-events-none" />
-            <div className="pointer-events-none" />
+          <div className="sticky top-[220px] xl:top-[250px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[440px] xl:h-[460px] pointer-events-none">
+            <div />
+            <div />
+            <div />
             <ProcessCard step={STEPS[3]} idx={3} />
           </div>
         </div>
