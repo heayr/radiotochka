@@ -69,7 +69,7 @@ export const DEFAULT_SERVICES_DATA: ServicesSectionData = {
         "Лицензионная\nмузыка",
         "Готовый ролик\nза 24 часа",
       ],
-      image: "/images/services/service-03-audio-real.jpg",
+      image: "/images/services/service-03-studio.jpg",
       alt: "Звукорежиссер за пультом аудиопродакшна студии Радиоточка",
     },
   ],

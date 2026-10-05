@@ -274,9 +274,9 @@ function BaseFooter() {
             </a>
           </div>
 
-          <Link href="/admin/content" className="hover:text-white/70 transition-colors">
+          <a href="/admin/content" className="hover:text-white/70 transition-colors">
             Панель модерации
-          </Link>
+          </a>
         </div>
       </div>
     </footer>

@@ -15,7 +15,7 @@ import {
 const PRESET_SERVICE_IMAGES = [
   { label: "Радио студия", src: "/images/services/service-01-radio-real.jpg" },
   { label: "Билборд", src: "/images/services/service-02-billboard.jpg" },
-  { label: "Аудиопродакшн", src: "/images/services/service-03-audio-real.jpg" },
+  { label: "Аудиопродакшн", src: "/images/services/service-03-studio.jpg" },
 ];
 
 export function ServicesEditor({ block, onSave, onCancel }: EditorProps) {

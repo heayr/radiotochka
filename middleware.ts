@@ -39,25 +39,27 @@ export default auth((req) => {
   if (!isLoggedIn && !isPublicRoute && !isApiRoute) {
     const loginUrl = new URL("/auth/login", nextUrl.origin);
     loginUrl.searchParams.set("callbackUrl", nextUrl.pathname);
-    return Response.redirect(loginUrl);
+    return NextResponse.redirect(loginUrl);
   }
 
   // Защита админ-маршрутов по ролям
   if (nextUrl.pathname.startsWith("/admin")) {
     if (!isLoggedIn) {
       const loginUrl = new URL("/auth/login", nextUrl.origin);
-      return Response.redirect(loginUrl);
+      loginUrl.searchParams.set("callbackUrl", nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
     }
 
     if (!["super_admin", "admin", "moderator"].includes(userRole ?? "")) {
-      return Response.redirect(new URL("/dashboard", nextUrl.origin));
+      return NextResponse.redirect(new URL("/dashboard", nextUrl.origin));
     }
   }
 
   // Защита дашборда
   if (nextUrl.pathname.startsWith("/dashboard") && !isLoggedIn) {
     const loginUrl = new URL("/auth/login", nextUrl.origin);
-    return Response.redirect(loginUrl);
+    loginUrl.searchParams.set("callbackUrl", nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
