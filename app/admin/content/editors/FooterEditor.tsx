@@ -33,6 +33,9 @@ export function FooterEditor({ block, onSave, onCancel }: EditorProps) {
   const [telegramUrl, setTelegramUrl] = useState(
     content.telegramUrl || DEFAULT_FOOTER_DATA.telegramUrl
   );
+  const [maxUrl, setMaxUrl] = useState(
+    content.maxUrl || DEFAULT_FOOTER_DATA.maxUrl || "#"
+  );
   const [legalInfo, setLegalInfo] = useState(
     content.legalInfo || DEFAULT_FOOTER_DATA.legalInfo
   );
@@ -48,6 +51,7 @@ export function FooterEditor({ block, onSave, onCancel }: EditorProps) {
       setEmail(DEFAULT_FOOTER_DATA.email);
       setVkUrl(DEFAULT_FOOTER_DATA.vkUrl);
       setTelegramUrl(DEFAULT_FOOTER_DATA.telegramUrl);
+      setMaxUrl(DEFAULT_FOOTER_DATA.maxUrl);
       setLegalInfo(DEFAULT_FOOTER_DATA.legalInfo);
     }
   };
@@ -64,6 +68,7 @@ export function FooterEditor({ block, onSave, onCancel }: EditorProps) {
         email,
         vkUrl,
         telegramUrl,
+        maxUrl,
         legalInfo,
       };
       await onSave(data as unknown as Record<string, unknown>);
@@ -161,16 +166,17 @@ export function FooterEditor({ block, onSave, onCancel }: EditorProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-xs font-semibold text-gray-700 mb-1">
             Ссылка ВКонтакте
           </label>
           <input
-            type="url"
+            type="text"
             value={vkUrl}
             onChange={(e) => setVkUrl(e.target.value)}
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
+            placeholder="https://vk.com/..."
             required
           />
         </div>
@@ -180,12 +186,29 @@ export function FooterEditor({ block, onSave, onCancel }: EditorProps) {
             Ссылка Telegram
           </label>
           <input
-            type="url"
+            type="text"
             value={telegramUrl}
             onChange={(e) => setTelegramUrl(e.target.value)}
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
+            placeholder="https://t.me/..."
             required
           />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 mb-1">
+            Ссылка МАКС
+          </label>
+          <input
+            type="text"
+            value={maxUrl}
+            onChange={(e) => setMaxUrl(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
+            placeholder="#"
+          />
+          <p className="text-[11px] text-gray-400 mt-1">
+            Укажите URL или оставьте «#» (кликабельная ссылка без перехода).
+          </p>
         </div>
       </div>
 
@@ -218,12 +241,15 @@ export function FooterEditor({ block, onSave, onCancel }: EditorProps) {
             <p className="text-white/40 text-[11px] mt-0.5">{phoneSecondary}</p>
           </div>
           <div>
-            <span className="text-gray-400 block mb-1">Email & Связь</span>
+            <span className="text-gray-400 block mb-1">Email & Соцсети</span>
             <p className="text-white/90">{email}</p>
-            <p className="text-gray-400 text-[11px] mt-0.5">VK / Telegram подключены</p>
+            <p className="text-gray-400 text-[11px] mt-0.5">
+              VK • Telegram • МАКС ({maxUrl})
+            </p>
           </div>
         </div>
       </div>
+
 
       <EditorFormFooter
         isLoading={isLoading}

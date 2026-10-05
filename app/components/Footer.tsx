@@ -19,6 +19,7 @@ function BaseFooter({ initialData }: FooterProps) {
   const email = initialData?.email || DEFAULT_FOOTER_DATA.email;
   const vkUrl = initialData?.vkUrl || DEFAULT_FOOTER_DATA.vkUrl;
   const telegramUrl = initialData?.telegramUrl || DEFAULT_FOOTER_DATA.telegramUrl;
+  const maxUrl = initialData?.maxUrl || DEFAULT_FOOTER_DATA.maxUrl;
 
   return (
     <footer className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 pb-8 overflow-hidden">
@@ -143,6 +144,16 @@ function BaseFooter({ initialData }: FooterProps) {
                   className="hover:text-white transition-colors block"
                 >
                   Telegram
+                </a>
+              </li>
+              <li>
+                <a
+                  href={maxUrl || "#"}
+                  target={maxUrl && maxUrl !== "#" ? "_blank" : undefined}
+                  rel={maxUrl && maxUrl !== "#" ? "noopener noreferrer" : undefined}
+                  className="hover:text-white transition-colors block cursor-pointer"
+                >
+                  МАКС
                 </a>
               </li>
             </ul>
