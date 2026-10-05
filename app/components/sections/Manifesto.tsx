@@ -1,46 +1,33 @@
 "use client";
 
 import React, { memo, useEffect, useRef } from "react";
+import {
+  DEFAULT_MANIFESTO_DATA,
+  type ManifestoSectionData,
+} from "@/types/site-content";
 
-const WORDS = [
-  "Мы",
-  "не",
-  "делаем",
-  "рекламу",
-  "«ради",
-  "галочки».",
-  "Каждая",
-  "кампания",
-  "на",
-  "радио",
-  "и",
-  "городских",
-  "экранах",
-  "строится",
-  "под",
-  "конкретные",
-  "цифры",
-  "и",
-  "продажи,",
-  "пока",
-  "показатели",
-  "бизнеса",
-  "реально",
-  "не",
-  "пойдут",
-  "вверх.",
-];
+interface ManifestoProps {
+  initialData?: Partial<ManifestoSectionData>;
+}
 
-function BaseManifesto() {
+function BaseManifesto({ initialData }: ManifestoProps) {
   const containerRef = useRef<HTMLElement>(null);
   const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
+
+  const text = initialData?.text || DEFAULT_MANIFESTO_DATA.text;
+  const since = initialData?.since || DEFAULT_MANIFESTO_DATA.since;
+  const cities = initialData?.cities && initialData.cities.length > 0
+    ? initialData.cities
+    : DEFAULT_MANIFESTO_DATA.cities;
+
+  const words = text.split(/\s+/).filter(Boolean);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const wordEls = wordsRef.current;
-    const totalWords = WORDS.length;
+    const totalWords = words.length;
     let rafId: number | null = null;
     let isIntersecting = false;
 
@@ -117,7 +104,7 @@ function BaseManifesto() {
         cancelAnimationFrame(rafId);
       }
     };
-  }, []);
+  }, [words.length]);
 
   return (
     <section
@@ -128,16 +115,16 @@ function BaseManifesto() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
         {/* Левая колонка со списком городов и годом основания */}
         <div className="lg:col-span-3 flex flex-col gap-1.5 text-xs sm:text-[13px] font-normal tracking-[0.16em] text-[#8C8780] uppercase select-none pt-1">
-          <span>SINCE 2004</span>
-          <span>БАЛАКОВО</span>
-          <span>САРАТОВ</span>
-          <span>ВОЛЬСК</span>
+          <span>{since}</span>
+          {cities.map((city) => (
+            <span key={city}>{city}</span>
+          ))}
         </div>
 
         {/* Правая колонка: Элегантная скругленная типографика с пословным проявлением при скролле */}
         <div className="lg:col-span-9">
           <p className="text-2xl sm:text-3xl lg:text-[38px] xl:text-[40px] font-medium text-[#0A0A0A] leading-[1.36] tracking-[-0.02em] max-w-4xl">
-            {WORDS.map((word, idx) => (
+            {words.map((word, idx) => (
               <span
                 key={`word-${idx}`}
                 ref={(el) => {

@@ -1,67 +1,19 @@
 "use client";
 
 import React, { memo } from "react";
-import Image from "next/image";
 import Link from "next/link";
-
-interface WorkProject {
-  id: string;
-  title: string;
-  description: string;
-  client: string;
-  services: string[];
-  imageSrc: string;
-  href: string;
-}
-
-const PROJECTS: WorkProject[] = [
-  {
-    id: "01",
-    title: "Alongside",
-    description:
-      "Комплексный ребрендинг и запуск федеральной рекламной кампании: разработка позиционирования, создание аудиороликов и ротация в эфире радиостанций.",
-    client: "Lumina Legal",
-    services: ["Айдентика", "Радиоэфир"],
-    imageSrc: "/images/work/project-01.png",
-    href: "#contact",
-  },
-  {
-    id: "02",
-    title: "Hypertech",
-    description:
-      "Кросс-канальная рекламная кампания: магистральные щиты 3х6 м в ключевых локациях города, аудио-джинглы в прайм-тайм и оперативная полиграфия.",
-    client: "FitFuel Nutrition",
-    services: ["Наружная реклама", "Аудиопродакшн"],
-    imageSrc: "/images/work/project-02.png",
-    href: "#contact",
-  },
-  {
-    id: "03",
-    title: "Redefine Flow",
-    description:
-      "Стратегический медиаплан и брендинг: позиционирование на региональном рынке, сити-форматы с высоким трафиком и спонсорские интеграции.",
-    client: "Verge Consulting",
-    services: ["Медиаплан", "Брендинг"],
-    imageSrc: "/images/work/project-03.png",
-    href: "#contact",
-  },
-  {
-    id: "04",
-    title: "Recap",
-    description:
-      "Пакетное размещение на радиостанциях «Дорожное радио» и «НАШЕ Радио» с охватом всей агломерации и точным попаданием в целевую аудиторию.",
-    client: "Harbor Financial",
-    services: ["Прямой эфир", "Спонсорство"],
-    imageSrc: "/images/work/project-04.png",
-    href: "#contact",
-  },
-];
+import SafeImage from "@/app/components/SafeImage";
+import {
+  DEFAULT_WORK_DATA,
+  type WorkProjectItem,
+  type WorkSectionData,
+} from "@/types/site-content";
 
 const WorkCard = memo(function WorkCard({
   project,
   index,
 }: {
-  project: WorkProject;
+  project: WorkProjectItem;
   index: number;
 }) {
   // Staggered sticky top offsets для красивого каскадного наслоения карточек (Stacking Cards)
@@ -99,23 +51,20 @@ const WorkCard = memo(function WorkCard({
                 <span className="text-xs sm:text-sm font-semibold text-[#737373] uppercase tracking-wider">
                   Клиент:
                 </span>
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-brand-pink" />
-                  <span className="text-sm sm:text-base font-bold text-[#0A0A0A]">
-                    {project.client}
-                  </span>
-                </div>
+                <span className="text-sm sm:text-base font-bold text-[#0A0A0A]">
+                  {project.client}
+                </span>
               </div>
 
               {/* Разделитель */}
-              <div className="w-full h-px bg-[#D4D4D4]/70 my-5" />
+              <div className="w-full h-px bg-[#D4D4D4]/70 my-4" />
 
-              {/* Строка: Услуги / Теги */}
+              {/* Строка: Услуги */}
               <div className="flex items-center justify-between py-1 mb-8">
                 <span className="text-xs sm:text-sm font-semibold text-[#737373] uppercase tracking-wider">
                   Услуги:
                 </span>
-                <div className="flex flex-wrap gap-2 justify-end">
+                <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
                   {project.services.map((service) => (
                     <span
                       key={service}
@@ -131,7 +80,7 @@ const WorkCard = memo(function WorkCard({
             {/* Кнопка / Ссылка на кейс */}
             <div>
               <Link
-                href={project.href}
+                href={project.href || "#contact"}
                 className="group inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#0A0A0A] hover:bg-brand-pink text-white font-semibold text-sm transition-all duration-300 shadow-md hover:scale-105 active:scale-95"
               >
                 <span>Обсудить похожий проект</span>
@@ -152,10 +101,10 @@ const WorkCard = memo(function WorkCard({
             </div>
           </div>
 
-          {/* Правая колонка: Высококачественное изображение проекта */}
+          {/* Правая колонка: Изображение проекта */}
           <div className="w-full lg:w-1/2">
             <div className="relative w-full aspect-[1184/1080] rounded-[20px] sm:rounded-[24px] overflow-hidden border border-black/5 bg-[#EFECE6] group">
-              <Image
+              <SafeImage
                 src={project.imageSrc}
                 alt={project.title}
                 fill
@@ -172,7 +121,16 @@ const WorkCard = memo(function WorkCard({
   );
 });
 
-export default function Work() {
+interface WorkProps {
+  initialData?: Partial<WorkSectionData>;
+}
+
+export default function Work({ initialData }: WorkProps) {
+  const items =
+    initialData?.items && initialData.items.length > 0
+      ? initialData.items
+      : DEFAULT_WORK_DATA.items;
+
   return (
     <section id="work" className="w-full bg-[#F3EFE8] py-20 sm:py-28 px-4 sm:px-8 lg:px-12">
       <div className="max-w-6xl mx-auto">
@@ -181,10 +139,10 @@ export default function Work() {
         <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-20">
           <p className="text-xs sm:text-sm font-semibold tracking-[0.2em] text-[#737373] uppercase mb-3 flex items-center justify-center gap-2">
             <span className="w-2 h-2 rounded-full bg-brand-pink" />
-            Портфолио / Кейсы
+            {initialData?.subtitle || "Портфолио / Кейсы"}
           </p>
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0A0A0A] tracking-tight leading-[1.1] mb-4">
-            Проекты, которые приносят результат
+            {initialData?.title || "Проекты, которые приносят результат"}
           </h2>
           <p className="text-base sm:text-lg text-[#525252] font-normal leading-relaxed">
             Реальные рекламные кампании на радио, магистральных щитах и в полиграфии для бизнеса в Балаково и Поволжье.
@@ -193,8 +151,8 @@ export default function Work() {
 
         {/* Стек карточек проектов с наслоением при скролле */}
         <div className="flex flex-col gap-12 sm:gap-16 pb-16">
-          {PROJECTS.map((project, index) => (
-            <WorkCard key={project.id} project={project} index={index} />
+          {items.map((project, index) => (
+            <WorkCard key={project.id || index} project={project} index={index} />
           ))}
         </div>
 

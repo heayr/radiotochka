@@ -1,87 +1,13 @@
 "use client";
 
 import React, { memo } from "react";
-import Image from "next/image";
 import Button from "./Button";
-
-interface ServiceItem {
-  id: string;
-  category: string;
-  title: string;
-  statNumber: string;
-  statLabel: string;
-  description: string;
-  tags: string[];
-  image: string;
-  alt: string;
-}
-
-const SERVICES: readonly ServiceItem[] = [
-  {
-    id: "01",
-    category: "Радиоресурсы и прямой эфир",
-    title: "Реклама на «Дорожном радио» и «НАШЕМ Радио»",
-    statNumber: "№1 в Балаково",
-    statLabel: "эксклюзивный представитель",
-    description:
-      "Официальный и эксклюзивный представитель радиостанций «Дорожное радио» и «НАШЕ Радио» в г. Балаково. Прямые договоры со станциями по всему региону: Балаково, Вольск, Пугачёв, Саратов, Пенза, Волгоград. Точный таргетинг и максимальный охват платежеспособных автомобилистов и семейной аудитории.",
-    tags: [
-      "Дорожное радио &\nНАШЕ Радио",
-      "Прямой эфир\nпо Поволжью",
-      "Эксклюзивные\nусловия",
-    ],
-    image: "/images/services/service-01-radio-real.jpg",
-    alt: "Профессиональная студия прямого радиоэфира Радиоточка Балаково",
-  },
-  {
-    id: "02",
-    category: "Наружная реклама",
-    title: "Билборды, сити-форматы и медиаконструкции",
-    statNumber: "От визитки",
-    statLabel: "до масштабного билборда",
-    description:
-      "Разработаем дизайн с нуля, качественно напечатаем и разместим на любой законной поверхности в Балаково и области: магистральные щиты 3х6 м, ситиборды, фасадные вывески и крупноформатные рекламные поверхности с максимальным пешеходным и автомобильным трафиком.",
-    tags: [
-      "Магистральные\nщиты 3х6",
-      "Ситиборды\nи вывески",
-      "Согласование\nи монтаж",
-    ],
-    image: "/images/services/service-02-billboard.jpg",
-    alt: "Наружная реклама и билборды на дорогах города",
-  },
-  {
-    id: "03",
-    category: "Аудиопродакшн полного цикла",
-    title: "Изготовление аудиороликов и джинглов",
-    statNumber: "Вся Россия",
-    statLabel: "и далеко за её пределами",
-    description:
-      "Собственная звуковая студия «Радиоточка». Аудиоролики, изготовленные на нашей студии, звучат в радиоэфире по всей России и далеко за её пределами. Пишем продающие сценарии, привлекаем профессиональных дикторов, делаем качественный саунд-дизайн и мастеринг. Быстро и профессионально.",
-    tags: [
-      "Сценарии и\nдраматургия",
-      "База федеральных\nдикторов",
-      "Мастеринг\nвещания",
-    ],
-    image: "/images/services/service-03-studio.jpg",
-    alt: "Звуковая студия записи радиороликов Радиоточка",
-  },
-  {
-    id: "04",
-    category: "Дизайн и оперативная печать",
-    title: "Полиграфия и фирменный стиль для бизнеса",
-    statNumber: "20+ лет",
-    statLabel: "на рекламном рынке",
-    description:
-      "Разработаем с нуля фирменный стиль и обеспечим ваш бизнес всеми видами качественной полиграфии: визитки, флаеры, буклеты, каталоги, широкоформатная интерьерная и наружная печать баннеров. Контроль качества на собственном оборудовании на каждом этапе.",
-    tags: [
-      "Фирменный стиль\nи логотипы",
-      "Деловая\nполиграфия",
-      "Широкоформатная\nпечать",
-    ],
-    image: "/images/services/service-04-polygraphy.jpg",
-    alt: "Полиграфия, дизайн и брендинг для бизнеса",
-  },
-];
+import SafeImage from "./SafeImage";
+import {
+  DEFAULT_SERVICES_DATA,
+  type ServiceCardItem,
+  type ServicesSectionData,
+} from "@/types/site-content";
 
 /**
  * Атомарная карточка услуги с каскадным наслоением (Stacking Cards)
@@ -91,7 +17,7 @@ const ServiceCard = memo(function ServiceCard({
   service,
   index,
 }: {
-  service: ServiceItem;
+  service: ServiceCardItem;
   index: number;
 }) {
   // Каскадный отступ сверху для наслоения карточек при скролле
@@ -126,7 +52,7 @@ const ServiceCard = memo(function ServiceCard({
             </span>
 
             <div className="relative w-full sm:w-[280px] md:w-[320px] lg:w-[340px] xl:w-[380px] aspect-[4/5] rounded-[26px] sm:rounded-3xl overflow-hidden shadow-2xl border border-white/10 group shrink-0">
-              <Image
+              <SafeImage
                 src={service.image}
                 alt={service.alt}
                 fill
@@ -198,7 +124,16 @@ const ServiceCard = memo(function ServiceCard({
   );
 });
 
-function BaseServices() {
+interface ServicesProps {
+  initialData?: Partial<ServicesSectionData>;
+}
+
+function BaseServices({ initialData }: ServicesProps) {
+  const items =
+    initialData?.items && initialData.items.length > 0
+      ? initialData.items
+      : DEFAULT_SERVICES_DATA.items;
+
   return (
     <section id="services" className="w-full bg-[#F3EFE8] pt-16 sm:pt-24 pb-20 sm:pb-32">
       {/* ЗАГОЛОВОК СЕКЦИИ */}
@@ -208,7 +143,7 @@ function BaseServices() {
           Радиоточка / Спектр услуг
         </p>
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0A0A0A] tracking-tight leading-[1.15] mb-4">
-          Продвижение вашего бизнеса по всем направлениям в Балаково
+          {initialData?.title || "Продвижение вашего бизнеса по всем направлениям в Балаково"}
         </h2>
         <p className="text-base sm:text-lg text-[#555555] font-normal leading-relaxed max-w-2xl mx-auto">
           Радиоэфир, наружная реклама, собственная звуковая студия и полиграфия. Более 20 лет работаем с ведущими предпринимателями региона.
@@ -217,9 +152,9 @@ function BaseServices() {
 
       {/* КАСКАДНОЕ НАСЛОЕНИЕ КАРТОЧЕК ВО ВСЮ ШИРИНУ ЭКРАНА (100% WIDTH, БЕЗ MAX-W ОГРАНИЧЕНИЯ) */}
       <div className="w-full flex flex-col">
-        {SERVICES.map((service, index) => (
+        {items.map((service, index) => (
           <ServiceCard
-            key={service.id}
+            key={service.id || index}
             service={service}
             index={index}
           />
