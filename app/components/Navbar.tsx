@@ -2,20 +2,30 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
+import { usePathname } from "next/navigation";
+import Button from "./Button";
 
 const navLinks = [
   { label: "Главная", href: "/" },
-  { label: "Услуги", href: "#services" },
-  { label: "Кейсы", href: "#cases" },
-  { label: "О нас", href: "#about" },
-  { label: "Радиостанции", href: "#radio" },
-  { label: "Прайс", href: "#pricing" },
-  { label: "Контакты", href: "#contact" },
+  { label: "Услуги", href: "/#services" },
+  { label: "Процесс", href: "/#process" },
+  { label: "Кейсы", href: "/#work" },
+  { label: "О нас", href: "/about" },
+  { label: "Контакты", href: "/#contact" },
 ] as const;
 
-export default function Navbar() {
+function BaseNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const handleToggleMenu = useCallback(() => {
+    setIsMenuOpen((prev) => !prev);
+  }, []);
+
+  const handleCloseMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
 
   return (
     <nav className="w-full bg-[#F3EFE8] py-9 px-[20px] sm:px-[20px] lg:px-[30px] transition-all">
@@ -38,25 +48,28 @@ export default function Navbar() {
 
         {/* Центр: Утонченные ссылки на Google Font Onest (как на референсе Framer) */}
         <div className="hidden lg:flex items-center gap-7 xl:gap-7 text-[15px] xl:text-[16px] font-medium text-[#262626]">
-          {navLinks.map((link, idx) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`group relative overflow-hidden inline-flex ${
-                idx === 0 ? "font-semibold text-black" : "text-[#333333]"
-              }`}
-            >
-              <span className="relative inline-flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full">
-                {/* Первый (видимый) текст */}
-                <span className="block">{link.label}</span>
-                
-                {/* Второй текст, который выезжает снизу и красится в фиолетовый */}
-                <span className="absolute top-full left-0 block text-brand-purple" aria-hidden="true">
-                  {link.label}
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`group relative overflow-hidden inline-flex ${
+                  isActive ? "font-semibold text-black" : "text-[#333333]"
+                }`}
+              >
+                <span className="relative inline-flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full">
+                  {/* Первый (видимый) текст */}
+                  <span className="block">{link.label}</span>
+                  
+                  {/* Второй текст, который выезжает снизу и красится в фиолетовый */}
+                  <span className="absolute top-full left-0 block text-brand-purple" aria-hidden="true">
+                    {link.label}
+                  </span>
                 </span>
-              </span>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
           <div className="flex items-center gap-1.5 text-[#333333] cursor-pointer hover:text-black transition-colors">
             <span>Все разделы</span>
             <svg className="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
@@ -81,7 +94,7 @@ export default function Navbar() {
         {/* Гамбургер для мобильных */}
         <button
           type="button"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={handleToggleMenu}
           className="lg:hidden p-2 rounded-xl text-gray-800 hover:bg-black/5 transition-colors"
           aria-label="Открыть меню"
         >
@@ -103,7 +116,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              onClick={() => setIsMenuOpen(false)}
+              onClick={handleCloseMenu}
               className="px-3 py-2 text-base font-semibold text-gray-800 hover:bg-white/60 rounded-lg transition-colors"
             >
               {link.label}
@@ -120,3 +133,6 @@ export default function Navbar() {
     </nav>
   );
 }
+
+const Navbar = memo(BaseNavbar);
+export default Navbar;

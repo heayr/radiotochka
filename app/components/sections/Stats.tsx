@@ -17,7 +17,7 @@ const statsMetrics = [
 ] as const;
 
 const servicePills = [
-  { label: "Прямой эфир 104.7 & 98.4 FM", href: "#radio" },
+  { label: "Прямой эфир 104.7 & 98.4 FM", href: "#services" },
   { label: "Медиафасады и наружная реклама", href: "#services" },
   { label: "Аудио-продакшн за 24ч", href: "#services" },
   { label: "Широкоформатная печать", href: "#services" },

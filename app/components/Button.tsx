@@ -109,7 +109,7 @@ const BaseButton = forwardRef(function Button<E extends ElementType = "button">(
   const Component: ElementType = as || (isLink ? (href?.startsWith("http") || href?.startsWith("tel:") || href?.startsWith("mailto:") ? "a" : Link) : "button");
 
   const baseClasses = [
-    "flex items-center justify-center gap-2",
+    "inline-flex items-center justify-center gap-2",
     "font-medium",
     "transition-all duration-300 ease-in-out",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-pink focus-visible:ring-offset-2",
