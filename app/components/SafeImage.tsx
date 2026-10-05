@@ -28,9 +28,13 @@ function BaseSafeImage({
     );
   }
 
-  const isExternal = src.startsWith("http://") || src.startsWith("https://");
+  const isExternal =
+    src.startsWith("http://") ||
+    src.startsWith("https://") ||
+    src.startsWith("data:");
 
   if (isExternal) {
+    const isFill = (props as { fill?: boolean }).fill;
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
@@ -39,7 +43,7 @@ function BaseSafeImage({
         width={typeof width === "number" ? width : undefined}
         height={typeof height === "number" ? height : undefined}
         onError={handleError}
-        className={className}
+        className={`${className || ""} ${isFill ? "absolute inset-0 w-full h-full" : ""}`}
         style={{ objectFit: "cover" }}
       />
     );

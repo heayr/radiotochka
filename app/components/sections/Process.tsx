@@ -1,48 +1,15 @@
 "use client";
 
 import React, { memo, useRef, useEffect } from "react";
-import Image from "next/image";
-
-interface ProcessStep {
-  number: string;
-  title: string;
-  description: string;
-  imageSrc: string;
-}
-
-const STEPS: ProcessStep[] = [
-  {
-    number: "01",
-    title: "Исследование",
-    description:
-      "Анализируем аудиторию и рынок, находя самые конверсионные точки контакта.",
-    imageSrc: "/images/process/step-01.jpg",
-  },
-  {
-    number: "02",
-    title: "Медиаплан",
-    description:
-      "Подбираем прайм-тайм станций и экраны под ваш бюджет без лишних переплат.",
-    imageSrc: "/images/process/step-02.jpg",
-  },
-  {
-    number: "03",
-    title: "Продакшн",
-    description:
-      "Создаем цепляющий ролик с дикторами и запускаем эфир день в день.",
-    imageSrc: "/images/process/step-03.jpg",
-  },
-  {
-    number: "04",
-    title: "Аналитика",
-    description:
-      "Отслеживаем входящие звонки и масштабируем охват с прозрачными отчетами.",
-    imageSrc: "/images/process/step-04.jpg",
-  },
-];
+import SafeImage from "@/app/components/SafeImage";
+import {
+  DEFAULT_PROCESS_DATA,
+  type ProcessStepItem,
+  type ProcessSectionData,
+} from "@/types/site-content";
 
 interface ProcessCardProps {
-  step: ProcessStep;
+  step: ProcessStepItem;
   idx: number;
 }
 
@@ -51,7 +18,7 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
     <div className="group relative w-full h-[440px] sm:h-[470px] lg:h-[460px] xl:h-[480px] rounded-[24px] sm:rounded-[28px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform pointer-events-auto">
       {/* Фоновое атмосферное изображение без зума */}
       <div className="absolute inset-0 z-0">
-        <Image
+        <SafeImage
           src={step.imageSrc}
           alt={step.title}
           fill
@@ -94,7 +61,15 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
   );
 });
 
-function BaseProcess() {
+interface ProcessProps {
+  initialData?: Partial<ProcessSectionData>;
+}
+
+function BaseProcess({ initialData }: ProcessProps) {
+  const steps =
+    initialData?.items && initialData.items.length > 0
+      ? initialData.items
+      : DEFAULT_PROCESS_DATA.items;
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -203,7 +178,11 @@ function BaseProcess() {
         >
           <div>
             <h2 className="text-4xl sm:text-5xl lg:text-[54px] font-bold text-white tracking-[-0.03em] leading-[1.05]">
-              Наш<br />процесс
+              {initialData?.title ? (
+                initialData.title
+              ) : (
+                <>Наш<br />процесс</>
+              )}
             </h2>
           </div>
           <p className="text-white/60 text-sm sm:text-base lg:text-[15px] font-normal leading-relaxed max-w-md text-left md:text-right">
@@ -213,7 +192,7 @@ function BaseProcess() {
 
         {/* На мобильных устройствах: удобный горизонтальный скролл со snap */}
         <div className="w-full lg:hidden flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4">
-          {STEPS.map((step, idx) => (
+          {steps.map((step, idx) => (
             <div key={`mobile-step-${idx}`} className="w-[285px] sm:w-[320px] shrink-0 snap-center">
               <ProcessCard step={step} idx={idx} />
             </div>
@@ -225,37 +204,20 @@ function BaseProcess() {
           ref={listRef}
           className="hidden lg:block w-full relative z-20 h-[1840px] xl:h-[1920px]"
         >
-          {/* Слой 01: прилипает на top-[220px]/[245px], остается на месте пока остальные слои приплывают */}
-          <div className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none">
-            <ProcessCard step={STEPS[0]} idx={0} />
-            <div />
-            <div />
-            <div />
-          </div>
-
-          {/* Слой 02: приплывает снизу ровно через высоту карточки скролла и прилипает рядом с шагом 01 */}
-          <div className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none">
-            <div />
-            <ProcessCard step={STEPS[1]} idx={1} />
-            <div />
-            <div />
-          </div>
-
-          {/* Слой 03: приплывает снизу ровно через высоту карточки скролла и прилипает рядом с шагом 02 */}
-          <div className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none">
-            <div />
-            <div />
-            <ProcessCard step={STEPS[2]} idx={2} />
-            <div />
-          </div>
-
-          {/* Слой 04: приплывает снизу и замыкает 4-колоночный ряд; после чего весь блок дружно уходит наверх */}
-          <div className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none">
-            <div />
-            <div />
-            <div />
-            <ProcessCard step={STEPS[3]} idx={3} />
-          </div>
+          {steps.map((step, idx) => (
+            <div
+              key={`desktop-step-${idx}`}
+              className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none"
+            >
+              {Array.from({ length: 4 }).map((_, colIdx) =>
+                colIdx === idx ? (
+                  <ProcessCard key={`card-${idx}`} step={step} idx={idx} />
+                ) : (
+                  <div key={`empty-${colIdx}`} />
+                )
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </section>

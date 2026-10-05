@@ -1,11 +1,19 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { adminUpdateUserSchema, contentBlockSchema } from "@/lib/validations";
 import { createAuditLog } from "@/lib/audit";
 import { requireRole, requireAdmin } from "@/lib/auth-helpers";
 import * as userService from "@/lib/services/user.service";
 import * as contentService from "@/lib/services/content.service";
+import {
+  DEFAULT_SERVICES_DATA,
+  DEFAULT_WORK_DATA,
+  DEFAULT_PROCESS_DATA,
+  DEFAULT_STATS_DATA,
+  DEFAULT_MANIFESTO_DATA,
+} from "@/types/site-content";
 
 export async function getUsers(params: {
   page?: number;
@@ -92,10 +100,13 @@ export async function updateContentBlock(
 ) {
   const session = await requireAdmin();
 
-  const title = input.title || (input.content as Record<string, unknown>)?.title || "";
+  const title =
+    input.title ||
+    (input.content as Record<string, unknown>)?.title ||
+    slug;
   const validated = contentBlockSchema.safeParse({
     slug,
-    title,
+    title: String(title),
     content: input.content,
     status: input.status,
   });
@@ -103,27 +114,71 @@ export async function updateContentBlock(
     return { error: validated.error.errors[0]?.message || "Ошибка валидации" };
   }
 
-  const existingBlock = await contentService.getContentBlock(slug);
-  if (!existingBlock) return { error: "Блок не найден" };
+  const updatedBlock = await contentService.upsertContentBlock({
+    slug,
+    title: validated.data.title,
+    content: (validated.data.content as Record<string, unknown>) || {},
+    status: (validated.data.status as string) || "published",
+  });
 
-  const data: Record<string, unknown> = {};
-  if (validated.data.title !== undefined) data.title = validated.data.title;
-  if (validated.data.content !== undefined)
-    data.content = validated.data.content;
-  if (validated.data.status !== undefined) data.status = validated.data.status;
-  data.version = existingBlock.version + 1;
-
-  await contentService.updateContentBlock(slug, data as { version: number });
+  revalidatePath("/");
+  revalidatePath("/admin/content");
 
   await createAuditLog({
     userId: session.user.id,
     action: "content_update",
     entity: "content",
-    entityId: existingBlock.id,
-    metadata: { slug, version: data.version },
+    entityId: updatedBlock.id,
+    metadata: { slug, version: updatedBlock.version },
   });
 
-  return { success: true, message: "Контент обновлён" };
+  return { success: true, message: "Контент обновлён на сайте в реальном времени" };
+}
+
+export async function seedDefaultContentBlocks() {
+  await requireAdmin();
+
+  const blocksToSeed = [
+    {
+      slug: "services",
+      title: "Услуги (Services Stacking Cards)",
+      content: DEFAULT_SERVICES_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
+      slug: "work",
+      title: "Кейсы и Проекты (Work)",
+      content: DEFAULT_WORK_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
+      slug: "process",
+      title: "Этапы работы (Process)",
+      content: DEFAULT_PROCESS_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
+      slug: "stats",
+      title: "Цифры и фото студии (Stats)",
+      content: DEFAULT_STATS_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
+      slug: "manifesto",
+      title: "Манифест агентства (Manifesto)",
+      content: DEFAULT_MANIFESTO_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+  ];
+
+  for (const block of blocksToSeed) {
+    await contentService.upsertContentBlock(block);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin/content");
+
+  return { success: true, message: "Все карточки и фото успешно инициализированы в базе данных!" };
 }
 
 export async function createContentBlock(input: {

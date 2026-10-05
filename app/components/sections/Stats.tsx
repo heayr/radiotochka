@@ -1,29 +1,30 @@
 import React, { memo } from "react";
-import Image from "next/image";
+import SafeImage from "@/app/components/SafeImage";
+import {
+  DEFAULT_STATS_DATA,
+  type StatsSectionData,
+} from "@/types/site-content";
 
-const statsMetrics = [
-  {
-    value: "20+",
-    label: "Лет успешной работы в Балаково",
-  },
-  {
-    value: "80 000+",
-    label: "Слушателей ежедневно в регионе",
-  },
-  {
-    value: "100%",
-    label: "Прямой эфирный пул без наценок",
-  },
-] as const;
+interface StatsProps {
+  initialData?: Partial<StatsSectionData>;
+}
 
-const servicePills = [
-  { label: "Прямой эфир 104.7 & 98.4 FM", href: "#services" },
-  { label: "Медиафасады и наружная реклама", href: "#services" },
-  { label: "Аудио-продакшн за 24ч", href: "#services" },
-  { label: "Широкоформатная печать", href: "#services" },
-] as const;
+function BaseStats({ initialData }: StatsProps) {
+  const metrics =
+    initialData?.metrics && initialData.metrics.length > 0
+      ? initialData.metrics
+      : DEFAULT_STATS_DATA.metrics;
 
-function BaseStats() {
+  const pills =
+    initialData?.pills && initialData.pills.length > 0
+      ? initialData.pills
+      : DEFAULT_STATS_DATA.pills;
+
+  const desktopBanner =
+    initialData?.desktopBanner || DEFAULT_STATS_DATA.desktopBanner;
+  const mobileBanner =
+    initialData?.mobileBanner || DEFAULT_STATS_DATA.mobileBanner;
+
   return (
     <section
       id="stats"
@@ -33,8 +34,8 @@ function BaseStats() {
       <div className="absolute inset-0 z-0 pointer-events-none select-none">
         {/* Мобильная версия (9:16) */}
         <div className="block md:hidden relative w-full h-full">
-          <Image
-            src="/images/stats-banner-mobile.jpg"
+          <SafeImage
+            src={mobileBanner}
             alt="Студия прямого эфира Радиоточка"
             fill
             sizes="100vw"
@@ -47,13 +48,12 @@ function BaseStats() {
 
         {/* Десктоп / Планшет (16:9) */}
         <div className="hidden md:block relative w-full h-full">
-          <Image
-            src="/images/stats-banner-desktop.jpg"
+          <SafeImage
+            src={desktopBanner}
             alt="Профессиональная вещательная студия Радиоточка"
             fill
             sizes="100vw"
             priority
-            quality={92}
             className="object-cover object-center"
           />
           {/* Деликатный градиент слева под текст оффера, не глушащий яркость студии */}
@@ -61,10 +61,10 @@ function BaseStats() {
         </div>
       </div>
 
-      {/* Верхний блок: Метрики агентства (оригинальный изящный шрифт, без разделителя) */}
+      {/* Верхний блок: Метрики агентства */}
       <div className="relative z-10 w-full grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 pb-6 sm:pb-8">
-        {statsMetrics.map((metric) => (
-          <div key={metric.value} className="flex flex-col">
+        {metrics.map((metric, idx) => (
+          <div key={metric.value || idx} className="flex flex-col">
             <span className="font-sans text-xl sm:text-[22px] font-semibold text-white mb-1 leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
               {metric.value}
             </span>
@@ -107,9 +107,9 @@ function BaseStats() {
 
         {/* Справа: Капсульные пилюли направлений агентства (без стрелочек) */}
         <div className="lg:col-span-5 flex flex-col items-start lg:items-end gap-2.5 sm:gap-3">
-          {servicePills.map((pill) => (
+          {pills.map((pill, idx) => (
             <a
-              key={pill.label}
+              key={pill.label || idx}
               href={pill.href}
               className="inline-flex items-center px-5 py-2.5 rounded-full bg-black/40 hover:bg-brand-purple/50 border border-white/20 hover:border-white/40 text-white font-medium text-xs sm:text-sm backdrop-blur-md shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >

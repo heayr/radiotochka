@@ -1,187 +1,326 @@
 "use client";
 
-import { useState } from "react";
-import SafeImage from "@/app/components/SafeImage";
+import React, { useState } from "react";
 import Button from "@/app/components/Button";
 import { EditorFormFooter } from "@/app/components/ui/EditorFormFooter";
 import type { EditorProps } from "./editor-types";
+import { ImageField } from "./ImageField";
+import {
+  DEFAULT_SERVICES_DATA,
+  type ServiceCardItem,
+  type ServiceBottomCard,
+  type ServicesSectionData,
+} from "@/types/site-content";
 
-interface ServiceItem {
-  title: string;
-  description?: string;
-  imageSrc: string;
-  bgColor: string;
-  textColor: string;
-}
+const PRESET_SERVICE_IMAGES = [
+  { label: "Радио студия", src: "/images/services/service-01-radio-real.jpg" },
+  { label: "Билборд", src: "/images/services/service-02-billboard.jpg" },
+  { label: "Аудиопродакшн", src: "/images/services/service-03-audio-real.jpg" },
+];
 
 export function ServicesEditor({ block, onSave, onCancel }: EditorProps) {
-  const content = block.content as Record<string, unknown>;
-  const [title, setTitle] = useState(
-    (content.title as string) || "Наши услуги",
+  const content = (block.content || {}) as Partial<ServicesSectionData>;
+
+  const [title, setTitle] = useState(content.title || DEFAULT_SERVICES_DATA.title || "Наши услуги");
+  const [items, setItems] = useState<ServiceCardItem[]>(
+    content.items && content.items.length > 0
+      ? content.items
+      : DEFAULT_SERVICES_DATA.items
   );
-  const [items, setItems] = useState<ServiceItem[]>(
-    (content.items as ServiceItem[]) || [],
+  const [bottomCards, setBottomCards] = useState<ServiceBottomCard[]>(
+    content.bottomCards && content.bottomCards.length > 0
+      ? content.bottomCards
+      : DEFAULT_SERVICES_DATA.bottomCards
   );
+
   const [isLoading, setIsLoading] = useState(false);
 
-  const defaultItems: ServiceItem[] = [
-    {
-      title: "Полиграфия",
-      imageSrc: "/images/web-search-with-elements 2.svg",
-      bgColor: "bg-default-grey",
-      textColor: "text-black",
-      description: "",
-    },
-    {
-      title: "Создание Контента",
-      imageSrc: "/images/content.svg",
-      bgColor: "bg-default-lime",
-      textColor: "text-white",
-      description: "",
-    },
-    {
-      title: "Наружная Реклама",
-      imageSrc: "/images/smm.svg",
-      bgColor: "bg-black",
-      textColor: "text-default-grey",
-      description: "",
-    },
-    {
-      title: "Радио",
-      imageSrc: "/images/main-illustration.svg",
-      bgColor: "bg-default-grey",
-      textColor: "text-black",
-      description: "",
-    },
-  ];
-
-  const updateItem = (idx: number, field: keyof ServiceItem, value: string) => {
+  // Обновление отдельной карточки услуги
+  const updateItem = <K extends keyof ServiceCardItem>(
+    index: number,
+    field: K,
+    val: ServiceCardItem[K]
+  ) => {
     setItems((prev) =>
-      prev.map((item, i) => (i === idx ? { ...item, [field]: value } : item)),
+      prev.map((item, i) => (i === index ? { ...item, [field]: val } : item))
     );
   };
 
-  const addItem = () =>
+  // Теги услуги
+  const updateTags = (index: number, tagsText: string) => {
+    const split = tagsText.split("\n").filter((t) => t.trim().length > 0);
+    updateItem(index, "tags", split);
+  };
+
+  // Добавление новой карточки услуги
+  const handleAddItem = () => {
+    const nextNum = String(items.length + 1).padStart(2, "0");
     setItems((prev) => [
       ...prev,
-      { title: "", description: "", imageSrc: "", bgColor: "", textColor: "" },
+      {
+        id: nextNum,
+        category: "Новая категория",
+        title: "Заголовок новой услуги",
+        statNumber: "№1",
+        statLabel: "показатель",
+        description: "Подробное описание условий и возможностей услуги...",
+        tags: ["Пункт 1", "Пункт 2", "Пункт 3"],
+        image: "/images/services/service-01-radio-real.jpg",
+        alt: "Иллюстрация услуги",
+      },
     ]);
-  const removeItem = (idx: number) =>
-    setItems((prev) => prev.filter((_, i) => i !== idx));
+  };
 
-  const resetItem = (idx: number) => {
-    const def = defaultItems[idx];
-    if (!def) return;
-    setItems((prev) =>
-      prev.map((item, i) =>
-        i === idx
-          ? {
-              title: def.title,
-              imageSrc: def.imageSrc,
-              bgColor: def.bgColor,
-              textColor: def.textColor,
-              description: item.description,
-            }
-          : item,
-      ),
+  // Удаление карточки
+  const handleRemoveItem = (index: number) => {
+    setItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Обновление нижней карточки
+  const updateBottomCard = (
+    index: number,
+    field: keyof ServiceBottomCard,
+    val: string
+  ) => {
+    setBottomCards((prev) =>
+      prev.map((c, i) => (i === index ? { ...c, [field]: val } : c))
     );
   };
 
-  const resetAll = () => {
-    setItems(
-      defaultItems.map((it) => ({
-        title: it.title,
-        imageSrc: it.imageSrc,
-        bgColor: it.bgColor,
-        textColor: it.textColor,
-      })),
-    );
+  // Сброс к дефолту
+  const handleResetToDefault = () => {
+    if (confirm("Сбросить все карточки услуг к изначальному дизайну?")) {
+      setTitle(DEFAULT_SERVICES_DATA.title || "Наши услуги");
+      setItems(DEFAULT_SERVICES_DATA.items);
+      setBottomCards(DEFAULT_SERVICES_DATA.bottomCards);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await onSave({ title, items });
+    await onSave({
+      title,
+      items,
+      bottomCards,
+    });
     setIsLoading(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Заголовок
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Главный заголовок секции */}
+      <div className="bg-gray-50 border border-gray-200 p-5 rounded-2xl">
+        <label className="block text-sm font-semibold text-gray-800 mb-1.5">
+          Заголовок секции услуг
         </label>
         <input
+          type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-4 py-2 border rounded-xl"
+          className="w-full px-4 py-2.5 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#ea5670]/40 focus:border-[#ea5670]"
+          placeholder="Наши услуги"
         />
       </div>
-      <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-xl text-sm">
-        <p className="font-medium mb-1">Рекомендации по изображениям услуг:</p>
-        <p>
-          Размер: 120×94 px. Формат: WebP (приоритет), SVG, PNG. Оптимизируйте
-          вес до ~15 КБ.
-        </p>
-      </div>
-      {items.map((item, idx) => (
-        <div key={idx} className="border p-4 rounded-xl space-y-2">
-          <input
-            value={item.title}
-            onChange={(e) => updateItem(idx, "title", e.target.value)}
-            placeholder="Название"
-            className="w-full px-4 py-2 border rounded-xl"
-          />
-          <textarea
-            value={item.description}
-            onChange={(e) => updateItem(idx, "description", e.target.value)}
-            placeholder="Описание"
-            className="w-full px-4 py-2 border rounded-xl"
-          />
-          <div className="flex items-center gap-4">
-            <SafeImage
-              src={item.imageSrc}
-              alt={item.title}
-              width={120}
-              height={94}
-              className="flex-shrink-0 rounded border bg-gray-50"
-            />
-            <input
-              value={item.imageSrc}
-              onChange={(e) => updateItem(idx, "imageSrc", e.target.value)}
-              placeholder="/images/... или https://..."
-              className="flex-1 px-4 py-2 border rounded-xl"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => resetItem(idx)}
-            >
-              Сбросить к дефолту
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => removeItem(idx)}
-            >
-              Удалить
-            </Button>
-          </div>
+
+      {/* 3 Большие каскадные карточки (Stacking Cards) */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-lg font-bold text-gray-900">
+            Основные карточки услуг ({items.length})
+          </h4>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAddItem}
+          >
+            + Добавить карточку
+          </Button>
         </div>
-      ))}
-      <div className="flex gap-2">
-        <Button type="button" variant="outline" size="sm" onClick={addItem}>
-          + Добавить услугу
-        </Button>
-        <Button type="button" variant="outline" size="sm" onClick={resetAll}>
-          Сбросить все к дефолту
-        </Button>
+
+        <div className="space-y-6">
+          {items.map((item, idx) => (
+            <div
+              key={idx}
+              className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm space-y-4"
+            >
+              <div className="flex items-center justify-between border-b pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-[#ea5670] text-white font-bold flex items-center justify-center text-sm">
+                    {item.id || idx + 1}
+                  </span>
+                  <span className="font-bold text-gray-800 text-base">
+                    Карточка #{idx + 1}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveItem(idx)}
+                  className="text-sm text-red-500 hover:text-red-700 font-medium"
+                >
+                  Удалить карточку
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    Категория (надзаголовок)
+                  </label>
+                  <input
+                    type="text"
+                    value={item.category}
+                    onChange={(e) => updateItem(idx, "category", e.target.value)}
+                    className="w-full px-3 py-2 border rounded-xl text-sm"
+                    placeholder="Радиоресурсы и прямой эфир"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    Заголовок услуги
+                  </label>
+                  <input
+                    type="text"
+                    value={item.title}
+                    onChange={(e) => updateItem(idx, "title", e.target.value)}
+                    className="w-full px-3 py-2 border rounded-xl text-sm font-semibold"
+                    placeholder="Реклама на «Дорожном радио»"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    Главная цифра / Статус
+                  </label>
+                  <input
+                    type="text"
+                    value={item.statNumber}
+                    onChange={(e) => updateItem(idx, "statNumber", e.target.value)}
+                    className="w-full px-3 py-2 border rounded-xl text-sm"
+                    placeholder="№1 в Балаково"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    Подпись к цифре
+                  </label>
+                  <input
+                    type="text"
+                    value={item.statLabel}
+                    onChange={(e) => updateItem(idx, "statLabel", e.target.value)}
+                    className="w-full px-3 py-2 border rounded-xl text-sm"
+                    placeholder="эксклюзивный представитель"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Подробное описание
+                </label>
+                <textarea
+                  rows={3}
+                  value={item.description}
+                  onChange={(e) => updateItem(idx, "description", e.target.value)}
+                  className="w-full px-3 py-2 border rounded-xl text-sm leading-relaxed"
+                  placeholder="Официальный представитель..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Теги преимуществ (каждый тег с новой строки)
+                </label>
+                <textarea
+                  rows={3}
+                  value={item.tags.join("\n")}
+                  onChange={(e) => updateTags(idx, e.target.value)}
+                  className="w-full px-3 py-2 border rounded-xl text-sm font-mono"
+                  placeholder="Дорожное радио&#10;Прямой эфир&#10;Эксклюзивные условия"
+                />
+              </div>
+
+              {/* Поле фотографии карточки */}
+              <div className="pt-2">
+                <ImageField
+                  label="Фотография карточки"
+                  value={item.image}
+                  onChange={(val) => updateItem(idx, "image", val)}
+                  presetImages={PRESET_SERVICE_IMAGES}
+                  hint="Поддерживаются URL (https://...), локальные пути (/images/...) и прямая загрузка файла."
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Alt-текст для фото
+                </label>
+                <input
+                  type="text"
+                  value={item.alt}
+                  onChange={(e) => updateItem(idx, "alt", e.target.value)}
+                  className="w-full px-3 py-2 border rounded-xl text-sm"
+                  placeholder="Профессиональная студия прямого радиоэфира"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-      <EditorFormFooter isLoading={isLoading} onCancel={onCancel} />
+
+      {/* 3 Нижние карточки преимуществ */}
+      <div className="space-y-4 pt-4 border-t">
+        <h4 className="text-lg font-bold text-gray-900">
+          3 Нижние карточки преимуществ
+        </h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {bottomCards.map((card, idx) => (
+            <div
+              key={idx}
+              className="bg-[#F8F5EE] border border-[#E5DFD5] p-4 rounded-xl space-y-2.5"
+            >
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Нижняя карточка #{idx + 1}
+              </span>
+              <input
+                type="text"
+                value={card.title}
+                onChange={(e) => updateBottomCard(idx, "title", e.target.value)}
+                className="w-full px-3 py-1.5 border rounded-lg text-sm font-bold bg-white"
+                placeholder="Заголовок"
+              />
+              <textarea
+                rows={2}
+                value={card.description}
+                onChange={(e) =>
+                  updateBottomCard(idx, "description", e.target.value)
+                }
+                className="w-full px-3 py-1.5 border rounded-lg text-xs leading-relaxed bg-white"
+                placeholder="Описание"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-4 border-t">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleResetToDefault}
+        >
+          Вернуть дизайн по умолчанию
+        </Button>
+
+        <EditorFormFooter isLoading={isLoading} onCancel={onCancel} />
+      </div>
     </form>
   );
 }
