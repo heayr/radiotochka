@@ -65,9 +65,9 @@ const WorkCard = memo(function WorkCard({
                   Услуги:
                 </span>
                 <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
-                  {project.services.map((service) => (
+                  {(Array.isArray(project.services) ? project.services : []).map((service, sIdx) => (
                     <span
-                      key={service}
+                      key={`${service}-${sIdx}`}
                       className="px-3.5 py-1.5 rounded-full bg-[#EAE0CF]/50 text-[#0A0A0A] text-xs font-semibold border border-[#D4C8B5]/60"
                     >
                       {service}
@@ -105,7 +105,7 @@ const WorkCard = memo(function WorkCard({
           <div className="w-full lg:w-1/2">
             <div className="relative w-full aspect-[1184/1080] rounded-[20px] sm:rounded-[24px] overflow-hidden border border-black/5 bg-[#EFECE6] group">
               <SafeImage
-                src={project.imageSrc}
+                src={project.imageSrc || (project as any).image || "/images/work/project-01.png"}
                 alt={project.title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 580px"
@@ -126,10 +126,18 @@ interface WorkProps {
 }
 
 export default function Work({ initialData }: WorkProps) {
-  const items =
-    initialData?.items && initialData.items.length > 0
+  const rawItems =
+    initialData?.items && Array.isArray(initialData.items) && initialData.items.length > 0
       ? initialData.items
-      : DEFAULT_WORK_DATA.items;
+      : [];
+
+  const isCompatible =
+    rawItems.length > 0 &&
+    rawItems.some(
+      (p) => p.client || (Array.isArray(p.services) && p.services.length > 0)
+    );
+
+  const items = isCompatible ? rawItems : DEFAULT_WORK_DATA.items;
 
   return (
     <section id="work" className="w-full bg-[#F3EFE8] py-20 sm:py-28 px-4 sm:px-8 lg:px-12">
@@ -152,7 +160,15 @@ export default function Work({ initialData }: WorkProps) {
         {/* Стек карточек проектов с наслоением при скролле */}
         <div className="flex flex-col gap-12 sm:gap-16 pb-16">
           {items.map((project, index) => (
-            <WorkCard key={project.id || index} project={project} index={index} />
+            <WorkCard
+              key={project.id || index}
+              project={{
+                ...project,
+                services: Array.isArray(project.services) ? project.services : [],
+                imageSrc: project.imageSrc || (project as any).image || "/images/work/project-01.png",
+              }}
+              index={index}
+            />
           ))}
         </div>
 
