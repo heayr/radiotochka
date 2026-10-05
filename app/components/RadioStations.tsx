@@ -46,7 +46,7 @@ const REGIONAL_CITIES = [
 
 export default function RadioStations() {
   return (
-    <section className="mt-fluid-section" id="radio">
+    <section className="pt-12 sm:pt-16 lg:pt-20" id="radio">
       <SectionHeader
         title="Радиовещание"
         subtitle="Мы официальный и эксклюзивный представитель федеральных радиостанций в г. Балаково с прямым эфирным пулом."

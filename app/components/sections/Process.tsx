@@ -44,6 +44,7 @@ const STEPS: ProcessStep[] = [
 function BaseProcess() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const headerRef = useRef<HTMLDivElement>(null);
   const cardsTrackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,41 +54,51 @@ function BaseProcess() {
     let rafId: number | null = null;
     let isIntersecting = false;
 
-    // Скролл-анимация каскадного выплывания и перекрытия текста (десктоп >= 1024px)
+    // Скролл-анимация: каскадное появление карточек + наплыв карточек на текст (десктоп >= 1024px)
     const updateParallax = () => {
       if (window.innerWidth < 1024) {
         // На мобильных устройствах все карточки открыты для удобного свайпа
+        if (cardsTrackRef.current) {
+          cardsTrackRef.current.style.transform = "none";
+        }
         cardsRef.current.forEach((el) => {
           if (el) {
             el.style.transform = "none";
             el.style.opacity = "1";
           }
         });
-        if (cardsTrackRef.current) {
-          cardsTrackRef.current.style.transform = "none";
+        if (headerRef.current) {
+          headerRef.current.style.transform = "none";
+          headerRef.current.style.opacity = "1";
         }
         return;
       }
 
       const rect = section.getBoundingClientRect();
-      const totalScrollable = rect.height - window.innerHeight;
+      const stickyDiv = section.firstElementChild as HTMLElement | null;
+      const stickyHeight = stickyDiv ? stickyDiv.offsetHeight : 500;
+      const stickyTop = 50;
+      const totalScrollable = Math.max(1, rect.height - stickyHeight - stickyTop - 48);
       if (totalScrollable <= 0) return;
 
-      // Нормализованный прогресс скролла внутри секции [0, 1]
+      // Нормализованный прогресс скролла внутри диапазона прилипания [0, 1]
       const progress = Math.max(0, Math.min(1, -rect.top / totalScrollable));
 
-      // Каскадные диапазоны появления:
-      // Карточка 01 видна сразу на месте
-      // Карточки 02, 03, 04 изначально полностью скрыты (opacity 0, сдвинуты вниз на 650px)
-      // Карточка 02 поднимается между 0.08 и 0.32
-      // Карточка 03 поднимается между 0.32 и 0.56
-      // Карточка 04 поднимается между 0.56 и 0.80
+      // Расчет высоты шапки для аккуратного наплыва
+      const headerHeight = headerRef.current ? headerRef.current.offsetHeight : 140;
+      const initialTrackOffset = Math.max(140, headerHeight + 24);
+
+      // Фаза 1: Каскадное выплывание карточек 02, 03, 04 снизу экрана
+      // Карточка 01 зафиксирована на месте под шапкой
+      // Карточки 02, 03, 04 поднимаются по очереди из-за нижнего края
       const cardRanges = [
         { start: 0, end: 0.05 },
-        { start: 0.08, end: 0.32 },
-        { start: 0.32, end: 0.56 },
-        { start: 0.56, end: 0.80 },
+        { start: 0.08, end: 0.28 },
+        { start: 0.26, end: 0.48 },
+        { start: 0.46, end: 0.68 },
       ];
+
+      const startOffset = 550; // Сдвиг вниз за нижний край экрана
 
       cardsRef.current.forEach((el, index) => {
         if (!el) return;
@@ -110,7 +121,6 @@ function BaseProcess() {
 
         // Плавная кубическая функция смягчения (ease-out cubic)
         const ease = 1 - Math.pow(1 - p, 3);
-        const startOffset = 650; // Сдвиг далеко вниз под экран
         const translateY = (1 - ease) * startOffset;
         const opacity = Math.min(1, p * 1.8);
 
@@ -118,15 +128,34 @@ function BaseProcess() {
         el.style.opacity = opacity.toFixed(3);
       });
 
-      // Фаза 5 (progress 0.80 -> 1.0): карточки поднимаются вверх и полностью перекрывают заголовок и текст
+      // Фаза 2: Когда все карточки собрались в ряд (progress >= 0.70),
+      // весь трек с карточками поднимается вверх, наплывая на текст и перекрывая его
+      const liftStart = 0.72;
+      const liftEnd = 0.94;
+      let liftP = 0;
+
+      if (progress >= liftEnd) {
+        liftP = 1;
+      } else if (progress <= liftStart) {
+        liftP = 0;
+      } else {
+        liftP = (progress - liftStart) / (liftEnd - liftStart);
+      }
+
+      const liftEase = 1 - Math.pow(1 - liftP, 3);
+      const currentTrackY = (1 - liftEase) * initialTrackOffset;
+
       if (cardsTrackRef.current) {
-        if (progress > 0.80) {
-          const overlapProgress = (progress - 0.80) / 0.20;
-          const easeOverlap = Math.pow(overlapProgress, 1.6);
-          const trackTranslateY = -easeOverlap * 240; // Сдвиг всего ряда вверх на заголовок
-          cardsTrackRef.current.style.transform = `translate3d(0, ${trackTranslateY.toFixed(1)}px, 0)`;
+        cardsTrackRef.current.style.transform = `translate3d(0, ${currentTrackY.toFixed(1)}px, 0)`;
+      }
+
+      // Текст шапки мягко растворяется по мере наплыва карточек
+      if (headerRef.current) {
+        if (liftP > 0) {
+          const headerFade = Math.max(0, 1 - liftP * 1.4);
+          headerRef.current.style.opacity = headerFade.toFixed(3);
         } else {
-          cardsTrackRef.current.style.transform = "translate3d(0, 0px, 0)";
+          headerRef.current.style.opacity = "1";
         }
       }
     };
@@ -178,14 +207,17 @@ function BaseProcess() {
       ref={sectionRef}
       id="process"
       aria-label="Наш процесс работы"
-      className="relative w-full bg-[#0A0A0A] text-white lg:min-h-[290vh]"
+      className="relative w-full bg-[#0A0A0A] text-white pt-8 sm:pt-10 lg:pt-12 pb-10 sm:pb-12 lg:min-h-[250vh]"
     >
-      {/* Закрепленный экран со сценой процесса на десктопе */}
-      <div className="lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-col lg:justify-center px-[20px] sm:px-[30px] lg:px-[60px] py-12 lg:py-10 overflow-hidden">
-        {/* Заголовок в 2 строчки и описание в нижнем слое (z-10), который перекрывается карточками */}
-        <div className="relative z-10 w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 lg:mb-10 pointer-events-none select-none">
+      {/* Закрепленный контейнер сцены на десктопе с точным отступом сверху */}
+      <div className="w-full px-[20px] sm:px-[30px] lg:px-[60px] lg:sticky lg:top-[50px] relative overflow-hidden lg:overflow-visible">
+        {/* Заголовок в 2 строчки и описание: на десктопе позиционирован абсолютно, чтобы карточки могли наплыть на него */}
+        <div
+          ref={headerRef}
+          className="relative lg:absolute lg:top-0 lg:left-[60px] lg:right-[60px] z-10 w-full lg:w-auto flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6 lg:mb-0 pointer-events-none select-none transition-opacity duration-200 will-change-transform"
+        >
           <div>
-            <h2 className="text-5xl sm:text-6xl lg:text-[72px] font-bold text-white tracking-[-0.03em] leading-[1.05]">
+            <h2 className="text-4xl sm:text-5xl lg:text-[56px] font-bold text-white tracking-[-0.03em] leading-[1.05]">
               Наш<br />процесс
             </h2>
           </div>
@@ -194,19 +226,16 @@ function BaseProcess() {
           </p>
         </div>
 
-        {/* Сетка карточек в верхнем слое (z-20), выплывающих снизу и наезжающих на заголовок */}
-        <div
-          ref={cardsTrackRef}
-          className="relative z-20 w-full transition-transform duration-75 will-change-transform"
-        >
-          <div className="flex lg:grid lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 overflow-x-auto lg:overflow-visible no-scrollbar snap-x snap-mandatory pb-4 lg:pb-0">
+        {/* Трек карточек: z-20 поверх текста, поднимается вверх на финальной фазе */}
+        <div ref={cardsTrackRef} className="relative z-20 w-full will-change-transform">
+          <div className="flex lg:grid lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 overflow-x-auto lg:overflow-visible no-scrollbar snap-x snap-mandatory pb-2 lg:pb-0">
             {STEPS.map((step, idx) => (
               <div
                 key={`process-step-${idx}`}
                 ref={(el) => {
                   cardsRef.current[idx] = el;
                 }}
-                className="group relative flex-shrink-0 w-[285px] sm:w-[320px] lg:w-auto h-[460px] sm:h-[480px] lg:h-[490px] xl:h-[510px] rounded-[24px] sm:rounded-[28px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out snap-center cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] will-change-transform bg-[#111111]"
+                className="group relative flex-shrink-0 w-[285px] sm:w-[320px] lg:w-auto h-[480px] xl:h-[500px] rounded-[24px] sm:rounded-[28px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out snap-center cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] will-change-transform bg-[#111111]"
               >
                 {/* Фоновое атмосферное изображение */}
                 <div className="absolute inset-0 z-0">
