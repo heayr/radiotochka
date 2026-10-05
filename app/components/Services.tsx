@@ -108,9 +108,9 @@ const ServiceCard = memo(function ServiceCard({
 
             {/* 3 КРУПНЫЕ СВЕТЛО-БЕЖЕВЫЕ КАРТОЧКИ В РЯД (ТОЧНО КАК В РЕФЕРЕНСЕ) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full mt-auto pt-2">
-              {service.tags.map((tag) => (
+              {(Array.isArray(service.tags) ? service.tags : []).map((tag, tagIdx) => (
                 <div
-                  key={tag}
+                  key={`${tag}-${tagIdx}`}
                   className="bg-[#F0ECE4] text-[#0A0A0A] font-bold text-sm sm:text-base p-5 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm min-h-[110px] sm:min-h-[125px] flex items-center justify-start text-left whitespace-pre-line leading-snug transition-transform hover:scale-[1.02]"
                 >
                   {tag}
@@ -129,10 +129,19 @@ interface ServicesProps {
 }
 
 function BaseServices({ initialData }: ServicesProps) {
-  const items =
-    initialData?.items && initialData.items.length > 0
+  const rawItems =
+    initialData?.items && Array.isArray(initialData.items) && initialData.items.length > 0
       ? initialData.items
-      : DEFAULT_SERVICES_DATA.items;
+      : [];
+
+  // Защита от старых записей в БД без полей tags/statNumber
+  const isCompatible =
+    rawItems.length > 0 &&
+    rawItems.some(
+      (it) => it.statNumber || (Array.isArray(it.tags) && it.tags.length > 0)
+    );
+
+  const items = isCompatible ? rawItems : DEFAULT_SERVICES_DATA.items;
 
   return (
     <section id="services" className="w-full bg-[#F3EFE8] pt-16 sm:pt-24 pb-20 sm:pb-32">
@@ -155,7 +164,11 @@ function BaseServices({ initialData }: ServicesProps) {
         {items.map((service, index) => (
           <ServiceCard
             key={service.id || index}
-            service={service}
+            service={{
+              ...service,
+              image: service.image || (service as any).imageSrc || "/images/services/service-01-radio-real.jpg",
+              tags: Array.isArray(service.tags) ? service.tags : [],
+            }}
             index={index}
           />
         ))}
