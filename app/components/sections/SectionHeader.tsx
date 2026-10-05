@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 
 interface SectionHeaderProps {
@@ -15,14 +16,14 @@ interface SectionHeaderProps {
  * Reusable section header with lime-highlighted title and optional subtitle.
  * Eliminates duplicated header markup across Cases, Services, ContactForm.
  */
-export function SectionHeader({
+export const SectionHeader = memo(function SectionHeader({
   title,
   subtitle,
   href,
   className = "",
 }: SectionHeaderProps) {
   const titleElement = (
-    <h2 className="text-fluid-h2 font-bold bg-default-lime px-4 py-2 rounded-md">
+    <h2 className="text-fluid-h2 font-bold bg-gradient-to-r from-brand-pink to-brand-purple text-white px-4 py-2 rounded-xl inline-block shadow-sm">
       {title}
     </h2>
   );
@@ -43,4 +44,4 @@ export function SectionHeader({
       </div>
     </div>
   );
-}
+});

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import Image, { type ImageProps } from "next/image";
 
-export default function SafeImage({
+function BaseSafeImage({
   src,
   alt,
   className,
@@ -12,6 +12,10 @@ export default function SafeImage({
   ...props
 }: ImageProps & { src: string }) {
   const [error, setError] = useState(false);
+
+  const handleError = useCallback(() => {
+    setError(true);
+  }, []);
 
   if (error || !src) {
     return (
@@ -34,7 +38,7 @@ export default function SafeImage({
         alt={alt || ""}
         width={typeof width === "number" ? width : undefined}
         height={typeof height === "number" ? height : undefined}
-        onError={() => setError(true)}
+        onError={handleError}
         className={className}
         style={{ objectFit: "cover" }}
       />
@@ -47,8 +51,12 @@ export default function SafeImage({
       alt={alt || ""}
       width={width}
       height={height}
-      onError={() => setError(true)}
+      onError={handleError}
       className={className}
+      {...props}
     />
   );
 }
+
+const SafeImage = memo(BaseSafeImage);
+export default SafeImage;

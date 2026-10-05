@@ -17,7 +17,7 @@ export default function PersonalDataConsentPage() {
   return (
     <section className="mt-fluid-section pb-16">
       <div className="max-w-container mx-auto">
-        <h1 className="text-fluid-h1 font-bold bg-default-lime inline-block px-4 py-2 rounded-md mb-8">
+        <h1 className="text-fluid-h1 font-bold bg-gradient-to-r from-brand-pink to-brand-purple text-white inline-block px-4 py-2 rounded-xl mb-8 shadow-sm">
           Согласие на обработку персональных данных
         </h1>
 

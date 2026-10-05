@@ -27,7 +27,7 @@ export default async function Proposal() {
             <p className="text-fluid-lg mb-8">{description}</p>
             <Link
               href="#consultation"
-              className="inline-block text-white bg-black text-lg sm:text-xl px-6 py-4 rounded-xl transition duration-300 hover:bg-default-lime hover:text-black hover:border-default-lime"
+              className="inline-block text-white bg-black text-lg sm:text-xl px-6 py-4 rounded-xl transition duration-300 hover:bg-brand-pink hover:text-white shadow-sm"
             >
               {buttonText}
             </Link>

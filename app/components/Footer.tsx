@@ -17,7 +17,7 @@ export default async function Footer() {
           <div className="flex justify-center sm:justify-start">
             <Link
               href="/"
-              className="flex items-center gap-4 px-4 py-3 border-2 border-transparent rounded-full hover:border-default-lime hover:bg-default-lime transition duration-300"
+              className="flex items-center gap-4 px-4 py-3 border-2 border-transparent rounded-full hover:border-brand-pink hover:bg-white/10 transition duration-300"
             >
               <Image
                 src="/images/main-logo.svg"
@@ -39,7 +39,7 @@ export default async function Footer() {
                   <li key={item}>
                     <Link
                       href={item === "Услуги" ? "#services" : "/"}
-                      className="text-default-grey px-4 py-2 text-lg rounded-full hover:bg-default-lime hover:text-dark transition duration-300"
+                      className="text-default-grey px-4 py-2 text-lg rounded-full hover:bg-brand-pink/20 hover:text-white transition duration-300"
                     >
                       {item}
                     </Link>
@@ -49,7 +49,7 @@ export default async function Footer() {
               <li>
                 <Link
                   href="/admin/content"
-                  className="px-4 py-2 text-lg rounded-full bg-default-lime text-black font-medium transition duration-300"
+                  className="px-4 py-2 text-lg rounded-full bg-gradient-to-r from-brand-pink to-brand-purple text-white font-medium hover:opacity-90 transition duration-300 shadow-sm"
                 >
                   Модерация
                 </Link>
@@ -61,7 +61,7 @@ export default async function Footer() {
         {/* Контакты */}
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
           <div>
-            <h3 className="text-xl font-medium bg-default-lime px-3 py-1 rounded-md inline-block mb-6">
+            <h3 className="text-xl font-medium bg-gradient-to-r from-brand-pink to-brand-purple text-white px-3.5 py-1.5 rounded-lg inline-block mb-6 shadow-sm">
               Контакты
             </h3>
             <div className="space-y-3">
@@ -85,7 +85,7 @@ export default async function Footer() {
 
           {/* Соцсети (пример) */}
           <div>
-            <h3 className="text-xl font-medium bg-default-lime px-3 py-1 rounded-md inline-block mb-6">
+            <h3 className="text-xl font-medium bg-gradient-to-r from-brand-pink to-brand-purple text-white px-3.5 py-1.5 rounded-lg inline-block mb-6 shadow-sm">
               Мы в соцсетях
             </h3>
             <div className="flex gap-6">

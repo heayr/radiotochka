@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Button from "@/app/components/Button";
-import { AuthFormWrapper } from "@/app/components/auth/AuthFormWrapper";
+import { AuthFormWrapper } from "./AuthFormWrapper";
 
 export default function LoginForm() {
   const router = useRouter();

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 import SafeImage from "./SafeImage";
 import { getContentBlock } from "@/lib/services/content.service";
@@ -23,7 +24,7 @@ const DEFAULT_CASES: CaseCardProps[] = [
   },
 ];
 
-function CaseCard({ text, link, imageSrc }: CaseCardProps) {
+const CaseCard = memo(function CaseCard({ text, link, imageSrc }: CaseCardProps) {
   return (
     <div className="flex flex-col p-6 bg-default-grey rounded-xl h-full">
       {imageSrc && (
@@ -46,7 +47,7 @@ function CaseCard({ text, link, imageSrc }: CaseCardProps) {
       </Link>
     </div>
   );
-}
+});
 
 export default async function Cases() {
   let block: { content: unknown } | null = null;
@@ -72,7 +73,7 @@ export default async function Cases() {
         <div className="bg-dark rounded-3xl p-fluid-container">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-fluid-cards-gap">
             {cases.map((caseItem, idx) => (
-              <CaseCard key={idx} {...caseItem} />
+              <CaseCard key={caseItem.link || idx} {...caseItem} />
             ))}
           </div>
         </div>

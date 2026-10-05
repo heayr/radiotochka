@@ -82,7 +82,7 @@ export default function RootLayout({
               name: "Радиоточка",
               url: "https://radiotochka.nologs.site",
               logo: "https://radiotochka.nologs.site/images/main-logo.svg",
-              email: "mailto:info@example.com",
+              email: "mailto:j.chur@inbox.ru",
               telephone: "+79271370750",
               address: {
                 "@type": "PostalAddress",
@@ -91,12 +91,11 @@ export default function RootLayout({
                 streetAddress: "ул. Факел социализма, 21, офис 207",
                 postalCode: "413857",
               },
-              sameAs: ["https://t.me/example", "https://vk.com/example"],
             }),
           }}
         />
       </head>
-      <body className="">
+      <body className="bg-brand-cream text-gray-950 min-h-screen antialiased selection:bg-brand-pink/20 selection:text-brand-purple">
         <SessionProvider>
           <a
             href="#main-content"
@@ -105,7 +104,7 @@ export default function RootLayout({
             Перейти к основному содержимому
           </a>
           <Navbar />
-          <main id="main-content" className="mx-auto w-full px-fluid-container">
+          <main id="main-content" className="w-full">
             {children}
           </main>
           <CookieConsent />

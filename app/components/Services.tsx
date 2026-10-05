@@ -1,3 +1,4 @@
+import { memo } from "react";
 import SafeImage from "./SafeImage";
 import { getContentBlock } from "@/lib/services/content.service";
 import { SectionHeader } from "./sections/SectionHeader";
@@ -19,21 +20,21 @@ const DEFAULT_SERVICES: ServiceCardProps[] = [
     iconSrc: "/images/icon-black.svg",
     bgColor: "bg-default-grey",
     textColor: "text-black",
-    borderColor: "border-default-lime",
+    borderColor: "border-brand-pink",
     borderWidth: "border-2",
   },
   {
     title: "Создание Контента",
     imageSrc: "/images/content.svg",
     iconSrc: "/images/icon-white.svg",
-    bgColor: "bg-default-lime",
+    bgColor: "bg-brand-pink",
     textColor: "text-white",
   },
   {
     title: "Наружная Реклама",
     imageSrc: "/images/smm.svg",
     iconSrc: "/images/icon-white.svg",
-    bgColor: "bg-black",
+    bgColor: "bg-dark",
     textColor: "text-default-grey",
   },
   {
@@ -42,12 +43,12 @@ const DEFAULT_SERVICES: ServiceCardProps[] = [
     iconSrc: "/images/icon-black.svg",
     bgColor: "bg-default-grey",
     textColor: "text-black",
-    borderColor: "border-default-lime",
+    borderColor: "border-brand-purple",
     borderWidth: "border-2",
   },
 ];
 
-function ServiceCard({
+const ServiceCard = memo(function ServiceCard({
   title,
   imageSrc,
   bgColor,
@@ -73,7 +74,7 @@ function ServiceCard({
       </div>
     </div>
   );
-}
+});
 
 export default async function Services() {
   const block = await getContentBlock("services");

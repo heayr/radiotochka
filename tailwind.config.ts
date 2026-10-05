@@ -9,10 +9,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "default-lime": "rgba(185, 255, 102, 1)",
+        "brand-pink": "#ea5670",
+        "brand-pink-hover": "#d9435d",
+        "brand-purple": "#824e98",
+        "brand-purple-hover": "#713d85",
+        "brand-cream": "#F6F4F0",
+        "brand-cream-border": "#EAE3D9",
+        "default-lime": "#ea5670", // Заменено на фирменный розовый цвет логотипа
         "default-grey": "rgba(243, 243, 243, 1)",
-        "links": "rgba(234, 86, 112, 1)",
+        "links": "#ea5670",
         "dark": "rgba(25, 26, 35, 1)",
+      },
+      fontFamily: {
+        sans: ["Onest", "Manrope", "Inter", "sans-serif"],
+        display: ["Oswald", "Impact", "sans-serif"],
       },
       fontSize: {
         // Fluid-типографика: плавное изменение размера текста

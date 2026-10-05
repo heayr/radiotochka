@@ -1,44 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { forwardRef } from "react";
+import React, {
+  ElementType,
+  ComponentPropsWithRef,
+  forwardRef,
+  memo,
+  useCallback,
+} from "react";
 
-interface ButtonProps {
-  children: React.ReactNode;
-  /** если передан — компонент работает как Link (Next.js) */
-  href?: string;
-  /** если true — всегда button, даже если href передан */
-  asButton?: boolean;
-  /** тип для form button */
-  type?: "button" | "submit" | "reset";
-  /** визуальный вариант */
-  variant?: "primary" | "secondary" | "outline" | "ghost";
-  /** размер: sm | md | lg | fluid (fluid использует clamp-значения) */
-  size?: "sm" | "md" | "lg" | "fluid";
-  /** disabled-состояние */
-  disabled?: boolean;
-  /** показать спиннер загрузки */
-  loading?: boolean;
-  /** обработчик клика */
-  onClick?: (e: React.MouseEvent) => void;
-  /** дополнительные классы поверх базовых */
+export interface BasePrimitiveProps {
   className?: string;
-  /** aria-label для доступности */
-  ariaLabel?: string;
+  href?: string;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+  target?: string;
+  rel?: string;
+  children?: React.ReactNode;
 }
 
-const variantStyles: Record<NonNullable<ButtonProps["variant"]>, string> = {
+export interface ButtonCustomProps extends BasePrimitiveProps {
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  size?: "sm" | "md" | "lg" | "fluid";
+  loading?: boolean;
+  ariaLabel?: string;
+  asButton?: boolean;
+}
+
+export type PolymorphicProps<E extends ElementType, P = {}> = P & {
+  as?: E;
+} & Omit<ComponentPropsWithRef<E>, keyof P | "as">;
+
+const variantStyles: Record<NonNullable<ButtonCustomProps["variant"]>, string> = {
   primary:
-    "bg-dark text-white border-2 border-dark hover:bg-default-lime hover:text-black hover:border-default-lime",
+    "bg-dark text-white border-2 border-dark hover:bg-brand-pink hover:text-white hover:border-brand-pink shadow-sm",
   secondary:
-    "bg-default-lime text-black border-2 border-default-lime hover:bg-black hover:text-white hover:border-black",
+    "bg-gradient-to-r from-brand-pink to-brand-purple text-white border-2 border-transparent hover:opacity-90 shadow-sm",
   outline:
-    "bg-transparent text-black border-2 border-black hover:bg-default-lime hover:border-default-lime hover:text-black",
+    "bg-transparent text-black border-2 border-black hover:bg-brand-pink hover:border-brand-pink hover:text-white shadow-sm",
   ghost:
-    "bg-transparent text-black border-2 border-transparent hover:bg-default-lime hover:text-black",
+    "bg-transparent text-black border-2 border-transparent hover:bg-pink-50 hover:text-brand-pink",
 };
 
-const sizeStyles: Record<NonNullable<ButtonProps["size"]>, string> = {
+const sizeStyles: Record<NonNullable<ButtonCustomProps["size"]>, string> = {
   sm: "px-4 py-2 text-fluid-sm rounded-lg",
   md: "px-6 py-3 text-fluid-base rounded-xl",
   lg: "px-8 py-4 text-fluid-lg rounded-2xl",
@@ -48,8 +52,8 @@ const sizeStyles: Record<NonNullable<ButtonProps["size"]>, string> = {
 const disabledStyles = "opacity-50 cursor-not-allowed pointer-events-none";
 const loadingStyles = "cursor-wait";
 
-/** Простой SVG-спиннер */
-function Spinner({ className }: { className?: string }) {
+/** Простой SVG-спиннер (memoized atomic primitive) */
+const Spinner = memo(function Spinner({ className }: { className?: string }) {
   return (
     <svg
       className={`animate-spin h-5 w-5 ${className ?? ""}`}
@@ -72,88 +76,101 @@ function Spinner({ className }: { className?: string }) {
       />
     </svg>
   );
-}
+});
 
-const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
-  (
-    {
-      children,
-      href,
-      asButton = false,
-      type = "button",
-      variant = "primary",
-      size = "md",
-      disabled = false,
-      loading = false,
-      onClick,
-      className = "",
-      ariaLabel,
+type PolymorphicButtonComponent = <E extends ElementType = "button">(
+  props: PolymorphicProps<E, ButtonCustomProps> & {
+    ref?: React.Ref<any>;
+  }
+) => React.ReactElement | null;
+
+const BaseButton = forwardRef(function Button<E extends ElementType = "button">(
+  {
+    as,
+    href,
+    asButton = false,
+    variant = "primary",
+    size = "md",
+    disabled = false,
+    loading = false,
+    type = "button",
+    target,
+    rel,
+    className = "",
+    ariaLabel,
+    children,
+    onClick,
+    ...restProps
+  }: PolymorphicProps<E, ButtonCustomProps>,
+  ref: React.Ref<any>
+) {
+  // Определяем тег без структурного дублирования JSX-дерева
+  const isLink = Boolean(href && !asButton);
+  const Component: ElementType = as || (isLink ? (href?.startsWith("http") || href?.startsWith("tel:") || href?.startsWith("mailto:") ? "a" : Link) : "button");
+
+  const baseClasses = [
+    "flex items-center justify-center gap-2",
+    "font-medium",
+    "transition-all duration-300 ease-in-out",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-pink focus-visible:ring-offset-2",
+    "active:scale-[0.97]",
+    variantStyles[variant],
+    sizeStyles[size],
+    disabled || loading ? disabledStyles : "",
+    loading ? loadingStyles : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (disabled || loading) {
+        e.preventDefault();
+        return;
+      }
+      onClick?.(e);
     },
-    ref,
-  ) => {
-    const baseClasses = [
-      "flex items-center justify-center gap-2",
-      "font-medium",
-      "transition-all duration-300 ease-in-out",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-default-lime focus-visible:ring-offset-2",
-      "active:scale-[0.97]",
-      variantStyles[variant],
-      sizeStyles[size],
-      disabled || loading ? disabledStyles : "",
-      loading ? loadingStyles : "",
-      className,
-    ]
-      .filter(Boolean)
-      .join(" ");
+    [disabled, loading, onClick]
+  );
 
-    // Режим ссылки (Next.js Link)
-    if (href && !asButton) {
-      return (
-        <Link
-          href={disabled ? "#" : href}
-          ref={ref as React.Ref<HTMLAnchorElement>}
-          className={baseClasses}
-          aria-label={ariaLabel}
-          aria-disabled={disabled || undefined}
-          tabIndex={disabled ? -1 : undefined}
-          onClick={(e) => {
-            if (disabled || loading) {
-              e.preventDefault();
-              return;
-            }
-            onClick?.(e as unknown as React.MouseEvent);
-          }}
-        >
-          {loading && <Spinner />}
-          {children}
-        </Link>
-      );
+  // Формируем безопасные свойства
+  const safeProps: Record<string, any> = {
+    className: baseClasses,
+    onClick: handleClick,
+  };
+
+  if (ariaLabel) {
+    safeProps["aria-label"] = ariaLabel;
+  }
+
+  if (isLink) {
+    safeProps.href = disabled ? "#" : href;
+    if (disabled) {
+      safeProps["aria-disabled"] = true;
+      safeProps.tabIndex = -1;
     }
+    if (target === "_blank") {
+      safeProps.target = "_blank";
+      safeProps.rel = rel ? `${rel} noopener noreferrer` : "noopener noreferrer";
+    }
+  } else {
+    safeProps.type = (restProps as any).type || type || "button";
+    safeProps.disabled = disabled || loading;
+    if (loading) {
+      safeProps["aria-busy"] = true;
+    }
+  }
 
-    // Режим обычной кнопки
-    return (
-      <button
-        ref={ref as React.Ref<HTMLButtonElement>}
-        type={type}
-        disabled={disabled || loading}
-        className={baseClasses}
-        aria-label={ariaLabel}
-        aria-busy={loading || undefined}
-        onClick={(e) => {
-          if (disabled || loading) {
-            e.preventDefault();
-            return;
-          }
-          onClick?.(e);
-        }}
-      >
-        {loading && <Spinner />}
-        {children}
-      </button>
-    );
-  },
-);
+  // Инвариант: safeProps раскрываются строго ПОСЛЕДНИМИ, единое дерево JSX
+  return (
+    <Component ref={ref} {...(restProps as any)} {...safeProps}>
+      {loading && <Spinner />}
+      {children}
+    </Component>
+  );
+});
 
-Button.displayName = "Button";
+const Button = memo(BaseButton) as unknown as PolymorphicButtonComponent;
 
 export default Button;

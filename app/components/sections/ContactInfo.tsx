@@ -16,7 +16,7 @@ export function ContactInfo() {
       <div className="max-w-container mx-auto">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
           <div>
-            <h3 className="text-xl font-medium bg-default-lime px-3 py-1 rounded-md inline-block mb-6">
+            <h3 className="text-xl font-medium bg-gradient-to-r from-brand-pink to-brand-purple text-white px-3.5 py-1.5 rounded-lg inline-block mb-6 shadow-sm">
               Контакты
             </h3>
             <div className="space-y-3">
@@ -39,7 +39,7 @@ export function ContactInfo() {
           </div>
 
           <div>
-            <h3 className="text-xl font-medium bg-default-lime px-3 py-1 rounded-md inline-block mb-6">
+            <h3 className="text-xl font-medium bg-gradient-to-r from-brand-pink to-brand-purple text-white px-3.5 py-1.5 rounded-lg inline-block mb-6 shadow-sm">
               Мы в соцсетях
             </h3>
             <div className="flex gap-6">
