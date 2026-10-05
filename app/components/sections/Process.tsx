@@ -15,28 +15,28 @@ const STEPS: ProcessStep[] = [
     number: "01",
     title: "Исследование",
     description:
-      "Погружаемся в ваш продукт, портрет покупателя и локальный рынок Балаково и области, чтобы найти самые конверсионные точки контакта.",
+      "Анализируем аудиторию и рынок, находя самые конверсионные точки контакта.",
     imageSrc: "/images/process/step-01.jpg",
   },
   {
     number: "02",
     title: "Медиаплан",
     description:
-      "Формируем точный тайминг: ротация в прайм-тайм на «Дорожном» и «Нашем Радио», ключевые цифровые экраны и частотность до расхода первого рубля.",
+      "Подбираем прайм-тайм станций и экраны под ваш бюджет без лишних переплат.",
     imageSrc: "/images/process/step-02.jpg",
   },
   {
     number: "03",
     title: "Продакшн",
     description:
-      "Пишем цепляющий аудиоролик, привлекаем федеральных дикторов, создаем динамичную графику для медиафасадов и запускаем эфир день в день.",
+      "Создаем цепляющий ролик с дикторами и запускаем эфир день в день.",
     imageSrc: "/images/process/step-03.jpg",
   },
   {
     number: "04",
     title: "Аналитика",
     description:
-      "Отслеживаем входящий поток звонков и заявок, оперативно корректируем сетку вещания, масштабируем охват и предоставляем прозрачные отчеты.",
+      "Отслеживаем входящие звонки и масштабируем охват с прозрачными отчетами.",
     imageSrc: "/images/process/step-04.jpg",
   },
 ];
@@ -61,14 +61,14 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
         />
       </div>
 
-      {/* Мягкая нижняя подсветка только под текстом, без затемнения верхней части фото */}
-      <div className="absolute inset-x-0 bottom-0 h-1/2 z-10 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+      {/* Мягкая нижняя подсветка под приподнятым текстом */}
+      <div className="absolute inset-x-0 bottom-0 h-3/5 z-10 bg-gradient-to-t from-black/75 via-black/35 to-transparent pointer-events-none" />
 
-      {/* Выразительный коралловый акцент под текстом при hover для максимальной читаемости и контраста */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/80 via-[#ea5670]/30 via-40% to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
+      {/* Выразительный коралловый акцент под текстом при hover, охватывающий оптический центр */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/85 via-[#ea5670]/35 via-50% to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
 
-      {/* Содержимое карточки: жестко выровненные по вертикали элементы с комфортным запасом высоты */}
-      <div className="relative z-20 h-full flex flex-col justify-between p-6 sm:p-7 select-none">
+      {/* Содержимое карточки: текст приподнят ближе к оптической середине (pb-12 lg:pb-14 xl:pb-16) */}
+      <div className="relative z-20 h-full flex flex-col justify-between p-6 sm:p-7 pb-12 sm:pb-14 lg:pb-14 xl:pb-16 select-none">
         {/* Верхняя зона: воздушный тонкий номер на фиксированной высоте */}
         <div className="h-[64px] flex items-start justify-end">
           <span className="text-7xl sm:text-8xl lg:text-[84px] font-extralight tracking-tight text-white/70 group-hover:text-white transition-colors duration-500 leading-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
@@ -76,15 +76,15 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
           </span>
         </div>
 
-        {/* Нижняя зона: заголовок и текст строго в одну горизонтальную линию с запасом пространства */}
+        {/* Зона контента: приподнята в фокусный центр карточки, строго по одной линии */}
         <div className="flex flex-col justify-end">
-          <div className="h-[32px] flex items-end mb-2.5">
-            <h3 className="text-2xl sm:text-[24px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <div className="h-[34px] flex items-end mb-2.5">
+            <h3 className="text-2xl sm:text-[25px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               {step.title}
             </h3>
           </div>
-          <div className="h-[116px] flex items-start">
-            <p className="text-sm sm:text-[13.5px] lg:text-[13.5px] xl:text-[14px] text-white/90 leading-[1.5] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+          <div className="h-[54px] flex items-start">
+            <p className="text-sm sm:text-[14px] text-white/90 leading-[1.5] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {step.description}
             </p>
           </div>

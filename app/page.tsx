@@ -6,7 +6,6 @@ import LogoSection from "./components/LogoSection";
 import Process from "./components/sections/Process";
 import RadioStations from "./components/RadioStations";
 import Services from "./components/Services";
-import AdCalculator from "./components/AdCalculator";
 import Proposal from "./components/Proposal";
 import Cases from "./components/Cases";
 import { ContactInfo } from "./components/sections/ContactInfo";
@@ -23,7 +22,6 @@ export default function Home() {
       <Process />
       <RadioStations />
       <Services />
-      <AdCalculator />
       <Proposal />
       <Cases />
       <ContactInfo />
