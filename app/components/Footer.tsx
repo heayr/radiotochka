@@ -1,7 +1,25 @@
 import React, { memo } from "react";
 import Link from "next/link";
+import {
+  DEFAULT_FOOTER_DATA,
+  type FooterSectionData,
+} from "@/types/site-content";
 
-function BaseFooter() {
+interface FooterProps {
+  initialData?: Partial<FooterSectionData>;
+}
+
+function BaseFooter({ initialData }: FooterProps) {
+  const brandDescription =
+    initialData?.brandDescription || DEFAULT_FOOTER_DATA.brandDescription;
+  const officeAddress =
+    initialData?.officeAddress || DEFAULT_FOOTER_DATA.officeAddress;
+  const phonePrimary =
+    initialData?.phonePrimary || DEFAULT_FOOTER_DATA.phonePrimary;
+  const email = initialData?.email || DEFAULT_FOOTER_DATA.email;
+  const vkUrl = initialData?.vkUrl || DEFAULT_FOOTER_DATA.vkUrl;
+  const telegramUrl = initialData?.telegramUrl || DEFAULT_FOOTER_DATA.telegramUrl;
+
   return (
     <footer className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 pb-8 overflow-hidden">
       <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
@@ -14,7 +32,7 @@ function BaseFooter() {
             </span>
           </Link>
           <p className="text-sm sm:text-base text-white/60 leading-relaxed font-normal">
-            Ведущее рекламное агентство полного цикла в Балаково с 2004 года. Собственный эфирный пул радиостанций, студия звукозаписи, щиты 3х6 и полиграфия.
+            {brandDescription}
           </p>
         </div>
 
@@ -96,7 +114,7 @@ function BaseFooter() {
             </h4>
             <div className="space-y-3 text-sm font-normal text-white/80">
               <p className="text-white/60">
-                г. Балаково, ул. Факел социализма, 21, оф. 207
+                {officeAddress}
               </p>
             </div>
           </div>
@@ -109,7 +127,7 @@ function BaseFooter() {
             <ul className="space-y-3 text-sm font-normal text-white/80">
               <li>
                 <a
-                  href="https://vk.ru/radio_blk"
+                  href={vkUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-white transition-colors block"
@@ -119,22 +137,12 @@ function BaseFooter() {
               </li>
               <li>
                 <a
-                  href="https://t.me/+79271370750"
+                  href={telegramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-white transition-colors block"
                 >
                   Telegram
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://t.me/+79271370750"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors block"
-                >
-                  Макс
                 </a>
               </li>
             </ul>
@@ -164,10 +172,10 @@ function BaseFooter() {
                 </svg>
                 <div>
                   <a
-                    href="tel:+79271370750"
+                    href={`tel:${phonePrimary.replace(/[^\d+]/g, "")}`}
                     className="text-sm font-medium text-white hover:text-brand-pink transition-colors block leading-tight"
                   >
-                    +7 927 137-07-50
+                    {phonePrimary}
                   </a>
                   <span className="text-xs text-white/40 block mt-0.5">
                     Пн–Пт с 9:00 до 18:00
@@ -192,10 +200,10 @@ function BaseFooter() {
                 </svg>
                 <div>
                   <a
-                    href="mailto:j.chur@inbox.ru"
+                    href={`mailto:${email}`}
                     className="text-sm font-medium text-white hover:text-brand-pink transition-colors block leading-tight"
                   >
-                    j.chur@inbox.ru
+                    {email}
                   </a>
                   <span className="text-xs text-white/40 block mt-0.5">
                     Медиапланы и документооборот

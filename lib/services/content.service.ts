@@ -67,12 +67,7 @@ export async function updateContentBlock(
   return db.contentBlock.update({ where: { slug }, data: data as never });
 }
 
-export async function createContentBlock(data: {
-  slug: string;
-  title: string;
-  content?: Record<string, unknown>;
-  status?: string;
-}) {
-  return db.contentBlock.create({ data: data as never });
+export async function deleteContentBlock(slug: string) {
+  return db.contentBlock.delete({ where: { slug } });
 }
 

@@ -1,21 +1,25 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { updateContentBlock, seedDefaultContentBlocks } from "@/lib/actions/admin-actions";
+import {
+  updateContentBlock,
+  seedDefaultContentBlocks,
+} from "@/lib/actions/admin-actions";
 import Button from "@/app/components/Button";
 import type { ContentBlock } from "@/types/content";
 import { StatusBadge } from "@/app/components/ui/StatusBadge";
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants/statuses";
 import type { EditorProps } from "./editors/editor-types";
-import { LogoSectionEditor } from "./editors/LogoSectionEditor";
+
+import { HeroEditor } from "./editors/HeroEditor";
+import { StatsEditor } from "./editors/StatsEditor";
+import { MarqueeEditor } from "./editors/MarqueeEditor";
+import { ManifestoEditor } from "./editors/ManifestoEditor";
+import { ProcessEditor } from "./editors/ProcessEditor";
 import { ServicesEditor } from "./editors/ServicesEditor";
 import { WorkEditor } from "./editors/WorkEditor";
-import { ProcessEditor } from "./editors/ProcessEditor";
-import { StatsEditor } from "./editors/StatsEditor";
-import { ManifestoEditor } from "./editors/ManifestoEditor";
-import { CasesEditor } from "./editors/CasesEditor";
-import { ProposalEditor } from "./editors/ProposalEditor";
+import { FooterEditor } from "./editors/FooterEditor";
 import { JsonEditor } from "./editors/JsonEditor";
 import { CreateContentBlock } from "./editors/CreateContentBlock";
 
@@ -25,14 +29,76 @@ interface ContentListProps {
 }
 
 const editorMap: Record<string, React.ComponentType<EditorProps>> = {
+  hero: HeroEditor,
+  stats: StatsEditor,
+  marquee: MarqueeEditor,
+  manifesto: ManifestoEditor,
+  process: ProcessEditor,
   services: ServicesEditor,
   work: WorkEditor,
-  process: ProcessEditor,
-  stats: StatsEditor,
-  manifesto: ManifestoEditor,
-  "logo-section": LogoSectionEditor,
-  cases: CasesEditor,
-  proposal: ProposalEditor,
+  footer: FooterEditor,
+};
+
+const SECTION_INFO: Record<
+  string,
+  { icon: string; order: number; sectionName: string; summary: string }
+> = {
+  hero: {
+    icon: "🌟",
+    order: 1,
+    sectionName: "Экран 1: Главный экран (Hero)",
+    summary:
+      "Верхний копирайт, лейбл агентства и плакатное SVG слово в градиенте.",
+  },
+  stats: {
+    icon: "📊",
+    order: 2,
+    sectionName: "Экран 2: Цифры и студия (Stats)",
+    summary:
+      "3 ключевые метрики агентства, текстовый оффер, плашки и фото студии.",
+  },
+  marquee: {
+    icon: "⚡",
+    order: 3,
+    sectionName: "Экран 3: Бегущая строка (Marquee)",
+    summary:
+      "Бесконечная бегущая лента с ключевыми направлениями и радиостанциями.",
+  },
+  manifesto: {
+    icon: "💎",
+    order: 4,
+    sectionName: "Экран 4: Манифест агентства (Manifesto)",
+    summary:
+      "Цитата манифеста с анимацией слов по скроллу, стаж и города охвата.",
+  },
+  process: {
+    icon: "🔄",
+    order: 5,
+    sectionName: "Экран 5: Этапы работы (Process)",
+    summary:
+      "4 карточки этапов (Брифинг, Медиаплан, Продакшн, Запуск) с фото и номерами.",
+  },
+  services: {
+    icon: "📻",
+    order: 6,
+    sectionName: "Экран 6: Услуги (Services Stacking Cards)",
+    summary:
+      "3 полноэкранные стек-карточки (Радио, Билборды, Звук) + 3 нижние карточки.",
+  },
+  work: {
+    icon: "🏆",
+    order: 7,
+    sectionName: "Экран 7: Кейсы и проекты (Work)",
+    summary:
+      "4 карточки реальных проектов (Оранж, ВолгаМоторс, Утёс, Премьер) с фото и тегами.",
+  },
+  footer: {
+    icon: "📍",
+    order: 8,
+    sectionName: "Экран 8: Контакты и подвал (Footer)",
+    summary:
+      "Офис в Балаково, телефоны, email, соцсети (VK, TG) и реквизиты компании.",
+  },
 };
 
 export default function ContentList({ blocks, canCreate }: ContentListProps) {
@@ -40,6 +106,15 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
   const [editingBlock, setEditingBlock] = useState<ContentBlock | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Сортируем блоки строго в порядке появления на лендинге
+  const sortedBlocks = useMemo(() => {
+    return [...blocks].sort((a, b) => {
+      const orderA = SECTION_INFO[a.slug]?.order ?? 99;
+      const orderB = SECTION_INFO[b.slug]?.order ?? 99;
+      return orderA - orderB;
+    });
+  }, [blocks]);
 
   const handleCancel = useCallback(() => setEditingBlock(null), []);
 
@@ -62,7 +137,7 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
   const handleSyncDefaults = async () => {
     if (
       !confirm(
-        "Инициализировать или обновить все блоки (Услуги, Проекты, Процесс, Цифры, Манифест) дефолтными карточками с сайта?",
+        "Синхронизировать все 8 секций сайта (Hero, Stats, Marquee, Manifesto, Process, Services, Work, Footer) дефолтными актуальными данными и удалить старые блоки?",
       )
     ) {
       return;
@@ -82,23 +157,28 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
 
   if (editingBlock) {
     const Editor = editorMap[editingBlock.slug] ?? JsonEditor;
+    const info = SECTION_INFO[editingBlock.slug];
+
     return (
       <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
         <div className="flex items-center justify-between pb-4 mb-6 border-b border-gray-200">
           <div>
-            <h3 className="font-extrabold text-xl text-gray-900">
-              Редактирование: {editingBlock.title}
-            </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{info?.icon || "📝"}</span>
+              <h3 className="font-extrabold text-xl text-gray-900">
+                {info?.sectionName || editingBlock.title}
+              </h3>
+            </div>
             <p className="text-xs text-gray-500 font-mono mt-0.5">
-              slug: {editingBlock.slug}
+              slug: {editingBlock.slug} • версия: v{editingBlock.version}
             </p>
           </div>
           <button
             onClick={handleCancel}
             type="button"
-            className="text-sm text-gray-500 hover:text-gray-800"
+            className="text-sm font-semibold text-gray-500 hover:text-gray-900 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
           >
-            ✕ Закрыть
+            ✕ Закрыть редактор
           </button>
         </div>
 
@@ -113,26 +193,33 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
 
   return (
     <div className="space-y-6">
-      {/* Верхняя панель управления */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
-        <div className="space-y-0.5">
-          <h2 className="text-lg font-bold text-gray-900">
-            Контентные блоки сайта
-          </h2>
-          <p className="text-xs text-gray-500">
-            Изменения вступают в силу на сайте сразу после сохранения.
+      {/* Верхняя плашка управления */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-brand-pink text-white text-xs font-bold">
+              8
+            </span>
+            <h2 className="text-xl font-bold text-gray-900">
+              Секции лендинга Радиоточки
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-gray-500">
+            Редактируйте тексты, цифры, этапы и фотографии в реальном времени.
+            Изменения сразу видны на сайте.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <Button
             type="button"
             variant="outline"
             size="sm"
             disabled={isSyncing}
             onClick={handleSyncDefaults}
+            className="border-gray-300 font-medium"
           >
-            {isSyncing ? "Синхронизация..." : "⚡ Загрузить карточки с сайта в базу"}
+            {isSyncing ? "Синхронизация..." : "⚡ Синхронизировать все 8 секций"}
           </Button>
 
           {canCreate && (
@@ -156,12 +243,12 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
         />
       )}
 
-      {/* Список блоков */}
-      <div className="grid gap-4">
-        {blocks.length === 0 ? (
+      {/* Список секций в порядке отображения на лендинге */}
+      <div className="grid gap-3.5">
+        {sortedBlocks.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center space-y-4">
             <p className="text-gray-500 text-base">
-              В подключенной базе данных пока нет контентных блоков.
+              В базе данных пока нет секций сайта.
             </p>
             <Button
               type="button"
@@ -172,49 +259,54 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
             >
               {isSyncing
                 ? "Синхронизация..."
-                : "⚡ Создать все блоки (Услуги, Кейсы, Процесс, Цифры)"}
+                : "⚡ Создать все 8 секций сайта в один клик"}
             </Button>
           </div>
         ) : (
-          blocks.map((block) => (
-            <div
-              key={block.id}
-              className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 hover:shadow-md transition-shadow flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-            >
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2.5">
-                  <h3 className="text-lg font-bold text-gray-900">
-                    {block.title}
-                  </h3>
+          sortedBlocks.map((block) => {
+            const info = SECTION_INFO[block.slug];
+
+            return (
+              <div
+                key={block.id}
+                className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-400 hover:shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              >
+                <div className="space-y-1.5 flex-1">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl shrink-0">
+                      {info?.icon || "📝"}
+                    </span>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-bold text-gray-900 leading-tight">
+                        {info?.sectionName || block.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                        {info?.summary || "Пользовательский блок контента"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
                   <StatusBadge
                     label={STATUS_LABELS[block.status] || block.status}
                     colorClass={
                       STATUS_COLORS[block.status] || STATUS_COLORS.draft
                     }
                   />
-                </div>
-                <div className="flex items-center gap-3 text-xs text-gray-500">
-                  <span className="font-mono bg-gray-100 px-2 py-0.5 rounded">
-                    slug: {block.slug}
-                  </span>
-                  <span>версия: v{block.version}</span>
-                  <span>
-                    изменено: {new Date(block.updatedAt).toLocaleString("ru-RU")}
-                  </span>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => setEditingBlock(block)}
-                  variant="primary"
-                  size="sm"
-                >
-                  Редактировать карточки
-                </Button>
+                  <Button
+                    onClick={() => setEditingBlock(block)}
+                    variant="primary"
+                    size="sm"
+                    className="font-medium"
+                  >
+                    Редактировать
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

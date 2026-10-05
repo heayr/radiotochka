@@ -13,6 +13,9 @@ import {
   DEFAULT_PROCESS_DATA,
   DEFAULT_STATS_DATA,
   DEFAULT_MANIFESTO_DATA,
+  DEFAULT_HERO_DATA,
+  DEFAULT_MARQUEE_DATA,
+  DEFAULT_FOOTER_DATA,
 } from "@/types/site-content";
 
 export async function getUsers(params: {
@@ -140,33 +143,51 @@ export async function seedDefaultContentBlocks() {
 
   const blocksToSeed = [
     {
+      slug: "hero",
+      title: "1. Главный экран (Hero)",
+      content: DEFAULT_HERO_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
+      slug: "stats",
+      title: "2. Цифры и студия (Stats)",
+      content: DEFAULT_STATS_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
+      slug: "marquee",
+      title: "3. Бегущая строка (Marquee)",
+      content: DEFAULT_MARQUEE_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
+      slug: "manifesto",
+      title: "4. Манифест агентства (Manifesto)",
+      content: DEFAULT_MANIFESTO_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
+      slug: "process",
+      title: "5. Этапы работы (Process)",
+      content: DEFAULT_PROCESS_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
       slug: "services",
-      title: "Услуги (Services Stacking Cards)",
+      title: "6. Услуги (Services Stacking Cards)",
       content: DEFAULT_SERVICES_DATA as unknown as Record<string, unknown>,
       status: "published",
     },
     {
       slug: "work",
-      title: "Кейсы и Проекты (Work)",
+      title: "7. Кейсы и Проекты (Work)",
       content: DEFAULT_WORK_DATA as unknown as Record<string, unknown>,
       status: "published",
     },
     {
-      slug: "process",
-      title: "Этапы работы (Process)",
-      content: DEFAULT_PROCESS_DATA as unknown as Record<string, unknown>,
-      status: "published",
-    },
-    {
-      slug: "stats",
-      title: "Цифры и фото студии (Stats)",
-      content: DEFAULT_STATS_DATA as unknown as Record<string, unknown>,
-      status: "published",
-    },
-    {
-      slug: "manifesto",
-      title: "Манифест агентства (Manifesto)",
-      content: DEFAULT_MANIFESTO_DATA as unknown as Record<string, unknown>,
+      slug: "footer",
+      title: "8. Контакты и подвал (Footer)",
+      content: DEFAULT_FOOTER_DATA as unknown as Record<string, unknown>,
       status: "published",
     },
   ];
@@ -175,10 +196,35 @@ export async function seedDefaultContentBlocks() {
     await contentService.upsertContentBlock(block);
   }
 
+  // Автоматически удаляем устаревшие блоки из старого шаблона
+  const obsoleteSlugs = ["cases", "proposal", "logo-section"];
+  for (const slug of obsoleteSlugs) {
+    try {
+      await contentService.deleteContentBlock(slug);
+    } catch {
+      // Игнорируем если уже удалены
+    }
+  }
+
   revalidatePath("/");
   revalidatePath("/admin/content");
 
-  return { success: true, message: "Все карточки и фото успешно инициализированы в базе данных!" };
+  return {
+    success: true,
+    message: "Все 8 актуальных секций сайта синхронизированы в базе данных! Устаревшие блоки удалены.",
+  };
+}
+
+export async function deleteContentBlockAction(slug: string) {
+  await requireRole(["super_admin", "admin"]);
+  try {
+    await contentService.deleteContentBlock(slug);
+    revalidatePath("/");
+    revalidatePath("/admin/content");
+    return { success: true, message: `Блок "${slug}" удален` };
+  } catch (e: any) {
+    return { error: e?.message || "Ошибка удаления блока" };
+  }
 }
 
 export async function createContentBlock(input: {
@@ -197,10 +243,10 @@ export async function createContentBlock(input: {
   const existing = await contentService.getContentBlock(validated.data.slug);
   if (existing) return { error: "Блок с таким slug уже существует" };
 
-  await contentService.createContentBlock({
+  await contentService.upsertContentBlock({
     slug: validated.data.slug,
     title: validated.data.title,
-    content: validated.data.content as Record<string, unknown>,
+    content: (validated.data.content as Record<string, unknown>) || {},
     status: (validated.data.status as string) || "draft",
   });
 

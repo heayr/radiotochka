@@ -1,13 +1,23 @@
-export default function Hero() {
+import { DEFAULT_HERO_DATA, type HeroSectionData } from "@/types/site-content";
+
+interface HeroProps {
+  initialData?: Partial<HeroSectionData>;
+}
+
+export default function Hero({ initialData }: HeroProps) {
+  const copyrightYear = initialData?.copyrightYear || DEFAULT_HERO_DATA.copyrightYear;
+  const agencyLabel = initialData?.agencyLabel || DEFAULT_HERO_DATA.agencyLabel;
+  const bannerWord = initialData?.bannerWord || DEFAULT_HERO_DATA.bannerWord;
+
   return (
     <section id="hero" className="relative w-full bg-[#F3EFE8] pt-2 sm:pt-4 overflow-hidden">
       {/* Hero Header: Copyright & Agency Label */}
       <div className="w-full px-[24px] sm:px-[30px] lg:px-[60px] pt-6 sm:pt-8 flex items-center justify-between">
         <span className="text-[26px] sm:text-[32px] font-bold text-[#0A0A0A] tracking-tight">
-          ©2026
+          {copyrightYear}
         </span>
         <span className="text-[20px] sm:text-[28px] font-bold tracking-widest text-[#0A0A0A] uppercase">
-          AGENCY
+          {agencyLabel}
         </span>
       </div>
 
@@ -43,7 +53,7 @@ export default function Hero() {
             fontSize="290"
             className="uppercase scale-y-[1.4] origin-bottom"
           >
-            МАРКЕТИНГ
+            {bannerWord}
           </text>
         </svg>
       </div>
