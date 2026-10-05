@@ -210,6 +210,7 @@ export interface ServicePillItem {
 
 export interface StatsSectionData {
   title?: string;
+  offerText?: string;
   metrics: StatMetricItem[];
   pills: ServicePillItem[];
   desktopBanner: string;
@@ -218,6 +219,8 @@ export interface StatsSectionData {
 
 export const DEFAULT_STATS_DATA: StatsSectionData = {
   title: "Радиоточка в цифрах",
+  offerText:
+    "Медиапланирование, радиоэфир «Дорожное радио» и «Наше Радио», наружные экраны и полиграфия — созданы масштабировать ваш бизнес и привлекать реальных покупателей.",
   metrics: [
     {
       value: "20+",
@@ -252,4 +255,57 @@ export const DEFAULT_MANIFESTO_DATA: ManifestoSectionData = {
   text: "Мы не делаем рекламу «ради галочки». Каждая кампания на радио и городских экранах строится под конкретные цифры и продажи, пока показатели бизнеса реально не пойдут вверх.",
   since: "SINCE 2004",
   cities: ["БАЛАКОВО", "САРАТОВ", "ВОЛЬСК"],
+};
+
+export interface HeroSectionData {
+  copyrightYear: string;
+  agencyLabel: string;
+  bannerWord: string;
+}
+
+export const DEFAULT_HERO_DATA: HeroSectionData = {
+  copyrightYear: "©2026",
+  agencyLabel: "AGENCY",
+  bannerWord: "МАРКЕТИНГ",
+};
+
+export interface MarqueeSectionData {
+  phrases: string[];
+}
+
+export const DEFAULT_MARQUEE_DATA: MarqueeSectionData = {
+  phrases: [
+    "РАДИОРЕКЛАМА",
+    "104.7 FM ДОРОЖНОЕ РАДИО",
+    "НАРУЖНАЯ РЕКЛАМА",
+    "МЕДИАФАСАДЫ В БАЛАКОВО",
+    "98.4 FM НАШЕ РАДИО",
+    "АУДИОРОЛИКИ ПОД КЛЮЧ",
+    "ШИРОКОФОРМАТНАЯ ПЕЧАТЬ",
+    "БИЛБОРДЫ И СИТИ-ФОРМАТЫ",
+  ],
+};
+
+export interface FooterSectionData {
+  brandDescription: string;
+  officeAddress: string;
+  phonePrimary: string;
+  phoneSecondary: string;
+  email: string;
+  vkUrl: string;
+  telegramUrl: string;
+  legalInfo: string;
+}
+
+export const DEFAULT_FOOTER_DATA: FooterSectionData = {
+  brandDescription:
+    "Ведущее рекламное агентство полного цикла в Балаково с 2004 года. Собственный эфирный пул радиостанций, студия звукозаписи, щиты 3х6 и полиграфия.",
+  officeAddress: "г. Балаково, ул. Факел социализма, 21, оф. 207",
+  phonePrimary: "+7 (927) 137-07-50",
+  phoneSecondary: "+7 (8453) 44-00-55",
+  email: "j.chur@inbox.ru",
+  vkUrl: "https://vk.com/radiotochka_balakovo",
+  telegramUrl: "https://t.me/+79271370750",
+  legalInfo:
+    "ИП Чуркина Ю.А. • ОГРНИП 318645100085392 • ИНН 643904996901",
 };

@@ -30,6 +30,9 @@ export function StatsEditor({ block, onSave, onCancel }: EditorProps) {
       ? content.pills
       : DEFAULT_STATS_DATA.pills
   );
+  const [offerText, setOfferText] = useState(
+    content.offerText || DEFAULT_STATS_DATA.offerText
+  );
   const [desktopBanner, setDesktopBanner] = useState(
     content.desktopBanner || DEFAULT_STATS_DATA.desktopBanner
   );
@@ -55,6 +58,7 @@ export function StatsEditor({ block, onSave, onCancel }: EditorProps) {
     if (confirm("Сбросить показатели и баннеры к значениям по умолчанию?")) {
       setMetrics(DEFAULT_STATS_DATA.metrics);
       setPills(DEFAULT_STATS_DATA.pills);
+      setOfferText(DEFAULT_STATS_DATA.offerText);
       setDesktopBanner(DEFAULT_STATS_DATA.desktopBanner);
       setMobileBanner(DEFAULT_STATS_DATA.mobileBanner);
     }
@@ -64,6 +68,7 @@ export function StatsEditor({ block, onSave, onCancel }: EditorProps) {
     e.preventDefault();
     setIsLoading(true);
     await onSave({
+      offerText,
       metrics,
       pills,
       desktopBanner,
@@ -117,6 +122,21 @@ export function StatsEditor({ block, onSave, onCancel }: EditorProps) {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Текстовый оффер секции */}
+      <div className="space-y-2 pt-4 border-t">
+        <h4 className="text-base font-bold text-gray-900">
+          Текстовый оффер над кнопками действия
+        </h4>
+        <textarea
+          rows={3}
+          value={offerText}
+          onChange={(e) => setOfferText(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm leading-relaxed focus:ring-2 focus:ring-black focus:outline-none"
+          placeholder="Медиапланирование, радиоэфир «Дорожное радио» и «Наше Радио»..."
+          required
+        />
       </div>
 
       {/* Плашки услуг (Pills) */}

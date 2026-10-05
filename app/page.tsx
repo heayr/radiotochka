@@ -13,36 +13,54 @@ import {
   DEFAULT_PROCESS_DATA,
   DEFAULT_STATS_DATA,
   DEFAULT_MANIFESTO_DATA,
+  DEFAULT_HERO_DATA,
+  DEFAULT_MARQUEE_DATA,
+  DEFAULT_FOOTER_DATA,
   type ServicesSectionData,
   type WorkSectionData,
   type ProcessSectionData,
   type StatsSectionData,
   type ManifestoSectionData,
+  type HeroSectionData,
+  type MarqueeSectionData,
+  type FooterSectionData,
 } from "@/types/site-content";
 
 // Обеспечивает обновление контента на горячую при редактировании через модерацию
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [servicesData, workData, processData, statsData, manifestoData] =
-    await Promise.all([
-      getContentBlockSafe<ServicesSectionData>("services", DEFAULT_SERVICES_DATA),
-      getContentBlockSafe<WorkSectionData>("work", DEFAULT_WORK_DATA),
-      getContentBlockSafe<ProcessSectionData>("process", DEFAULT_PROCESS_DATA),
-      getContentBlockSafe<StatsSectionData>("stats", DEFAULT_STATS_DATA),
-      getContentBlockSafe<ManifestoSectionData>("manifesto", DEFAULT_MANIFESTO_DATA),
-    ]);
+  const [
+    heroData,
+    statsData,
+    marqueeData,
+    manifestoData,
+    processData,
+    servicesData,
+    workData,
+    footerData,
+  ] = await Promise.all([
+    getContentBlockSafe<HeroSectionData>("hero", DEFAULT_HERO_DATA),
+    getContentBlockSafe<StatsSectionData>("stats", DEFAULT_STATS_DATA),
+    getContentBlockSafe<MarqueeSectionData>("marquee", DEFAULT_MARQUEE_DATA),
+    getContentBlockSafe<ManifestoSectionData>("manifesto", DEFAULT_MANIFESTO_DATA),
+    getContentBlockSafe<ProcessSectionData>("process", DEFAULT_PROCESS_DATA),
+    getContentBlockSafe<ServicesSectionData>("services", DEFAULT_SERVICES_DATA),
+    getContentBlockSafe<WorkSectionData>("work", DEFAULT_WORK_DATA),
+    getContentBlockSafe<FooterSectionData>("footer", DEFAULT_FOOTER_DATA),
+  ]);
 
   return (
     <div className="w-full overflow-x-clip">
-      <Hero />
+      <Hero initialData={heroData} />
       <Stats initialData={statsData} />
-      <Marquee />
+      <Marquee initialData={marqueeData} />
       <Manifesto initialData={manifestoData} />
       <Process initialData={processData} />
       <Services initialData={servicesData} />
       <Work initialData={workData} />
-      <Footer />
+      <Footer initialData={footerData} />
     </div>
   );
 }
+

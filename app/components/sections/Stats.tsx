@@ -24,6 +24,8 @@ function BaseStats({ initialData }: StatsProps) {
     initialData?.desktopBanner || DEFAULT_STATS_DATA.desktopBanner;
   const mobileBanner =
     initialData?.mobileBanner || DEFAULT_STATS_DATA.mobileBanner;
+  const offerText =
+    initialData?.offerText || DEFAULT_STATS_DATA.offerText;
 
   return (
     <section
@@ -80,7 +82,7 @@ function BaseStats({ initialData }: StatsProps) {
         {/* Слева: Текстовый оффер и капсульные кнопки в фирменных цветах */}
         <div className="lg:col-span-7 flex flex-col items-start">
           <p className="text-base sm:text-xl lg:text-[22px] text-white font-normal leading-relaxed mb-8 max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-            Медиапланирование, радиоэфир «Дорожное радио» и «Наше Радио», наружные экраны и полиграфия — созданы масштабировать ваш бизнес и привлекать реальных покупателей.
+            {offerText}
           </p>
 
           <div className="flex flex-wrap items-center gap-3.5 sm:gap-4">

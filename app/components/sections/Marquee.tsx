@@ -1,4 +1,19 @@
-export default function Marquee() {
+import React from "react";
+import {
+  DEFAULT_MARQUEE_DATA,
+  type MarqueeSectionData,
+} from "@/types/site-content";
+
+interface MarqueeProps {
+  initialData?: Partial<MarqueeSectionData>;
+}
+
+export default function Marquee({ initialData }: MarqueeProps) {
+  const phrases =
+    initialData?.phrases && initialData.phrases.length > 0
+      ? initialData.phrases
+      : DEFAULT_MARQUEE_DATA.phrases;
+
   return (
     <section
       id="marquee"
@@ -6,41 +21,23 @@ export default function Marquee() {
       className="w-full border-y border-[#E0D8CB] bg-[#F3EFE8] py-9 overflow-hidden"
     >
       <div className="animate-marquee whitespace-nowrap flex items-center gap-8 text-[17px] sm:text-[18px] font-semibold uppercase tracking-widest text-[#0A0A0A]">
-        <span>РАДИОРЕКЛАМА</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>104.7 FM ДОРОЖНОЕ РАДИО</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>НАРУЖНАЯ РЕКЛАМА</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>МЕДИАФАСАДЫ В БАЛАКОВО</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>98.4 FM НАШЕ РАДИО</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>АУДИОРОЛИКИ ПОД КЛЮЧ</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>ШИРОКОФОРМАТНАЯ ПЕЧАТЬ</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>БИЛБОРДЫ И СИТИ-ФОРМАТЫ</span>
-        <span className="text-brand-pink font-bold">/</span>
+        {/* Первый прогон */}
+        {phrases.map((phrase, idx) => (
+          <React.Fragment key={`p1-${idx}`}>
+            <span>{phrase}</span>
+            <span className="text-brand-pink font-bold">/</span>
+          </React.Fragment>
+        ))}
 
         {/* Дубликат для бесконечного плавного скролла */}
-        <span>РАДИОРЕКЛАМА</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>104.7 FM ДОРОЖНОЕ РАДИО</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>НАРУЖНАЯ РЕКЛАМА</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>МЕДИАФАСАДЫ В БАЛАКОВО</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>98.4 FM НАШЕ РАДИО</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>АУДИОРОЛИКИ ПОД КЛЮЧ</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>ШИРОКОФОРМАТНАЯ ПЕЧАТЬ</span>
-        <span className="text-brand-pink font-bold">/</span>
-        <span>БИЛБОРДЫ И СИТИ-ФОРМАТЫ</span>
-        <span className="text-brand-pink font-bold">/</span>
+        {phrases.map((phrase, idx) => (
+          <React.Fragment key={`p2-${idx}`}>
+            <span>{phrase}</span>
+            <span className="text-brand-pink font-bold">/</span>
+          </React.Fragment>
+        ))}
       </div>
     </section>
   );
 }
+
