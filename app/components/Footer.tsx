@@ -249,9 +249,31 @@ function BaseFooter() {
       </div>
 
       <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
-        {/* Нижний копирайт и ссылка на панель модерации */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
+        {/* Нижний копирайт, блок разработчика и ссылка на панель модерации */}
+        <div className="pt-8 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-white/40">
           <p>© {new Date().getFullYear()} Рекламное агентство «Радиоточка». г. Балаково. Все права защищены.</p>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center lg:text-left">
+            <span>
+              Запрограмлено и задизайнено —{" "}
+              <a
+                href="https://yegor-dev.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/75 hover:text-white underline underline-offset-2 transition-colors font-medium"
+              >
+                yegor-dev.vercel.app
+              </a>
+            </span>
+            <span className="hidden sm:inline text-white/20">·</span>
+            <a
+              href="mailto:egormyshinsky@gmail.com"
+              className="text-white/60 hover:text-brand-pink transition-colors"
+            >
+              egormyshinsky@gmail.com
+            </a>
+          </div>
+
           <Link href="/admin/content" className="hover:text-white/70 transition-colors">
             Панель модерации
           </Link>
