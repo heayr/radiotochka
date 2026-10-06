@@ -29,7 +29,9 @@ export default auth((req) => {
   const isStaticFile =
     nextUrl.pathname.startsWith("/_next") ||
     nextUrl.pathname.startsWith("/images") ||
-    nextUrl.pathname.startsWith("/favicon");
+    nextUrl.pathname.startsWith("/favicon") ||
+    nextUrl.pathname.startsWith("/icon") ||
+    /\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest)$/.test(nextUrl.pathname);
 
   if (isStaticFile) {
     return NextResponse.next();
@@ -67,6 +69,6 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|images/).*)",
+    "/((?!_next/static|_next/image|images|favicon.*|icon.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest)$).*)",
   ],
 };
