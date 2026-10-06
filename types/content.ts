@@ -35,4 +35,11 @@ export interface ProposalContent {
 export interface LogoItem {
   src: string;
   alt: string;
+  name?: string;
+  type?: string;
+  href?: string;
+  scale?: number;
+  fit?: "contain" | "cover" | "scale-down";
+  filter?: "none" | "grayscale" | "invert";
+  maxWidth?: number;
 }

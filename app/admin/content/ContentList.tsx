@@ -166,7 +166,7 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
     });
 
     // Дополнительные пользовательские блоки (исключаем устаревшие блоки из старого шаблона)
-    const obsoleteSlugs = new Set(["cases", "proposal", "logo-section"]);
+    const obsoleteSlugs = new Set(["cases", "proposal"]);
     const extraBlocks = blocks.filter(
       (b) => !SECTION_INFO[b.slug] && !obsoleteSlugs.has(b.slug),
     );

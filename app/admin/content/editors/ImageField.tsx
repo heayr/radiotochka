@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import SafeImage from "@/app/components/SafeImage";
+import SafeImage, { normalizeImageUrl } from "@/app/components/SafeImage";
 import Button from "@/app/components/Button";
+import { ImageEditorModal } from "./ImageEditorModal";
 
 interface ImageFieldProps {
   label: string;
@@ -21,6 +22,7 @@ export function ImageField({
 }: ImageFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,6 +30,18 @@ export function ImageField({
 
     setIsProcessing(true);
     const reader = new FileReader();
+
+    // Если это SVG — сохраняем чистый вектор DataURL напрямую без растеризации в Canvas
+    if (file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg")) {
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        onChange(dataUrl);
+        setIsProcessing(false);
+      };
+      reader.readAsDataURL(file);
+      e.target.value = "";
+      return;
+    }
 
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
@@ -91,13 +105,13 @@ export function ImageField({
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
         {/* Превью изображения */}
-        <div className="relative w-24 h-16 rounded-xl border border-gray-200 overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center shadow-sm">
+        <div className="relative w-24 h-16 rounded-xl border border-gray-200 overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center shadow-sm p-1">
           {value ? (
             <SafeImage
               src={value}
               alt="Превью"
               fill
-              className="object-cover object-center"
+              className="object-contain object-center"
             />
           ) : (
             <span className="text-[11px] text-gray-400">Нет фото</span>
@@ -109,12 +123,12 @@ export function ImageField({
           <input
             type="text"
             value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="/images/... или https://... или загрузите файл"
+            onChange={(e) => onChange(normalizeImageUrl(e.target.value))}
+            placeholder="/images/... или https://... или ссылка с Google Диска"
             className="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea5670]/40 focus:border-[#ea5670] transition-all"
           />
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <input
               ref={fileInputRef}
               type="file"
@@ -133,19 +147,40 @@ export function ImageField({
             </Button>
 
             {value && (
-              <button
-                type="button"
-                onClick={() => onChange("")}
-                className="text-xs text-red-500 hover:text-red-700 transition-colors"
-              >
-                Очистить
-              </button>
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditorOpen(true)}
+                  title="Обрезать, масштабировать, убрать белый фон"
+                >
+                  ✂️ Редактировать / Обрезать
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={() => onChange("")}
+                  className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                >
+                  Очистить
+                </button>
+              </>
             )}
           </div>
         </div>
       </div>
 
-      {hint && <p className="text-xs text-gray-500">{hint}</p>}
+      <ImageEditorModal
+        isOpen={isEditorOpen}
+        onClose={() => setIsEditorOpen(false)}
+        imageUrl={value}
+        onSave={(newUrl) => onChange(newUrl)}
+      />
+
+      <p className="text-xs text-gray-500">
+        {hint || "Поддерживаются файлы с устройства (SVG, PNG, WebP), локальные пути и ссылки с Google Диска."}
+      </p>
 
       {presetImages && presetImages.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 pt-1">

@@ -333,6 +333,11 @@ export interface LogoItem {
   alt: string;
   name?: string;
   type?: string;
+  href?: string;
+  scale?: number;
+  fit?: "contain" | "cover" | "scale-down";
+  filter?: "none" | "grayscale" | "invert";
+  maxWidth?: number;
 }
 
 export interface LogoSectionData {
