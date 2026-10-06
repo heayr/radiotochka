@@ -42,7 +42,7 @@ export default function Hero({ initialData }: HeroProps) {
   const textRef = useRef<SVGTextElement>(null);
   const [viewBox, setViewBox] = useState<string>(() => {
     const estW = estimateTextWidth(bannerWord, 280);
-    return `0 50 ${estW} 220`;
+    return `0 36 ${estW} 242`;
   });
 
   // Прецизионный расчет реальных границ рендеринга текста в браузере (getBBox)
@@ -52,11 +52,13 @@ export default function Hero({ initialData }: HeroProps) {
         try {
           const b = textRef.current.getBBox();
           if (b && b.width > 0 && b.height > 0) {
-            // Безопасный отступ 6px для сглаживания и антиалиасинга
+            // Комфортный запас ~16-20px сверху и снизу для идеального контура букв без малейшего среза
+            const padY = 16;
             const padX = 6;
-            const padY = 4;
+            const capTop = 52 - padY; // 36
+            const capHeight = 210 + padY * 2; // 242
             setViewBox(
-              `${Math.floor(b.x - padX)} ${Math.floor(b.y - padY)} ${Math.ceil(b.width + padX * 2)} ${Math.ceil(b.height + padY * 2)}`
+              `${Math.floor(b.x - padX)} ${capTop} ${Math.ceil(b.width + padX * 2)} ${capHeight}`
             );
           }
         } catch {
@@ -76,7 +78,7 @@ export default function Hero({ initialData }: HeroProps) {
   return (
     <section id="hero" className="relative w-full bg-[#F3EFE8] pt-1 sm:pt-2 overflow-hidden">
       {/* Hero Header: Copyright & Agency Label */}
-      <div className="w-full px-[24px] sm:px-[30px] lg:px-[60px] pt-3 sm:pt-4 flex items-center justify-between">
+      <div className="w-full px-[24px] sm:px-[30px] lg:px-[60px] pt-2 sm:pt-3 flex items-center justify-between">
         <span className="text-[26px] sm:text-[32px] font-bold text-[#0A0A0A] tracking-tight">
           {copyrightYear}
         </span>
@@ -85,12 +87,12 @@ export default function Hero({ initialData }: HeroProps) {
         </span>
       </div>
 
-      {/* Hero Banner: Монументальная адаптивная плакатная SVG-типографика без обрезания границ */}
-      <div className="w-full px-3 sm:px-6 lg:px-10 pt-0 sm:pt-1 pb-1 sm:pb-2 select-none">
+      {/* Hero Banner: Центрированная пропорциональная типографика по ширине с отступом 20px снизу */}
+      <div className="w-full px-4 sm:px-8 lg:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] select-none flex justify-center items-center">
         <svg
           viewBox={viewBox}
           preserveAspectRatio="none"
-          className="w-full h-[180px] xs:h-[220px] sm:h-[300px] md:h-[380px] lg:h-[450px] xl:h-[500px] block"
+          className="w-full h-[150px] sm:h-[210px] md:h-[250px] lg:h-[280px] xl:h-[295px] block"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >

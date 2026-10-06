@@ -33,7 +33,7 @@ function HeroPreviewSvg({ word }: { word: string }) {
   const cleanWord = (word || DEFAULT_HERO_DATA.bannerWord).trim().toUpperCase();
   const [viewBox, setViewBox] = useState<string>(() => {
     const estW = estimateTextWidth(cleanWord, 280);
-    return `0 50 ${estW} 220`;
+    return `0 36 ${estW} 242`;
   });
 
   useEffect(() => {
@@ -42,10 +42,12 @@ function HeroPreviewSvg({ word }: { word: string }) {
         try {
           const b = textRef.current.getBBox();
           if (b && b.width > 0 && b.height > 0) {
+            const padY = 16;
             const padX = 6;
-            const padY = 4;
+            const capTop = 52 - padY;
+            const capHeight = 210 + padY * 2;
             setViewBox(
-              `${Math.floor(b.x - padX)} ${Math.floor(b.y - padY)} ${Math.ceil(b.width + padX * 2)} ${Math.ceil(b.height + padY * 2)}`
+              `${Math.floor(b.x - padX)} ${capTop} ${Math.ceil(b.width + padX * 2)} ${capHeight}`
             );
           }
         } catch {}
@@ -61,7 +63,7 @@ function HeroPreviewSvg({ word }: { word: string }) {
     <svg
       viewBox={viewBox}
       preserveAspectRatio="none"
-      className="w-full h-[120px] sm:h-[180px] md:h-[220px] block"
+      className="w-full h-[120px] sm:h-[150px] md:h-[175px] block"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
