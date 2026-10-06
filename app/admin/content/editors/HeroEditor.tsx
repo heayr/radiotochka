@@ -113,16 +113,50 @@ export function HeroEditor({ block, onSave, onCancel }: EditorProps) {
       </div>
 
       {/* Живое превью */}
-      <div className="bg-[#F3EFE8] rounded-xl p-6 border border-[#E0D8CB]">
-        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block mb-2">
-          Мини-превью на сайте
+      <div className="bg-[#F3EFE8] rounded-xl p-5 border border-[#E0D8CB] space-y-3">
+        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">
+          Мини-превью на сайте (реальный SVG-баннер)
         </span>
-        <div className="flex items-center justify-between text-black font-bold mb-4 text-sm">
+        <div className="flex items-center justify-between text-black font-bold text-xs sm:text-sm px-2">
           <span>{copyrightYear}</span>
           <span className="tracking-widest uppercase">{agencyLabel}</span>
         </div>
-        <div className="text-center font-extrabold text-2xl sm:text-4xl uppercase tracking-widest text-[#ea5670] bg-clip-text">
-          {bannerWord}
+        <div className="w-full select-none bg-[#F3EFE8] rounded-lg overflow-hidden">
+          {(() => {
+            const word = (bannerWord || DEFAULT_HERO_DATA.bannerWord).trim().toUpperCase();
+            const len = word.length || 9;
+            const optimalFontSize = len <= 8 ? 245 : len <= 10 ? 230 : 210;
+            const textLength = Math.min(1330, Math.max(1200, 1400 - (len > 10 ? 50 : 80)));
+            return (
+              <svg viewBox="0 0 1400 380" className="w-full h-auto block" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="previewBrandGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ea5670" />
+                    <stop offset="14%" stopColor="#f07389" />
+                    <stop offset="30%" stopColor="#824e98" />
+                    <stop offset="47%" stopColor="#2c1038" />
+                    <stop offset="64%" stopColor="#ea5670" />
+                    <stop offset="82%" stopColor="#ad3557" />
+                    <stop offset="100%" stopColor="#431c57" />
+                  </linearGradient>
+                </defs>
+                <text
+                  x="700"
+                  y="300"
+                  textAnchor="middle"
+                  textLength={textLength}
+                  lengthAdjust="spacingAndGlyphs"
+                  fill="url(#previewBrandGradient)"
+                  fontFamily="'Oswald', Impact, sans-serif"
+                  fontWeight="600"
+                  fontSize={optimalFontSize}
+                  className="uppercase"
+                >
+                  {word}
+                </text>
+              </svg>
+            );
+          })()}
         </div>
       </div>
 

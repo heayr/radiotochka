@@ -7,7 +7,11 @@ interface HeroProps {
 export default function Hero({ initialData }: HeroProps) {
   const copyrightYear = initialData?.copyrightYear || DEFAULT_HERO_DATA.copyrightYear;
   const agencyLabel = initialData?.agencyLabel || DEFAULT_HERO_DATA.agencyLabel;
-  const bannerWord = initialData?.bannerWord || DEFAULT_HERO_DATA.bannerWord;
+  const bannerWord = (initialData?.bannerWord || DEFAULT_HERO_DATA.bannerWord).trim().toUpperCase();
+  const len = bannerWord.length || 9;
+  // Адаптивный расчет размера шрифта и ширины строки для безупречной посадки любого слова
+  const optimalFontSize = len <= 8 ? 245 : len <= 10 ? 230 : 210;
+  const textLength = Math.min(1330, Math.max(1200, 1400 - (len > 10 ? 50 : 80)));
 
   return (
     <section id="hero" className="relative w-full bg-[#F3EFE8] pt-2 sm:pt-4 overflow-hidden">
@@ -24,7 +28,7 @@ export default function Hero({ initialData }: HeroProps) {
       {/* Hero Banner: Giant SVG Typography */}
       <div className="w-full px-[20px] sm:px-[30px] lg:px-[60px] pt-7 sm:pt-9 pb-6 sm:pb-8 select-none">
         <svg
-          viewBox="0 0 1320 360"
+          viewBox="0 0 1400 380"
           className="w-full h-auto max-h-[500px] block"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -41,17 +45,18 @@ export default function Hero({ initialData }: HeroProps) {
             </linearGradient>
           </defs>
 
-          {/* Текст растянут строго по ширине 1320px и плакатной высоте */}
+          {/* Плакатный текст: центрирован с гарантированным запасом сверху, снизу и по краям */}
           <text
-            x="0"
-            y="350"
-            textLength="1320"
+            x="700"
+            y="300"
+            textAnchor="middle"
+            textLength={textLength}
             lengthAdjust="spacingAndGlyphs"
             fill="url(#brandGradient)"
             fontFamily="'Oswald', Impact, sans-serif"
-            fontWeight="500"
-            fontSize="290"
-            className="uppercase scale-y-[1.4] origin-bottom"
+            fontWeight="600"
+            fontSize={optimalFontSize}
+            className="uppercase"
           >
             {bannerWord}
           </text>
