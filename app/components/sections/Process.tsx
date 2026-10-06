@@ -61,6 +61,155 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
   );
 });
 
+/**
+ * Мобильный контейнер: при вертикальном скролле вниз карточки процесса плавно едут по горизонтали
+ * С соблюдением Invariant 1.1 (useRef + direct DOM transforms) и Invariant 2.3 (IntersectionObserver)
+ */
+const MobileProcessTrack = memo(function MobileProcessTrack({
+  steps,
+}: {
+  steps: ProcessStepItem[];
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const progressFillRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const track = trackRef.current;
+    if (!container || !track) return;
+
+    let isVisible = false;
+    let rafId: number | null = null;
+    let maxTranslate = 0;
+
+    const measure = () => {
+      if (!track) return;
+      const lastCard = track.lastElementChild as HTMLElement;
+      if (lastCard) {
+        const savedTransform = track.style.transform;
+        track.style.transform = "translate3d(0, 0, 0)";
+        const untranslatedLeft = lastCard.getBoundingClientRect().left;
+        track.style.transform = savedTransform;
+
+        const targetLeft = Math.max(16, (window.innerWidth - lastCard.offsetWidth) / 2);
+        maxTranslate = Math.max(0, untranslatedLeft - targetLeft);
+      } else {
+        maxTranslate = Math.max(0, track.scrollWidth - window.innerWidth + 40);
+      }
+    };
+
+    const updateScroll = () => {
+      if (!container || !track) return;
+
+      const rect = container.getBoundingClientRect();
+      const totalScroll = container.offsetHeight - window.innerHeight;
+      if (totalScroll <= 0) return;
+
+      const currentScroll = -rect.top;
+      const progress = Math.min(Math.max(currentScroll / totalScroll, 0), 1);
+
+      // Горизонтальный скролл завершается на 75% пройденного пути,
+      // чтобы 4-я карточка успела полностью встать по центру экрана и зафиксироваться,
+      // дав пользователю комфортный запас скролла прочитать её до перехода к следующей секции.
+      const horizontalProgress = Math.min(1, progress / 0.75);
+
+      const translateX = horizontalProgress * maxTranslate;
+      track.style.transform = `translate3d(${-translateX}px, 0, 0)`;
+
+      if (progressFillRef.current) {
+        progressFillRef.current.style.transform = `scaleX(${progress})`;
+      }
+    };
+
+    const onScrollOrResize = () => {
+      if (!isVisible) return;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        measure();
+        updateScroll();
+      });
+    };
+
+    measure();
+    updateScroll();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          measure();
+          updateScroll();
+          window.addEventListener("scroll", onScrollOrResize, { passive: true });
+          window.addEventListener("resize", onScrollOrResize, { passive: true });
+        } else {
+          window.removeEventListener("scroll", onScrollOrResize);
+          window.removeEventListener("resize", onScrollOrResize);
+          if (rafId) cancelAnimationFrame(rafId);
+        }
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [steps.length]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full h-[350vh] lg:hidden -mx-5 sm:-mx-7"
+    >
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden flex flex-col justify-between py-6 px-4 bg-[#0A0A0A]">
+        {/* Центр: Горизонтальный трек карточек */}
+        <div className="flex-1 flex items-center overflow-hidden my-auto w-full">
+          <div
+            ref={trackRef}
+            className="flex flex-row gap-4 will-change-transform items-stretch px-2"
+            style={{ transform: "translate3d(0, 0, 0)" }}
+          >
+            {steps.map((step, idx) => (
+              <div
+                key={`mobile-step-${idx}`}
+                className="w-[82vw] max-w-[320px] h-[430px] shrink-0"
+              >
+                <ProcessCard step={step} idx={idx} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Нижняя панель: прогресс и подсказка */}
+        <div className="w-full pt-2 pb-1 flex flex-col gap-2 border-t border-white/10">
+          <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+            <div
+              ref={progressFillRef}
+              className="h-full bg-brand-pink rounded-full origin-left will-change-transform"
+              style={{ transform: "scaleX(0)" }}
+            />
+          </div>
+          <div className="flex items-center justify-between text-[11px] text-white/60 font-medium">
+            <span className="flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5 text-brand-pink animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+              </svg>
+              Листайте вниз
+            </span>
+            <span>Скролл листает этапы →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 interface ProcessProps {
   initialData?: Partial<ProcessSectionData>;
 }
@@ -190,14 +339,8 @@ function BaseProcess({ initialData }: ProcessProps) {
           </p>
         </div>
 
-        {/* На мобильных устройствах: удобный горизонтальный скролл со snap */}
-        <div className="w-full lg:hidden flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4">
-          {steps.map((step, idx) => (
-            <div key={`mobile-step-${idx}`} className="w-[285px] sm:w-[320px] shrink-0 snap-center">
-              <ProcessCard step={step} idx={idx} />
-            </div>
-          ))}
-        </div>
+        {/* На мобильных устройствах: горизонтальный скролл при вертикальной прокрутке вниз */}
+        <MobileProcessTrack steps={steps} />
 
         {/* На десктопе: аутентичный каскадный CSS Sticky Stacking из Framer Our Process */}
         <div

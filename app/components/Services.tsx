@@ -10,7 +10,109 @@ import {
 } from "@/types/site-content";
 
 /**
- * Атомарная карточка услуги с каскадным наслоением (Stacking Cards)
+ * Мобильная карточка услуги (чистый, компактный, негромоздкий дизайн без наслоения)
+ */
+const MobileServiceCard = memo(function MobileServiceCard({
+  service,
+  index,
+}: {
+  service: ServiceCardItem;
+  index: number;
+}) {
+  return (
+    <div
+      className="w-full rounded-[22px] p-5 sm:p-6 border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between"
+      style={{
+        backgroundColor: "#111216",
+        backgroundImage: `
+          radial-gradient(ellipse 100% 60% at 20% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
+          radial-gradient(ellipse 80% 50% at 90% 100%, rgba(234, 86, 112, 0.12) 0%, transparent 60%),
+          linear-gradient(135deg, #181920 0%, #101115 100%)
+        `,
+      }}
+    >
+      <div>
+        {/* Верхняя строка: Категория и номер */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <span className="text-[11px] font-semibold text-white/60 tracking-wider uppercase truncate">
+            {service.category}
+          </span>
+          <span className="text-xs font-mono font-bold text-white/90 px-2.5 py-0.5 rounded-full bg-white/10 border border-white/10 shrink-0">
+            {service.id || `0${index + 1}`}
+          </span>
+        </div>
+
+        {/* Фотография превью (16:9) */}
+        <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden border border-white/10 mb-3.5 group">
+          <SafeImage
+            src={service.image || "/images/services/service-01-radio-real.jpg"}
+            alt={service.alt || service.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            priority={index === 0}
+          />
+        </div>
+
+        {/* Заголовок */}
+        <h3 className="text-xl font-bold text-white tracking-tight leading-snug mb-2">
+          {service.title}
+        </h3>
+
+        {/* Метрика */}
+        {service.statNumber && (
+          <div className="flex items-baseline gap-2 mb-2">
+            <span className="text-xl font-black text-white tracking-tight">
+              {service.statNumber}
+            </span>
+            {service.statLabel && (
+              <span className="text-xs text-white/70 font-normal">
+                {service.statLabel}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Описание */}
+        {service.description && (
+          <p className="text-xs sm:text-sm text-white/75 font-normal leading-relaxed mb-3.5">
+            {service.description}
+          </p>
+        )}
+
+        {/* Теги-плашки (аккуратные компактные бейджи, НЕ громоздкие блоки) */}
+        {Array.isArray(service.tags) && service.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {service.tags.map((tag, tIdx) => (
+              <span
+                key={`${tag}-${tIdx}`}
+                className="bg-[#F0ECE4] text-[#0A0A0A] font-bold text-[11px] px-2.5 py-1 rounded-lg leading-tight"
+              >
+                {tag.replace(/\n/g, " ")}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Кнопка действия */}
+      <Button
+        href="tel:+79271370750"
+        variant="primary"
+        size="sm"
+        className="!w-full !inline-flex items-center justify-center gap-2 !py-2.5 !rounded-xl !bg-[#FF385C] hover:!bg-[#E02D50] !border-transparent !text-white font-semibold text-xs shadow-md active:scale-95 transition-all mt-auto"
+      >
+        <span>Запустить проект</span>
+        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+        </svg>
+      </Button>
+    </div>
+  );
+});
+
+/**
+ * Атомарная карточка услуги с каскадным наслоением (Stacking Cards) для ДЕСКТОПА
  * НА ВСЮ ШИРИНУ ЭКРАНА (100% full screen width, без ограничения контейнера)
  */
 const ServiceCard = memo(function ServiceCard({
@@ -146,23 +248,38 @@ function BaseServices({ initialData }: ServicesProps) {
   const items = isCompatible ? rawItems : DEFAULT_SERVICES_DATA.items;
 
   return (
-    <section id="services" className="w-full bg-[#F3EFE8] pt-16 sm:pt-24 pb-20 sm:pb-32">
+    <section id="services" className="w-full bg-[#F3EFE8] pt-12 sm:pt-24 pb-16 sm:pb-32">
       {/* ЗАГОЛОВОК СЕКЦИИ */}
-      <div className="w-full px-4 sm:px-8 lg:px-12 text-center max-w-5xl mx-auto mb-14 sm:mb-20">
+      <div className="w-full px-4 sm:px-8 lg:px-12 text-center max-w-5xl mx-auto mb-8 sm:mb-14 lg:mb-20">
         <p className="text-xs sm:text-sm font-semibold tracking-[0.2em] text-[#737373] uppercase mb-3 flex items-center justify-center gap-2">
           <span className="w-2 h-2 rounded-full bg-brand-pink" />
           Радиоточка / Спектр услуг
         </p>
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0A0A0A] tracking-tight leading-[1.15] mb-4">
+        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#0A0A0A] tracking-tight leading-[1.15] mb-3 sm:mb-4">
           {initialData?.title || "Продвижение вашего бизнеса по всем направлениям в Балаково"}
         </h2>
-        <p className="text-base sm:text-lg text-[#555555] font-normal leading-relaxed max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base lg:text-lg text-[#555555] font-normal leading-relaxed max-w-2xl mx-auto">
           Радиоэфир, наружная реклама, собственная звуковая студия и полиграфия. Более 20 лет работаем с ведущими предпринимателями региона.
         </p>
       </div>
 
-      {/* КАСКАДНОЕ НАСЛОЕНИЕ КАРТОЧЕК ВО ВСЮ ШИРИНУ ЭКРАНА (100% WIDTH, БЕЗ MAX-W ОГРАНИЧЕНИЯ) */}
-      <div className="w-full flex flex-col">
+      {/* МОБИЛЬНАЯ ВЕРСИЯ: Чистый аккуратный вертикальный список без наслоения и громоздкости */}
+      <div className="flex flex-col gap-5 lg:hidden px-4">
+        {items.map((service, index) => (
+          <MobileServiceCard
+            key={service.id || index}
+            service={{
+              ...service,
+              image: service.image || (service as any).imageSrc || "/images/services/service-01-radio-real.jpg",
+              tags: Array.isArray(service.tags) ? service.tags : [],
+            }}
+            index={index}
+          />
+        ))}
+      </div>
+
+      {/* ДЕСКТОП: КАСКАДНОЕ НАСЛОЕНИЕ КАРТОЧЕК ВО ВСЮ ШИРИНУ ЭКРАНА */}
+      <div className="hidden lg:flex flex-col w-full">
         {items.map((service, index) => (
           <ServiceCard
             key={service.id || index}
@@ -181,3 +298,4 @@ function BaseServices({ initialData }: ServicesProps) {
 
 const Services = memo(BaseServices);
 export default Services;
+
