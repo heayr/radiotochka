@@ -229,16 +229,18 @@ function BaseFooter({ initialData }: FooterProps) {
       </div>
 
       {/* 
-        УТОНЧЕННЫЙ ВОДЯНОЙ ЗНАК «РАДИОТОЧКА» НА ВСЮ ШИРИНУ ЭКРАНА:
-        - Вынесен из контейнера max-w-[1360px] для полного растяжения (100% ширины)
-        - textLength="1000" (равно ширине viewBox) чтобы буквы растянулись точно от края до края
+        АККУРАТНЫЙ ВОДЯНОЙ ЗНАК «РАДИОТОЧКА»:
+        - Просторный viewBox 1400x170 с гарантированными отступами со всех сторон (запас по краям и высоте)
+        - textAnchor="middle" по центру x="700", textLength="1220" (по 90px безопасного запаса слева и справа)
+        - Надежный baseline y="130", исключающий обрезание верхних или нижних элементов
       */}
-      <div className="w-full overflow-hidden select-none pointer-events-none px-4 sm:px-6">
+      <div className="w-full max-w-[1360px] mx-auto overflow-hidden select-none pointer-events-none px-6 sm:px-10 lg:px-14 my-4 sm:my-6">
         <svg
-          viewBox="0 0 1000 120"
+          viewBox="0 0 1400 170"
           className="w-full h-auto block"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid meet"
         >
           <defs>
             <linearGradient id="footerRefinedGradient" x1="0" y1="0" x2="0" y2="1">
@@ -249,18 +251,16 @@ function BaseFooter({ initialData }: FooterProps) {
             </linearGradient>
           </defs>
           <text
-            x="0"
-            y="98"
-            textLength="1000"
-            lengthAdjust="spacing"
+            x="700"
+            y="130"
+            textAnchor="middle"
+            textLength="1220"
+            lengthAdjust="spacingAndGlyphs"
             fill="url(#footerRefinedGradient)"
-            fontSize="100"
-            fontWeight="200"
-            style={{
-              fontFamily: "Urbanist, Onest, system-ui, -apple-system, sans-serif",
-              transform: "scaleY(1.3)",
-              transformOrigin: "bottom"
-            }}
+            fontSize="105"
+            fontWeight="300"
+            letterSpacing="0.04em"
+            fontFamily="Urbanist, Onest, system-ui, -apple-system, sans-serif"
           >
             РАДИОТОЧКА
           </text>
