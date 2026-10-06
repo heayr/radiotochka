@@ -20,6 +20,7 @@ function BaseFooter({ initialData }: FooterProps) {
   const vkUrl = initialData?.vkUrl || DEFAULT_FOOTER_DATA.vkUrl;
   const telegramUrl = initialData?.telegramUrl || DEFAULT_FOOTER_DATA.telegramUrl;
   const maxUrl = initialData?.maxUrl || DEFAULT_FOOTER_DATA.maxUrl;
+  const legalInfo = initialData?.legalInfo || DEFAULT_FOOTER_DATA.legalInfo;
 
   return (
     <footer className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 pb-8 overflow-hidden">
@@ -270,7 +271,15 @@ function BaseFooter({ initialData }: FooterProps) {
       <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
         {/* Нижний копирайт, блок разработчика и ссылка на панель модерации */}
         <div className="pt-8 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-white/40">
-          <p>© {new Date().getFullYear()} Рекламное агентство «Радиоточка». г. Балаково. Все права защищены.</p>
+          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2.5 text-center sm:text-left">
+            <p>© {new Date().getFullYear()} Рекламное агентство «Радиоточка». г. Балаково.</p>
+            {legalInfo && (
+              <>
+                <span className="hidden sm:inline text-white/20">•</span>
+                <p className="text-white/60 font-mono text-[11px]">{legalInfo}</p>
+              </>
+            )}
+          </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center lg:text-left">
             <span>

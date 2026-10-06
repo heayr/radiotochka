@@ -221,7 +221,7 @@ export function FooterEditor({ block, onSave, onCancel }: EditorProps) {
           value={legalInfo}
           onChange={(e) => setLegalInfo(e.target.value)}
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none font-mono text-xs"
-          placeholder="ИП Чуркина Ю.А. • ОГРНИП 318645100085392 • ИНН 643904996901"
+          placeholder="ИП Чурилова Ж.И. • ОГРНИП 319645100006105 • ИНН 643908571782"
         />
       </div>
 

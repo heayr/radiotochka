@@ -309,6 +309,6 @@ export const DEFAULT_FOOTER_DATA: FooterSectionData = {
   telegramUrl: "https://t.me/+79271370750",
   maxUrl: "#",
   legalInfo:
-    "ИП Чуркина Ю.А. • ОГРНИП 318645100085392 • ИНН 643904996901",
+    "ИП Чурилова Ж.И. • ОГРНИП 319645100006105 • ИНН 643908571782",
 };
 
