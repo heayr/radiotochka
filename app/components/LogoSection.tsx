@@ -134,14 +134,16 @@ const ClientCard = memo(function ClientCard({ item }: ClientCardProps) {
   return (
     <Component
       {...linkProps}
-      className={`group relative bg-white rounded-[16px] sm:rounded-[28px] border border-[#E5DFD5]/90 shadow-[0_2px_12px_rgba(0,0,0,0.02)] min-w-[170px] sm:min-w-[280px] lg:min-w-[340px] h-[72px] sm:h-[110px] lg:h-[135px] flex items-center justify-center px-4 sm:px-8 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md select-none shrink-0 ${
-        item.href ? "cursor-pointer hover:border-[#ea5670]/40" : ""
+      className={`group/card relative bg-white rounded-[16px] sm:rounded-[28px] border border-[#E5DFD5]/90 shadow-[0_2px_12px_rgba(0,0,0,0.02)] min-w-[170px] sm:min-w-[280px] lg:min-w-[340px] h-[72px] sm:h-[110px] lg:h-[135px] flex items-center justify-center px-4 sm:px-8 transition-[border-color,box-shadow] duration-200 ease-out hover:border-[#ea5670]/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] select-none shrink-0 ${
+        item.href ? "cursor-pointer" : ""
       }`}
     >
-      {cardContent}
+      <div className="w-full h-full flex items-center justify-center transition-transform duration-200 ease-out group-hover/card:scale-[1.02]">
+        {cardContent}
+      </div>
       {item.href && (
         <span
-          className="absolute top-2.5 right-3.5 text-xs text-gray-400 group-hover:text-[#ea5670] opacity-0 group-hover:opacity-100 transition-all transform -translate-y-0.5 group-hover:translate-y-0 select-none"
+          className="absolute top-2.5 right-3.5 text-xs text-gray-400 group-hover/card:text-[#ea5670] opacity-0 group-hover/card:opacity-100 transition-all select-none"
           title="Открыть сайт партнера"
         >
           ↗
@@ -164,6 +166,10 @@ export default function LogoSection({ initialData }: LogoSectionProps) {
       ? initialData.logos
       : DEFAULT_LOGO_SECTION_DATA.logos;
 
+  // Динамическая адаптивная длительность анимации:
+  // При добавлении большого количества логотипов скорость остается комфортной (~3.5с на карточку)
+  const animationDuration = `${Math.max(36, logos.length * 3.5)}s`;
+
   return (
     <section id="clients" className="w-full bg-[#F4F0EB] pt-6 sm:pt-10 pb-20 sm:pb-28">
       {/* Заголовок и подзаголовок в точном соответствии с референсом */}
@@ -179,9 +185,12 @@ export default function LogoSection({ initialData }: LogoSectionProps) {
         </div>
       </div>
 
-      {/* Бегущий трек карточек брендов */}
-      <div className="w-full overflow-hidden py-3">
-        <div className="animate-cards-marquee flex items-center gap-4 sm:gap-6 pl-4 sm:pl-6">
+      {/* Бегущий трек карточек брендов с контейнерной паузой и градиентными краями */}
+      <div className="marquee-container w-full overflow-hidden py-4 relative [mask-image:linear-gradient(to_right,transparent,black_3%,black_97%,transparent)]">
+        <div
+          className="animate-cards-marquee flex items-center gap-4 sm:gap-6 pr-4 sm:pr-6"
+          style={{ animationDuration }}
+        >
           {/* 1-й цикл */}
           {logos.map((item, idx) => (
             <ClientCard key={`card-1-${idx}-${item.alt}`} item={item} />
