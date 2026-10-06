@@ -72,6 +72,22 @@ export const DEFAULT_SERVICES_DATA: ServicesSectionData = {
       image: "/images/services/service-03-studio.jpg",
       alt: "Звукорежиссер за пультом аудиопродакшна студии Радиоточка",
     },
+    {
+      id: "04",
+      category: "Полиграфия и производство",
+      title: "Широкоформатная печать и рекламная полиграфия",
+      statNumber: "От 1 дня",
+      statLabel: "собственная производственная база",
+      description:
+        "Собственный печатный цех в Балаково: широкоформатная и интерьерная печать на баннере, пленке, холсте и бумаге. Изготовление полиграфической продукции от визиток до каталогов. Яркие устойчивые краски и оперативные тиражи любой сложности.",
+      tags: [
+        "Широкоформатная\nпечать",
+        "Баннеры и\nплёнка",
+        "Оперативная\nполиграфия",
+      ],
+      image: "/images/services/service-04-polygraphy.jpg",
+      alt: "Широкоформатная печать и рекламная полиграфия в Балаково",
+    },
   ],
   bottomCards: [
     {
@@ -310,5 +326,34 @@ export const DEFAULT_FOOTER_DATA: FooterSectionData = {
   maxUrl: "#",
   legalInfo:
     "ИП Чурилова Ж.И. • ОГРНИП 319645100006105 • ИНН 643908571782",
+};
+
+export interface LogoItem {
+  src: string;
+  alt: string;
+  name?: string;
+  type?: string;
+}
+
+export interface LogoSectionData {
+  title?: string;
+  subtitle?: string;
+  subtext?: string;
+  logos: LogoItem[];
+}
+
+export const DEFAULT_LOGO_SECTION_DATA: LogoSectionData = {
+  title: "Наши клиенты",
+  subtitle: "Работали с более чем 100+ брендами в регионе",
+  subtext: "Ритейл · Авто · Недвижимость · Сфера услуг · Медицина",
+  logos: [
+    { src: "", alt: "+Shift", name: "Shift", type: "shift" },
+    { src: "", alt: "BuildingBlocks", name: "BuildingBlocks", type: "building-blocks" },
+    { src: "", alt: "Capsule", name: "Capsule", type: "capsule" },
+    { src: "", alt: "45 Degrees°", name: "45 Degrees°", type: "45-degrees" },
+    { src: "", alt: "Acme", name: "Acme", type: "acme" },
+    { src: "/images/dorozhnoe.svg", alt: "Дорожное Радио", name: "Дорожное Радио", type: "image" },
+    { src: "/images/nashe.svg", alt: "Наше Радио", name: "Наше Радио", type: "image" },
+  ],
 };
 

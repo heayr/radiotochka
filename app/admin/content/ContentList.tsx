@@ -16,6 +16,7 @@ import { HeroEditor } from "./editors/HeroEditor";
 import { StatsEditor } from "./editors/StatsEditor";
 import { MarqueeEditor } from "./editors/MarqueeEditor";
 import { ManifestoEditor } from "./editors/ManifestoEditor";
+import { LogoSectionEditor } from "./editors/LogoSectionEditor";
 import { ProcessEditor } from "./editors/ProcessEditor";
 import { ServicesEditor } from "./editors/ServicesEditor";
 import { WorkEditor } from "./editors/WorkEditor";
@@ -27,6 +28,7 @@ import {
   DEFAULT_STATS_DATA,
   DEFAULT_MARQUEE_DATA,
   DEFAULT_MANIFESTO_DATA,
+  DEFAULT_LOGO_SECTION_DATA,
   DEFAULT_PROCESS_DATA,
   DEFAULT_SERVICES_DATA,
   DEFAULT_WORK_DATA,
@@ -43,6 +45,7 @@ const editorMap: Record<string, React.ComponentType<EditorProps>> = {
   stats: StatsEditor,
   marquee: MarqueeEditor,
   manifesto: ManifestoEditor,
+  "logo-section": LogoSectionEditor,
   process: ProcessEditor,
   services: ServicesEditor,
   work: WorkEditor,
@@ -81,31 +84,38 @@ const SECTION_INFO: Record<
     summary:
       "Цитата манифеста с анимацией слов по скроллу, стаж и города охвата.",
   },
+  "logo-section": {
+    icon: "🏢",
+    order: 5,
+    sectionName: "Экран 5: Клиенты и логотипы (LogoSection)",
+    summary:
+      "Бегущая строка карточек клиентов, логотипов брендов и радиостанций.",
+  },
   process: {
     icon: "🔄",
-    order: 5,
-    sectionName: "Экран 5: Этапы работы (Process)",
+    order: 6,
+    sectionName: "Экран 6: Этапы работы (Process)",
     summary:
       "4 карточки этапов (Брифинг, Медиаплан, Продакшн, Запуск) с фото и номерами.",
   },
   services: {
     icon: "📻",
-    order: 6,
-    sectionName: "Экран 6: Услуги (Services Stacking Cards)",
+    order: 7,
+    sectionName: "Экран 7: Услуги (Services Stacking Cards)",
     summary:
-      "3 полноэкранные стек-карточки (Радио, Билборды, Звук) + 3 нижние карточки.",
+      "4 полноэкранные стек-карточки (Радио, Билборды, Звук, Полиграфия) + 3 нижние карточки.",
   },
   work: {
     icon: "🏆",
-    order: 7,
-    sectionName: "Экран 7: Кейсы и проекты (Work)",
+    order: 8,
+    sectionName: "Экран 8: Кейсы и проекты (Work)",
     summary:
       "4 карточки реальных проектов (Оранж, ВолгаМоторс, Утёс, Премьер) с фото и тегами.",
   },
   footer: {
     icon: "📍",
-    order: 8,
-    sectionName: "Экран 8: Контакты и подвал (Footer)",
+    order: 9,
+    sectionName: "Экран 9: Контакты и подвал (Footer)",
     summary:
       "Офис в Балаково, телефоны, email, соцсети (VK, TG) и реквизиты компании.",
   },
@@ -121,10 +131,11 @@ const CANONICAL_SECTIONS: Array<{
   { slug: "stats", order: 2, title: "2. Цифры и студия (Stats)", defaultContent: DEFAULT_STATS_DATA as unknown as Record<string, unknown> },
   { slug: "marquee", order: 3, title: "3. Бегущая строка (Marquee)", defaultContent: DEFAULT_MARQUEE_DATA as unknown as Record<string, unknown> },
   { slug: "manifesto", order: 4, title: "4. Манифест агентства (Manifesto)", defaultContent: DEFAULT_MANIFESTO_DATA as unknown as Record<string, unknown> },
-  { slug: "process", order: 5, title: "5. Этапы работы (Process)", defaultContent: DEFAULT_PROCESS_DATA as unknown as Record<string, unknown> },
-  { slug: "services", order: 6, title: "6. Услуги (Services Stacking Cards)", defaultContent: DEFAULT_SERVICES_DATA as unknown as Record<string, unknown> },
-  { slug: "work", order: 7, title: "7. Кейсы и Проекты (Work)", defaultContent: DEFAULT_WORK_DATA as unknown as Record<string, unknown> },
-  { slug: "footer", order: 8, title: "8. Контакты и подвал (Footer)", defaultContent: DEFAULT_FOOTER_DATA as unknown as Record<string, unknown> },
+  { slug: "logo-section", order: 5, title: "5. Клиенты и логотипы (LogoSection)", defaultContent: DEFAULT_LOGO_SECTION_DATA as unknown as Record<string, unknown> },
+  { slug: "process", order: 6, title: "6. Этапы работы (Process)", defaultContent: DEFAULT_PROCESS_DATA as unknown as Record<string, unknown> },
+  { slug: "services", order: 7, title: "7. Услуги (Services Stacking Cards)", defaultContent: DEFAULT_SERVICES_DATA as unknown as Record<string, unknown> },
+  { slug: "work", order: 8, title: "8. Кейсы и Проекты (Work)", defaultContent: DEFAULT_WORK_DATA as unknown as Record<string, unknown> },
+  { slug: "footer", order: 9, title: "9. Контакты и подвал (Footer)", defaultContent: DEFAULT_FOOTER_DATA as unknown as Record<string, unknown> },
 ];
 
 export default function ContentList({ blocks, canCreate }: ContentListProps) {
@@ -245,7 +256,7 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-brand-pink text-white text-xs font-bold">
-              8
+              9
             </span>
             <h2 className="text-xl font-bold text-gray-900">
               Секции лендинга Радиоточки
@@ -266,7 +277,7 @@ export default function ContentList({ blocks, canCreate }: ContentListProps) {
             onClick={handleSyncDefaults}
             className="border-gray-300 font-medium"
           >
-            {isSyncing ? "Синхронизация..." : "⚡ Синхронизировать все 8 секций"}
+            {isSyncing ? "Синхронизация..." : "⚡ Синхронизировать все 9 секций"}
           </Button>
 
           {canCreate && (

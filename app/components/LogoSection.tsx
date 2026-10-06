@@ -1,13 +1,10 @@
 import React, { memo } from "react";
 import SafeImage from "./SafeImage";
-import { getContentBlock } from "@/lib/services/content.service";
-
-export interface LogoItem {
-  src: string;
-  alt: string;
-  name?: string;
-  type?: string;
-}
+import {
+  DEFAULT_LOGO_SECTION_DATA,
+  type LogoItem,
+  type LogoSectionData,
+} from "@/types/site-content";
 
 const defaultLogos: LogoItem[] = [
   { src: "", alt: "+Shift", name: "Shift", type: "shift" },
@@ -98,18 +95,18 @@ const ClientCard = memo(function ClientCard({ item }: ClientCardProps) {
   );
 });
 
-export default async function LogoSection() {
-  let block: { content: unknown } | null = null;
-  try {
-    block = await getContentBlock("logo-section");
-  } catch (e) {
-    console.error("[LogoSection] DB error:", e);
-  }
+export interface LogoSectionProps {
+  initialData?: Partial<LogoSectionData>;
+}
 
-  const content = (block?.content ?? {}) as Record<string, unknown>;
-  const logos = (content.logos as LogoItem[]) && (content.logos as LogoItem[]).length > 0
-    ? (content.logos as LogoItem[])
-    : defaultLogos;
+export default function LogoSection({ initialData }: LogoSectionProps) {
+  const title = initialData?.title || DEFAULT_LOGO_SECTION_DATA.title || "Наши клиенты";
+  const subtitle = initialData?.subtitle || DEFAULT_LOGO_SECTION_DATA.subtitle || "Работали с более чем 100+ брендами в регионе";
+  const subtext = initialData?.subtext || DEFAULT_LOGO_SECTION_DATA.subtext || "Ритейл · Авто · Недвижимость · Сфера услуг · Медицина";
+  const logos =
+    initialData?.logos && initialData.logos.length > 0
+      ? initialData.logos
+      : DEFAULT_LOGO_SECTION_DATA.logos;
 
   return (
     <section id="clients" className="w-full bg-[#F4F0EB] pt-6 sm:pt-10 pb-20 sm:pb-28">
@@ -117,11 +114,11 @@ export default async function LogoSection() {
       <div className="px-[20px] sm:px-[30px] lg:px-[60px] mb-8 sm:mb-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
           <h2 className="text-4xl sm:text-5xl lg:text-[56px] font-bold text-[#0A0A0A] tracking-[-0.03em] leading-tight">
-            Наши клиенты
+            {title}
           </h2>
           <div className="text-left md:text-right text-[#7E7971] text-xs sm:text-[14px] leading-relaxed select-none">
-            <p className="font-medium text-[#4A4742]">Работали с более чем 100+ брендами в регионе</p>
-            <p className="text-[#8E8B85]">Ритейл · Авто · Недвижимость · Сфера услуг · Медицина</p>
+            <p className="font-medium text-[#4A4742]">{subtitle}</p>
+            <p className="text-[#8E8B85]">{subtext}</p>
           </div>
         </div>
       </div>

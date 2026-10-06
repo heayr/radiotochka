@@ -16,6 +16,7 @@ import {
   DEFAULT_HERO_DATA,
   DEFAULT_MARQUEE_DATA,
   DEFAULT_FOOTER_DATA,
+  DEFAULT_LOGO_SECTION_DATA,
 } from "@/types/site-content";
 
 export async function getUsers(params: {
@@ -167,26 +168,32 @@ export async function seedDefaultContentBlocks() {
       status: "published",
     },
     {
+      slug: "logo-section",
+      title: "5. Клиенты и логотипы (LogoSection)",
+      content: DEFAULT_LOGO_SECTION_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
+    {
       slug: "process",
-      title: "5. Этапы работы (Process)",
+      title: "6. Этапы работы (Process)",
       content: DEFAULT_PROCESS_DATA as unknown as Record<string, unknown>,
       status: "published",
     },
     {
       slug: "services",
-      title: "6. Услуги (Services Stacking Cards)",
+      title: "7. Услуги (Services Stacking Cards)",
       content: DEFAULT_SERVICES_DATA as unknown as Record<string, unknown>,
       status: "published",
     },
     {
       slug: "work",
-      title: "7. Кейсы и Проекты (Work)",
+      title: "8. Кейсы и Проекты (Work)",
       content: DEFAULT_WORK_DATA as unknown as Record<string, unknown>,
       status: "published",
     },
     {
       slug: "footer",
-      title: "8. Контакты и подвал (Footer)",
+      title: "9. Контакты и подвал (Footer)",
       content: DEFAULT_FOOTER_DATA as unknown as Record<string, unknown>,
       status: "published",
     },
@@ -196,8 +203,8 @@ export async function seedDefaultContentBlocks() {
     await contentService.upsertContentBlock(block);
   }
 
-  // Автоматически удаляем устаревшие блоки из старого шаблона
-  const obsoleteSlugs = ["cases", "proposal", "logo-section"];
+  // Автоматически удаляем действительно устаревшие блоки старого шаблона
+  const obsoleteSlugs = ["cases", "proposal"];
   for (const slug of obsoleteSlugs) {
     try {
       await contentService.deleteContentBlock(slug);

@@ -2,6 +2,7 @@ import Hero from "./components/sections/Hero";
 import Stats from "./components/sections/Stats";
 import Marquee from "./components/sections/Marquee";
 import Manifesto from "./components/sections/Manifesto";
+import LogoSection from "./components/LogoSection";
 import Process from "./components/sections/Process";
 import Services from "./components/Services";
 import Work from "./components/sections/Work";
@@ -16,6 +17,7 @@ import {
   DEFAULT_HERO_DATA,
   DEFAULT_MARQUEE_DATA,
   DEFAULT_FOOTER_DATA,
+  DEFAULT_LOGO_SECTION_DATA,
   type ServicesSectionData,
   type WorkSectionData,
   type ProcessSectionData,
@@ -24,6 +26,7 @@ import {
   type HeroSectionData,
   type MarqueeSectionData,
   type FooterSectionData,
+  type LogoSectionData,
 } from "@/types/site-content";
 
 // Обеспечивает обновление контента на горячую при редактировании через модерацию
@@ -35,6 +38,7 @@ export default async function Home() {
     statsData,
     marqueeData,
     manifestoData,
+    logoSectionData,
     processData,
     servicesData,
     workData,
@@ -44,6 +48,7 @@ export default async function Home() {
     getContentBlockSafe<StatsSectionData>("stats", DEFAULT_STATS_DATA),
     getContentBlockSafe<MarqueeSectionData>("marquee", DEFAULT_MARQUEE_DATA),
     getContentBlockSafe<ManifestoSectionData>("manifesto", DEFAULT_MANIFESTO_DATA),
+    getContentBlockSafe<LogoSectionData>("logo-section", DEFAULT_LOGO_SECTION_DATA),
     getContentBlockSafe<ProcessSectionData>("process", DEFAULT_PROCESS_DATA),
     getContentBlockSafe<ServicesSectionData>("services", DEFAULT_SERVICES_DATA),
     getContentBlockSafe<WorkSectionData>("work", DEFAULT_WORK_DATA),
@@ -56,6 +61,7 @@ export default async function Home() {
       <Stats initialData={statsData} />
       <Marquee initialData={marqueeData} />
       <Manifesto initialData={manifestoData} />
+      <LogoSection initialData={logoSectionData} />
       <Process initialData={processData} />
       <Services initialData={servicesData} />
       <Work initialData={workData} />
