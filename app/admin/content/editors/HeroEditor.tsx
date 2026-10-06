@@ -124,32 +124,29 @@ export function HeroEditor({ block, onSave, onCancel }: EditorProps) {
         <div className="w-full select-none bg-[#F3EFE8] rounded-lg overflow-hidden">
           {(() => {
             const word = (bannerWord || DEFAULT_HERO_DATA.bannerWord).trim().toUpperCase();
-            const len = word.length || 9;
-            const optimalFontSize = len <= 8 ? 245 : len <= 10 ? 230 : 210;
-            const textLength = Math.min(1330, Math.max(1200, 1400 - (len > 10 ? 50 : 80)));
+            const len = Math.max(1, word.length);
+            const fontSize = Math.min(330, Math.max(180, Math.round(1400 / (len * 0.50))));
+            const viewBoxHeight = Math.round(fontSize * 1.12);
+            const baselineY = Math.round(fontSize * 0.91);
+
             return (
-              <svg viewBox="0 0 1400 380" className="w-full h-auto block" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox={`0 0 1400 ${viewBoxHeight}`} className="w-full h-auto block" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="previewBrandGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#ea5670" />
-                    <stop offset="14%" stopColor="#f07389" />
-                    <stop offset="30%" stopColor="#824e98" />
-                    <stop offset="47%" stopColor="#2c1038" />
-                    <stop offset="64%" stopColor="#ea5670" />
-                    <stop offset="82%" stopColor="#ad3557" />
-                    <stop offset="100%" stopColor="#431c57" />
+                    <stop offset="0%" stopColor="#EA5670" />
+                    <stop offset="50%" stopColor="#B35284" />
+                    <stop offset="100%" stopColor="#824E98" />
                   </linearGradient>
                 </defs>
                 <text
-                  x="700"
-                  y="300"
-                  textAnchor="middle"
-                  textLength={textLength}
+                  x="0"
+                  y={baselineY}
+                  textLength="1400"
                   lengthAdjust="spacingAndGlyphs"
                   fill="url(#previewBrandGradient)"
-                  fontFamily="'Oswald', Impact, sans-serif"
-                  fontWeight="600"
-                  fontSize={optimalFontSize}
+                  fontFamily="'Onest', -apple-system, BlinkMacSystemFont, sans-serif"
+                  fontWeight="500"
+                  fontSize={fontSize}
                   className="uppercase"
                 >
                   {word}
