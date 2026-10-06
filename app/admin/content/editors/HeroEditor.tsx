@@ -6,64 +6,48 @@ import { EditorFormFooter } from "@/app/components/ui/EditorFormFooter";
 import type { EditorProps } from "./editor-types";
 import { DEFAULT_HERO_DATA, type HeroSectionData } from "@/types/site-content";
 
-// Карта пропорций ширин символов Oswald Bold для мгновенного точного превью
-const OSWALD_CHAR_WIDTHS: Record<string, number> = {
-  "Ж": 0.88, "Ш": 0.88, "Щ": 0.90, "Ю": 0.84, "М": 0.78, "W": 0.88, "M": 0.82,
-  "I": 0.30, "І": 0.30, "Ї": 0.30, "J": 0.38, "1": 0.42,
-  "А": 0.64, "Б": 0.62, "В": 0.62, "Г": 0.54, "Д": 0.66, "Е": 0.58, "Ё": 0.58,
-  "З": 0.58, "И": 0.66, "Й": 0.66, "К": 0.62, "Л": 0.64, "Н": 0.66, "О": 0.66,
-  "П": 0.66, "Р": 0.60, "С": 0.62, "Т": 0.58, "У": 0.60, "Ф": 0.74, "Х": 0.62,
-  "Ц": 0.68, "Ч": 0.60, "Ъ": 0.70, "Ы": 0.80, "Ь": 0.60, "Э": 0.60, "Я": 0.64,
-  "A": 0.64, "B": 0.62, "C": 0.62, "D": 0.66, "E": 0.58, "F": 0.54, "G": 0.66,
-  "H": 0.66, "K": 0.62, "L": 0.54, "N": 0.66, "O": 0.66, "P": 0.60, "R": 0.60,
-  "S": 0.58, "T": 0.58, "U": 0.66, "V": 0.62, "X": 0.62, "Y": 0.60, "Z": 0.58,
-  " ": 0.35,
+// Прецизионные глифы Oswald Bold при fontSize=280 для идеального центрирования любого слова
+const OSWALD_GLYPH_WIDTHS: Record<string, number> = {
+  // Cyrillic
+  "А": 154, "Б": 155, "В": 165, "Г": 130, "Д": 194, "Е": 125, "Ё": 125,
+  "Ж": 223, "З": 147, "И": 165, "Й": 165, "К": 160, "Л": 184, "М": 197,
+  "Н": 171, "О": 164, "П": 169, "Р": 160, "С": 158, "Т": 125, "У": 155,
+  "Ф": 213, "Х": 144, "Ц": 190, "Ч": 171, "Ш": 231, "Щ": 249, "Ъ": 177,
+  "Ы": 233, "Ь": 156, "Э": 161, "Ю": 231, "Я": 170,
+  // Latin
+  "A": 154, "B": 155, "C": 158, "D": 165, "E": 125, "F": 120, "G": 165,
+  "H": 171, "I": 68, "J": 95, "K": 160, "L": 120, "M": 197, "N": 171,
+  "O": 164, "P": 160, "Q": 164, "R": 160, "S": 147, "T": 125, "U": 165,
+  "V": 155, "W": 225, "X": 144, "Y": 155, "Z": 145,
+  " ": 70,
 };
 
-function estimateTextWidth(word: string, fontSize: number): number {
-  let totalRatio = 0;
-  for (const char of word.toUpperCase()) {
-    totalRatio += OSWALD_CHAR_WIDTHS[char] || 0.64;
+function getHeroTypography(word: string) {
+  const cleanWord = (word || "МАРКЕТИНГ").trim().toUpperCase();
+  let rawSum = 0;
+  for (const c of cleanWord) {
+    rawSum += OSWALD_GLYPH_WIDTHS[c] || 160;
   }
-  return Math.ceil(totalRatio * fontSize * 1.03);
+  const textWidth = Math.round(rawSum * 0.925);
+  const padX = 45;
+  const viewBoxWidth = textWidth + padX * 2;
+  const centerX = viewBoxWidth / 2;
+
+  return {
+    viewBox: `0 36 ${viewBoxWidth} 242`,
+    centerX,
+    bannerWord: cleanWord,
+  };
 }
 
 function HeroPreviewSvg({ word }: { word: string }) {
-  const textRef = useRef<SVGTextElement>(null);
-  const cleanWord = (word || DEFAULT_HERO_DATA.bannerWord).trim().toUpperCase();
-  const [viewBox, setViewBox] = useState<string>(() => {
-    const estW = estimateTextWidth(cleanWord, 280);
-    return `0 36 ${estW} 242`;
-  });
-
-  useEffect(() => {
-    const updateBBox = () => {
-      if (textRef.current) {
-        try {
-          const b = textRef.current.getBBox();
-          if (b && b.width > 0 && b.height > 0) {
-            const padY = 16;
-            const padX = 6;
-            const capTop = 52 - padY;
-            const capHeight = 210 + padY * 2;
-            setViewBox(
-              `${Math.floor(b.x - padX)} ${capTop} ${Math.ceil(b.width + padX * 2)} ${capHeight}`
-            );
-          }
-        } catch {}
-      }
-    };
-    updateBBox();
-    if (typeof document !== "undefined" && "fonts" in document) {
-      document.fonts.ready.then(updateBBox);
-    }
-  }, [cleanWord]);
+  const { viewBox, centerX, bannerWord } = getHeroTypography(word);
 
   return (
     <svg
       viewBox={viewBox}
       preserveAspectRatio="none"
-      className="w-full h-[120px] sm:h-[150px] md:h-[175px] block"
+      className="w-full h-[120px] sm:h-[150px] md:h-[175px] block overflow-hidden"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
@@ -74,16 +58,16 @@ function HeroPreviewSvg({ word }: { word: string }) {
         </linearGradient>
       </defs>
       <text
-        ref={textRef}
-        x="0"
+        x={centerX}
         y="260"
+        textAnchor="middle"
         fill="url(#previewBrandGradient)"
         fontFamily="'Oswald', Impact, sans-serif"
         fontWeight="700"
         fontSize="280"
         className="uppercase"
       >
-        {cleanWord}
+        {bannerWord}
       </text>
     </svg>
   );

@@ -112,18 +112,21 @@ function BaseManifesto({ initialData }: ManifestoProps) {
       id="manifesto"
       className="w-full bg-[#F4F0EB] px-[20px] sm:px-[30px] lg:px-[60px] pt-16 sm:pt-24 pb-12 sm:pb-16"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
         {/* Левая колонка со списком городов и годом основания */}
-        <div className="lg:col-span-3 flex flex-col gap-1.5 text-xs sm:text-[13px] font-normal tracking-[0.16em] text-[#8C8780] uppercase select-none pt-1">
+        <div className="lg:col-span-3 flex flex-row flex-wrap lg:flex-col gap-x-4 gap-y-1.5 text-xs sm:text-[13px] font-normal tracking-[0.16em] text-[#8C8780] uppercase select-none pt-1">
           <span>{since}</span>
           {cities.map((city) => (
-            <span key={city}>{city}</span>
+            <span key={city} className="flex items-center gap-2">
+              <span className="lg:hidden text-[#8C8780]/40">•</span>
+              {city}
+            </span>
           ))}
         </div>
 
         {/* Правая колонка: Элегантная скругленная типографика с пословным проявлением при скролле */}
         <div className="lg:col-span-9">
-          <p className="text-2xl sm:text-3xl lg:text-[38px] xl:text-[40px] font-medium text-[#0A0A0A] leading-[1.36] tracking-[-0.02em] max-w-4xl">
+          <p className="text-xl sm:text-3xl lg:text-[38px] xl:text-[40px] font-medium text-[#0A0A0A] leading-[1.38] tracking-[-0.02em] max-w-4xl">
             {words.map((word, idx) => (
               <span
                 key={`word-${idx}`}

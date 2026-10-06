@@ -28,7 +28,7 @@ function BaseNavbar() {
   }, []);
 
   return (
-    <nav className="w-full bg-[#F3EFE8] py-9 px-[20px] sm:px-[20px] lg:px-[30px] transition-all">
+    <nav className="w-full bg-[#F3EFE8] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 transition-all relative z-40">
       <div className="w-full flex items-center justify-between">
 
         {/* Логотип слева в точности по левому отступу референса */}

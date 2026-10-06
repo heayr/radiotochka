@@ -25,14 +25,16 @@ const ServiceCard = memo(function ServiceCard({
 
   return (
     <div
-      className="sticky w-full transition-all duration-300 ease-out"
-      style={{
-        top: stickyTop,
-        zIndex: index + 1,
-      }}
+      className="relative lg:sticky w-full transition-all duration-300 ease-out top-auto lg:[top:var(--sticky-top)]"
+      style={
+        {
+          "--sticky-top": stickyTop,
+          zIndex: index + 1,
+        } as React.CSSProperties
+      }
     >
       <div
-        className="w-full py-8 sm:py-10 lg:py-12 px-6 sm:px-10 lg:px-14 xl:px-20 border-t border-b border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
+        className="w-full py-6 sm:py-10 lg:py-12 px-4 sm:px-10 lg:px-14 xl:px-20 border-t border-b border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
         style={{
           backgroundColor: "#101115",
           backgroundImage: `
@@ -44,14 +46,14 @@ const ServiceCard = memo(function ServiceCard({
           backgroundBlendMode: "screen, screen, normal, overlay",
         }}
       >
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 xl:gap-16 items-stretch w-full">
-          {/* ЛЕВАЯ КОЛОНКА: Номер + Портретное вертикальное фото */}
-          <div className="flex gap-4 sm:gap-6 items-start shrink-0">
-            <span className="text-xl sm:text-2xl font-extrabold text-white/90 tracking-tight shrink-0 pt-1">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-stretch w-full">
+          {/* ЛЕВАЯ КОЛОНКА: Номер + Портретное фото */}
+          <div className="flex gap-3 sm:gap-6 items-start shrink-0">
+            <span className="text-lg sm:text-2xl font-extrabold text-white/90 tracking-tight shrink-0 pt-1">
               {service.id}
             </span>
 
-            <div className="relative w-full sm:w-[280px] md:w-[320px] lg:w-[340px] xl:w-[380px] aspect-[4/5] rounded-[26px] sm:rounded-3xl overflow-hidden shadow-2xl border border-white/10 group shrink-0">
+            <div className="relative w-full sm:w-[280px] md:w-[320px] lg:w-[340px] xl:w-[380px] aspect-[16/10] sm:aspect-[4/3] lg:aspect-[4/5] rounded-[18px] sm:rounded-3xl overflow-hidden shadow-2xl border border-white/10 group shrink-0">
               <SafeImage
                 src={service.image}
                 alt={service.alt}

@@ -7,92 +7,119 @@ interface HeroProps {
   initialData?: Partial<HeroSectionData>;
 }
 
-// Карта пропорций ширин символов Oswald Bold для мгновенного точного SSR-расчета
-const OSWALD_CHAR_WIDTHS: Record<string, number> = {
-  // Широкие символы
-  "Ж": 0.88, "Ш": 0.88, "Щ": 0.90, "Ю": 0.84, "М": 0.78, "W": 0.88, "M": 0.82,
-  // Узкие символы
-  "I": 0.30, "І": 0.30, "Ї": 0.30, "J": 0.38, "1": 0.42,
-  // Стандартные символы
-  "А": 0.64, "Б": 0.62, "В": 0.62, "Г": 0.54, "Д": 0.66, "Е": 0.58, "Ё": 0.58,
-  "З": 0.58, "И": 0.66, "Й": 0.66, "К": 0.62, "Л": 0.64, "Н": 0.66, "О": 0.66,
-  "П": 0.66, "Р": 0.60, "С": 0.62, "Т": 0.58, "У": 0.60, "Ф": 0.74, "Х": 0.62,
-  "Ц": 0.68, "Ч": 0.60, "Ъ": 0.70, "Ы": 0.80, "Ь": 0.60, "Э": 0.60, "Я": 0.64,
+// Прецизионные глифы Oswald Bold при fontSize=280 для идеального центрирования любого слова
+const OSWALD_GLYPH_WIDTHS: Record<string, number> = {
+  // Cyrillic
+  "А": 154, "Б": 155, "В": 165, "Г": 130, "Д": 194, "Е": 125, "Ё": 125,
+  "Ж": 223, "З": 147, "И": 165, "Й": 165, "К": 160, "Л": 184, "М": 197,
+  "Н": 171, "О": 164, "П": 169, "Р": 160, "С": 158, "Т": 125, "У": 155,
+  "Ф": 213, "Х": 144, "Ц": 190, "Ч": 171, "Ш": 231, "Щ": 249, "Ъ": 177,
+  "Ы": 233, "Ь": 156, "Э": 161, "Ю": 231, "Я": 170,
   // Latin
-  "A": 0.64, "B": 0.62, "C": 0.62, "D": 0.66, "E": 0.58, "F": 0.54, "G": 0.66,
-  "H": 0.66, "K": 0.62, "L": 0.54, "N": 0.66, "O": 0.66, "P": 0.60, "R": 0.60,
-  "S": 0.58, "T": 0.58, "U": 0.66, "V": 0.62, "X": 0.62, "Y": 0.60, "Z": 0.58,
-  " ": 0.35,
+  "A": 154, "B": 155, "C": 158, "D": 165, "E": 125, "F": 120, "G": 165,
+  "H": 171, "I": 68, "J": 95, "K": 160, "L": 120, "M": 197, "N": 171,
+  "O": 164, "P": 160, "Q": 164, "R": 160, "S": 147, "T": 125, "U": 165,
+  "V": 155, "W": 225, "X": 144, "Y": 155, "Z": 145,
+  " ": 70,
 };
 
-function estimateTextWidth(word: string, fontSize: number): number {
-  let totalRatio = 0;
-  for (const char of word.toUpperCase()) {
-    totalRatio += OSWALD_CHAR_WIDTHS[char] || 0.64;
+function getHeroTypography(word: string) {
+  const cleanWord = (word || "МАРКЕТИНГ").trim().toUpperCase();
+  let rawSum = 0;
+  for (const c of cleanWord) {
+    rawSum += OSWALD_GLYPH_WIDTHS[c] || 160;
   }
-  // Запас 3% для исключения любого обрезания до гидратации
-  return Math.ceil(totalRatio * fontSize * 1.03);
+  // Учитываем парный кернинг в сплошном тексте Oswald
+  const textWidth = Math.round(rawSum * 0.925);
+
+  // =========================================================================
+  // 🎛 НАСТРОЙКИ ПОЗИЦИОНИРОВАНИЯ БУКВ ВНУТРИ SVG (МЕНЯЙ ЗДЕСЬ):
+  // =========================================================================
+
+  // 1. Боковой запас слева и справа (px):
+  //    Гарантирует, что крайние ножки букв «М» и «А» не будут срезаться рамкой SVG.
+  //    Увеличь (например, 60 или 70), если хочешь ещё больше воздуха по бокам.
+  const padX = 57;
+
+  // 2. Верхняя граница окна SVG (viewBox Y):
+  //    Уменьшаешь (например, 20 или 25) -> буквы опускаются ниже внутри блока.
+  //    Увеличиваешь (например, 45 или 50) -> буквы поднимаются выше.
+  const viewBoxTop = 36;
+
+  // 3. Высота окна SVG (viewBox Height):
+  //    Чем меньше число (например, 230) -> буквы сильнее вытягиваются в высоту.
+  //    Чем больше число (например, 260) -> буквы становятся чуть ниже и компактнее.
+  const viewBoxHeight = 242;
+
+  // 4. Базовая линия шрифта (Y посадки текста):
+  //    260 — идеальная оптическая посадка для кегля 280.
+  //    Увеличиваешь -> буквы смещаются вниз; уменьшаешь -> вверх.
+  const textBaselineY = 260;
+
+  // 5. Кегль шрифта внутри SVG:
+  const fontSize = 280;
+
+  // Итоговая ширина окна SVG с учетом текста и боковых отступов
+  const viewBoxWidth = textWidth + padX * 2;
+  // Центр по горизонтали: текст всегда идеально отцентрирован, ни один край не обрежется
+  const centerX = viewBoxWidth / 2;
+
+  return {
+    viewBox: `0 ${viewBoxTop} ${viewBoxWidth} ${viewBoxHeight}`,
+    centerX,
+    textBaselineY,
+    fontSize,
+    bannerWord: cleanWord,
+  };
 }
 
 export default function Hero({ initialData }: HeroProps) {
   const copyrightYear = initialData?.copyrightYear || DEFAULT_HERO_DATA.copyrightYear;
   const agencyLabel = initialData?.agencyLabel || DEFAULT_HERO_DATA.agencyLabel;
-  const bannerWord = (initialData?.bannerWord || DEFAULT_HERO_DATA.bannerWord).trim().toUpperCase();
+  const rawWord = initialData?.bannerWord || DEFAULT_HERO_DATA.bannerWord;
 
-  const textRef = useRef<SVGTextElement>(null);
-  const [viewBox, setViewBox] = useState<string>(() => {
-    const estW = estimateTextWidth(bannerWord, 280);
-    return `0 36 ${estW} 242`;
-  });
-
-  // Прецизионный расчет реальных границ рендеринга текста в браузере (getBBox)
-  useEffect(() => {
-    const updateBBox = () => {
-      if (textRef.current) {
-        try {
-          const b = textRef.current.getBBox();
-          if (b && b.width > 0 && b.height > 0) {
-            // Комфортный запас ~16-20px сверху и снизу для идеального контура букв без малейшего среза
-            const padY = 16;
-            const padX = 6;
-            const capTop = 52 - padY; // 36
-            const capHeight = 210 + padY * 2; // 242
-            setViewBox(
-              `${Math.floor(b.x - padX)} ${capTop} ${Math.ceil(b.width + padX * 2)} ${capHeight}`
-            );
-          }
-        } catch {
-          // fallback на оценочные размеры
-        }
-      }
-    };
-
-    updateBBox();
-
-    // Перепроверяем после гарантированной загрузки веб-шрифта
-    if (typeof document !== "undefined" && "fonts" in document) {
-      document.fonts.ready.then(updateBBox);
-    }
-  }, [bannerWord]);
+  const { viewBox, centerX, textBaselineY, fontSize, bannerWord } = getHeroTypography(rawWord);
 
   return (
     <section id="hero" className="relative w-full bg-[#F3EFE8] pt-1 sm:pt-2 overflow-hidden">
-      {/* Hero Header: Copyright & Agency Label */}
-      <div className="w-full px-[24px] sm:px-[30px] lg:px-[60px] pt-2 sm:pt-3 flex items-center justify-between">
-        <span className="text-[26px] sm:text-[32px] font-bold text-[#0A0A0A] tracking-tight">
+      {/* 
+        =====================================================================
+        ВЕРХНЯЯ СТРОКА: Год копирайта и статус агентства
+        - pt-2 sm:pt-3: отступ сверху от шапки меню
+        - px-4 sm:px-8 lg:px-[60px]: боковые отступы по краям экрана
+        =====================================================================
+      */}
+      <div className="w-full px-4 sm:px-8 lg:px-[60px] pt-2 sm:pt-3 flex items-center justify-between">
+        <span className="text-[20px] sm:text-[32px] font-bold text-[#0A0A0A] tracking-tight">
           {copyrightYear}
         </span>
-        <span className="text-[20px] sm:text-[28px] font-bold tracking-widest text-[#0A0A0A] uppercase">
+        <span className="text-[14px] sm:text-[28px] font-bold tracking-widest text-[#0A0A0A] uppercase">
           {agencyLabel}
         </span>
       </div>
 
-      {/* Hero Banner: Центрированная пропорциональная типографика по ширине с отступом 20px снизу */}
+      {/* 
+        =====================================================================
+        ГЛАВНЫЙ БАННЕР С НАДПИСЬЮ (МАРКЕТИНГА):
+        
+        ОТСТУПЫ СНАРУЖИ:
+        - pt-2 sm:pt-3: расстояние от верхней строки (©2026 / АГЕНТСТВО) до надписи
+        - mb-[20px]: отступ СНИЗУ от букв до следующего блока со студией (задай любое число)
+        - px-4 sm:px-8 lg:px-12: отступы от краев экрана
+        
+        ВЫСОТА НАДПИСИ (в классе svg):
+        - h-[85px]    -> на смартфонах (до 640px)
+        - sm:h-[180px]-> на больших телефонах
+        - md:h-[230px]-> на планшетах
+        - lg:h-[280px]-> на ноутбуках и ПК (эталон)
+        - xl:h-[295px]-> на больших мониторах
+        =====================================================================
+      */}
       <div className="w-full px-4 sm:px-8 lg:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] select-none flex justify-center items-center">
         <svg
           viewBox={viewBox}
           preserveAspectRatio="none"
-          className="w-full h-[150px] sm:h-[210px] md:h-[250px] lg:h-[280px] xl:h-[295px] block"
+          className="w-full h-[85px] sm:h-[180px] md:h-[230px] lg:h-[280px] xl:h-[295px] block overflow-hidden"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -104,15 +131,15 @@ export default function Hero({ initialData }: HeroProps) {
             </linearGradient>
           </defs>
 
-          {/* Плакатный текст: Oswald bold, монументальный и адаптивный под любой текст из админки */}
+          {/* Плакатный текст: Oswald bold, монументальный и центрированный без обрезания */}
           <text
-            ref={textRef}
-            x="0"
-            y="260"
+            x={centerX}
+            y={textBaselineY}
+            textAnchor="middle"
             fill="url(#heroRefinedGradient)"
             fontFamily="'Oswald', Impact, sans-serif"
             fontWeight="700"
-            fontSize="280"
+            fontSize={fontSize}
             className="uppercase"
           >
             {bannerWord}
