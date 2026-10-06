@@ -231,21 +231,20 @@ function BaseFooter({ initialData }: FooterProps) {
 
       {/* 
         ВОДЯНОЙ ЗНАК «РАДИОТОЧКА» НА ВСЮ ШИРИНУ ЭКРАНА:
-        - Растянут на 100% ширины экрана (w-full) без искусственных ограничений сетки
-        - Утончённый вес (fontWeight="100", тонкий изящный начерк шрифта Onest)
-        - Естественные пропорции без сплющивания (lengthAdjust="spacing" не деформирует глифы)
-        - Просторная высота viewBox (240px) с базовой линией y="160": запас 55px сверху и 80px снизу исключает любое обрезание
+        - Занимает 100% ширины экрана от левого до правого края (w-full, px-0)
+        - Крупный по высоте (fontSize="240", просторный viewBox 1400x320)
+        - Тонкие изящные буквы (fontWeight="200") без сплющивания (lengthAdjust="spacing")
+        - Запас 80px сверху и 70px снизу исключает любое обрезание
       */}
-      <div className="w-full overflow-hidden select-none pointer-events-none my-6 sm:my-10 px-2 sm:px-4">
+      <div className="w-full overflow-hidden select-none pointer-events-none my-6 sm:my-12">
         <svg
-          viewBox="0 0 1600 240"
+          viewBox="0 0 1400 320"
           className="w-full h-auto block"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMidYMid meet"
         >
           <defs>
-            <linearGradient id="footerRefinedGradient" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="footerRefinedGradient" x1="0" y1="0" x2="0" y2="100%">
               <stop offset="0%" stopColor="#EA5670" stopOpacity="0.55" />
               <stop offset="35%" stopColor="#EA5670" stopOpacity="0.22" />
               <stop offset="75%" stopColor="#EA5670" stopOpacity="0.06" />
@@ -253,16 +252,14 @@ function BaseFooter({ initialData }: FooterProps) {
             </linearGradient>
           </defs>
           <text
-            x="800"
-            y="160"
-            textAnchor="middle"
-            textLength="1540"
+            x="0"
+            y="250"
+            textLength="1400"
             lengthAdjust="spacing"
             fill="url(#footerRefinedGradient)"
-            fontSize="145"
-            fontWeight="100"
-            letterSpacing="0.06em"
-            fontFamily="'Onest', 'Urbanist', system-ui, -apple-system, sans-serif"
+            fontSize="240"
+            fontWeight="200"
+            fontFamily="'Onest', -apple-system, BlinkMacSystemFont, sans-serif"
           >
             РАДИОТОЧКА
           </text>
