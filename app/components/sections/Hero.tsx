@@ -9,9 +9,8 @@ export default function Hero({ initialData }: HeroProps) {
   const agencyLabel = initialData?.agencyLabel || DEFAULT_HERO_DATA.agencyLabel;
   const bannerWord = (initialData?.bannerWord || DEFAULT_HERO_DATA.bannerWord).trim().toUpperCase();
   const len = bannerWord.length || 9;
-  // Адаптивный расчет размера шрифта и ширины строки для безупречной посадки любого слова
-  const optimalFontSize = len <= 8 ? 245 : len <= 10 ? 230 : 210;
-  const textLength = Math.min(1330, Math.max(1200, 1400 - (len > 10 ? 50 : 80)));
+  // Адаптивный расчет размера шрифта для идеальной посадки и изящного трекинга без деформации глифов
+  const optimalFontSize = len <= 7 ? 240 : len <= 9 ? 220 : len <= 11 ? 190 : 160;
 
   return (
     <section id="hero" className="relative w-full bg-[#F3EFE8] pt-2 sm:pt-4 overflow-hidden">
@@ -25,36 +24,31 @@ export default function Hero({ initialData }: HeroProps) {
         </span>
       </div>
 
-      {/* Hero Banner: Giant SVG Typography */}
-      <div className="w-full px-[20px] sm:px-[30px] lg:px-[60px] pt-7 sm:pt-9 pb-6 sm:pb-8 select-none">
+      {/* Hero Banner: Giant SVG Typography в точности по эталону футера */}
+      <div className="w-full px-[20px] sm:px-[30px] lg:px-[60px] pt-4 sm:pt-6 pb-4 sm:pb-6 select-none">
         <svg
-          viewBox="0 0 1400 380"
-          className="w-full h-auto max-h-[500px] block"
+          viewBox="0 0 1400 300"
+          className="w-full h-auto block"
+          fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            {/* Кинематографичный плакатный градиент в фирменных цветах Радиоточки */}
-            <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#ea5670" />
-              <stop offset="14%" stopColor="#f07389" />
-              <stop offset="30%" stopColor="#824e98" />
-              <stop offset="47%" stopColor="#2c1038" />
-              <stop offset="64%" stopColor="#ea5670" />
-              <stop offset="82%" stopColor="#ad3557" />
-              <stop offset="100%" stopColor="#431c57" />
+            <linearGradient id="heroRefinedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#EA5670" />
+              <stop offset="50%" stopColor="#B35284" />
+              <stop offset="100%" stopColor="#824E98" />
             </linearGradient>
           </defs>
 
-          {/* Плакатный текст: центрирован с гарантированным запасом сверху, снизу и по краям */}
+          {/* Эталонная типографика: Onest, тонкое начертание 200, чистый трекинг spacing без сплющивания */}
           <text
-            x="700"
-            y="300"
-            textAnchor="middle"
-            textLength={textLength}
-            lengthAdjust="spacingAndGlyphs"
-            fill="url(#brandGradient)"
-            fontFamily="'Oswald', Impact, sans-serif"
-            fontWeight="600"
+            x="0"
+            y="240"
+            textLength="1400"
+            lengthAdjust="spacing"
+            fill="url(#heroRefinedGradient)"
+            fontFamily="'Onest', -apple-system, BlinkMacSystemFont, sans-serif"
+            fontWeight="200"
             fontSize={optimalFontSize}
             className="uppercase"
           >
