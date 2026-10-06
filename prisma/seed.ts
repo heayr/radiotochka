@@ -1,5 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import {
+  DEFAULT_HERO_DATA,
+  DEFAULT_STATS_DATA,
+  DEFAULT_MARQUEE_DATA,
+  DEFAULT_MANIFESTO_DATA,
+  DEFAULT_PROCESS_DATA,
+  DEFAULT_SERVICES_DATA,
+  DEFAULT_WORK_DATA,
+  DEFAULT_FOOTER_DATA,
+} from "../types/site-content";
 
 const prisma = new PrismaClient();
 
@@ -35,229 +45,54 @@ async function main() {
     console.log(`   Password: ${adminPassword}`);
   }
 
-  // Создаём контентные блоки по умолчанию
+  // Создаём контентные блоки по умолчанию (все 8 актуальных секций сайта)
   const defaultBlocks = [
     {
-      slug: "services",
-      title: "Услуги (Services Stacking Cards)",
-      content: {
-        title: "Наши услуги",
-        items: [
-          {
-            id: "01",
-            category: "Радиоресурсы и прямой эфир",
-            title: "Реклама на «Дорожном радио» и «НАШЕМ Радио»",
-            statNumber: "№1 в Балаково",
-            statLabel: "эксклюзивный представитель",
-            description:
-              "Официальный и эксклюзивный представитель радиостанций «Дорожное радио» и «НАШЕ Радио» в г. Балаково. Прямые договоры со станциями по всему региону: Балаково, Вольск, Пугачёв, Саратов, Пенза, Волгоград. Точный таргетинг и максимальный охват платежеспособных автомобилистов и семейной аудитории.",
-            tags: [
-              "Дорожное радио &\nНАШЕ Радио",
-              "Прямой эфир\nпо Поволжью",
-              "Эксклюзивные\nусловия",
-            ],
-            image: "/images/services/service-01-radio-real.jpg",
-            alt: "Профессиональная студия прямого радиоэфира Радиоточка Балаково",
-          },
-          {
-            id: "02",
-            category: "Наружная реклама",
-            title: "Билборды, сити-форматы и медиаконструкции",
-            statNumber: "От визитки",
-            statLabel: "до масштабного билборда",
-            description:
-              "Разработаем дизайн с нуля, качественно напечатаем и разместим на любой законной поверхности в Балаково и области: магистральные щиты 3х6 м, ситиборды, фасадные вывески и крупноформатные рекламные поверхности с максимальным пешеходным и автомобильным трафиком.",
-            tags: [
-              "Магистральные\nщиты 3х6",
-              "Ситиборды\nи вывески",
-              "Согласование\nи монтаж",
-            ],
-            image: "/images/services/service-02-billboard.jpg",
-            alt: "Наружная реклама и билборды на дорогах города",
-          },
-          {
-            id: "03",
-            category: "Аудиопродакшн полного цикла",
-            title: "Изготовление аудиороликов и джинглов",
-            statNumber: "Вся Россия",
-            statLabel: "и далеко за её пределами",
-            description:
-              "Собственная звуковая студия «Радиоточка». Аудиоролики, изготовленные на нашей студии, звучат в радиоэфире по всей России и далеко за её пределами. Пишем продающие сценарии, привлекаем профессиональных дикторов, делаем качественный саунд-дизайн и мастеринг. Быстро и профессионально.",
-            tags: [
-              "Федеральные\nдикторы",
-              "Лицензионная\nмузыка",
-              "Готовый ролик\nза 24 часа",
-            ],
-            image: "/images/services/service-03-studio.jpg",
-            alt: "Звукорежиссер за пультом аудиопродакшна студии Радиоточка",
-          },
-        ],
-        bottomCards: [
-          {
-            title: "Аудиореклама",
-            description: "Качественный звук, сценарий и профессиональные дикторы.",
-          },
-          {
-            title: "Медиапланирование",
-            description: "Индивидуальный расчет под ваш бюджет и целевую аудиторию.",
-          },
-          {
-            title: "Быстрый старт",
-            description: "Запуск рекламной кампании в эфир в кратчайшие сроки.",
-          },
-        ],
-      },
-      status: "published" as const,
-    },
-    {
-      slug: "work",
-      title: "Кейсы и Проекты (Work)",
-      content: {
-        title: "Избранные проекты",
-        subtitle: "Кейсы агентства",
-        items: [
-          {
-            id: "01",
-            title: "Alongside",
-            description:
-              "Комплексный ребрендинг и запуск федеральной рекламной кампании: разработка позиционирования, создание аудиороликов и ротация в эфире радиостанций.",
-            client: "Lumina Legal",
-            services: ["Айдентика", "Радиоэфир"],
-            imageSrc: "/images/work/project-01.png",
-            href: "#contact",
-          },
-          {
-            id: "02",
-            title: "Hypertech",
-            description:
-              "Кросс-канальная рекламная кампания: магистральные щиты 3х6 м в ключевых локациях города, аудио-джинглы в прайм-тайм и оперативная полиграфия.",
-            client: "FitFuel Nutrition",
-            services: ["Наружная реклама", "Аудиопродакшн"],
-            imageSrc: "/images/work/project-02.png",
-            href: "#contact",
-          },
-          {
-            id: "03",
-            title: "Redefine Flow",
-            description:
-              "Стратегический медиаплан и брендинг: позиционирование на региональном рынке, сити-форматы с высоким трафиком и спонсорские интеграции.",
-            client: "Verge Consulting",
-            services: ["Медиаплан", "Брендинг"],
-            imageSrc: "/images/work/project-03.png",
-            href: "#contact",
-          },
-          {
-            id: "04",
-            title: "Recap",
-            description:
-              "Пакетное размещение на радиостанциях «Дорожное радио» и «НАШЕ Радио» с охватом всей агломерации и точным попаданием в целевую аудиторию.",
-            client: "Harbor Financial",
-            services: ["Прямой эфир", "Спонсорство"],
-            imageSrc: "/images/work/project-04.png",
-            href: "#contact",
-          },
-        ],
-      },
-      status: "published" as const,
-    },
-    {
-      slug: "process",
-      title: "Этапы работы (Process)",
-      content: {
-        title: "Как мы работаем",
-        items: [
-          {
-            number: "01",
-            title: "Исследование",
-            description:
-              "Анализируем аудиторию и рынок, находя самые конверсионные точки контакта.",
-            imageSrc: "/images/process/step-01.jpg",
-          },
-          {
-            number: "02",
-            title: "Медиаплан",
-            description:
-              "Подбираем прайм-тайм станций и экраны под ваш бюджет без лишних переплат.",
-            imageSrc: "/images/process/step-02.jpg",
-          },
-          {
-            number: "03",
-            title: "Продакшн",
-            description:
-              "Создаем цепляющий ролик с дикторами и запускаем эфир день в день.",
-            imageSrc: "/images/process/step-03.jpg",
-          },
-          {
-            number: "04",
-            title: "Аналитика",
-            description:
-              "Отслеживаем входящие звонки и масштабируем охват с прозрачными отчетами.",
-            imageSrc: "/images/process/step-04.jpg",
-          },
-        ],
-      },
+      slug: "hero",
+      title: "1. Главный экран (Hero)",
+      content: DEFAULT_HERO_DATA as unknown as Record<string, unknown>,
       status: "published" as const,
     },
     {
       slug: "stats",
-      title: "Цифры и фото студии (Stats)",
-      content: {
-        title: "Радиоточка в цифрах",
-        metrics: [
-          {
-            value: "20+",
-            label: "Лет успешной работы в Балаково",
-          },
-          {
-            value: "80 000+",
-            label: "Слушателей ежедневно в регионе",
-          },
-          {
-            value: "100%",
-            label: "Прямой эфирный пул без наценок",
-          },
-        ],
-        pills: [
-          { label: "Прямой эфир 104.7 & 98.4 FM", href: "#services" },
-          { label: "Медиафасады и наружная реклама", href: "#services" },
-          { label: "Аудио-продакшн за 24ч", href: "#services" },
-          { label: "Широкоформатная печать", href: "#services" },
-        ],
-        desktopBanner: "/images/stats-banner-desktop.jpg",
-        mobileBanner: "/images/stats-banner-mobile.jpg",
-      },
+      title: "2. Цифры и студия (Stats)",
+      content: DEFAULT_STATS_DATA as unknown as Record<string, unknown>,
+      status: "published" as const,
+    },
+    {
+      slug: "marquee",
+      title: "3. Бегущая строка (Marquee)",
+      content: DEFAULT_MARQUEE_DATA as unknown as Record<string, unknown>,
       status: "published" as const,
     },
     {
       slug: "manifesto",
-      title: "Манифест агентства (Manifesto)",
-      content: {
-        text: "Мы не делаем рекламу «ради галочки». Каждая кампания на радио и городских экранах строится под конкретные цифры и продажи, пока показатели бизнеса реально не пойдут вверх.",
-        since: "SINCE 2004",
-        cities: ["БАЛАКОВО", "САРАТОВ", "ВОЛЬСК"],
-      },
+      title: "4. Манифест агентства (Manifesto)",
+      content: DEFAULT_MANIFESTO_DATA as unknown as Record<string, unknown>,
       status: "published" as const,
     },
     {
-      slug: "logo-section",
-      title: "Логотипы",
-      content: {
-        logos: [
-          { src: "/images/dorozhnoe.svg", alt: "Логотип Дорожное Радио" },
-          { src: "/images/nashe.svg", alt: "Логотип Наше Радио" },
-        ],
-      },
+      slug: "process",
+      title: "5. Этапы работы (Process)",
+      content: DEFAULT_PROCESS_DATA as unknown as Record<string, unknown>,
       status: "published" as const,
     },
     {
-      slug: "proposal",
-      title: "Предложение",
-      content: {
-        title: "Давайте создавать вместе",
-        description:
-          "Напишите нам сегодня, чтобы узнать больше о наших маркетинговых продуктах, которые помогут вашему бизнесу расти",
-        buttonText: "Получить предложение",
-      },
+      slug: "services",
+      title: "6. Услуги (Services Stacking Cards)",
+      content: DEFAULT_SERVICES_DATA as unknown as Record<string, unknown>,
+      status: "published" as const,
+    },
+    {
+      slug: "work",
+      title: "7. Кейсы и Проекты (Work)",
+      content: DEFAULT_WORK_DATA as unknown as Record<string, unknown>,
+      status: "published" as const,
+    },
+    {
+      slug: "footer",
+      title: "8. Контакты и подвал (Footer)",
+      content: DEFAULT_FOOTER_DATA as unknown as Record<string, unknown>,
       status: "published" as const,
     },
   ];
@@ -267,12 +102,28 @@ async function main() {
       where: { slug: block.slug },
       update: {
         title: block.title,
-        content: block.content,
+        content: block.content as any,
         status: block.status,
       },
-      create: block,
+      create: {
+        slug: block.slug,
+        title: block.title,
+        content: block.content as any,
+        status: block.status,
+      },
     });
     console.log(`✅ Блок "${block.slug}" сохранён`);
+  }
+
+  // Удаляем устаревшие блоки старого шаблона
+  const obsoleteSlugs = ["cases", "proposal", "logo-section"];
+  for (const slug of obsoleteSlugs) {
+    try {
+      await prisma.contentBlock.delete({ where: { slug } });
+      console.log(`🗑️  Устаревший блок "${slug}" удалён`);
+    } catch {
+      // Игнорируем если уже удалён
+    }
   }
 
   console.log("\n🎉 Сидинг завершён!");

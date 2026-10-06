@@ -22,6 +22,16 @@ import { WorkEditor } from "./editors/WorkEditor";
 import { FooterEditor } from "./editors/FooterEditor";
 import { JsonEditor } from "./editors/JsonEditor";
 import { CreateContentBlock } from "./editors/CreateContentBlock";
+import {
+  DEFAULT_HERO_DATA,
+  DEFAULT_STATS_DATA,
+  DEFAULT_MARQUEE_DATA,
+  DEFAULT_MANIFESTO_DATA,
+  DEFAULT_PROCESS_DATA,
+  DEFAULT_SERVICES_DATA,
+  DEFAULT_WORK_DATA,
+  DEFAULT_FOOTER_DATA,
+} from "@/types/site-content";
 
 interface ContentListProps {
   blocks: ContentBlock[];
@@ -101,19 +111,56 @@ const SECTION_INFO: Record<
   },
 };
 
+const CANONICAL_SECTIONS: Array<{
+  slug: string;
+  order: number;
+  title: string;
+  defaultContent: Record<string, unknown>;
+}> = [
+  { slug: "hero", order: 1, title: "1. Главный экран (Hero)", defaultContent: DEFAULT_HERO_DATA as unknown as Record<string, unknown> },
+  { slug: "stats", order: 2, title: "2. Цифры и студия (Stats)", defaultContent: DEFAULT_STATS_DATA as unknown as Record<string, unknown> },
+  { slug: "marquee", order: 3, title: "3. Бегущая строка (Marquee)", defaultContent: DEFAULT_MARQUEE_DATA as unknown as Record<string, unknown> },
+  { slug: "manifesto", order: 4, title: "4. Манифест агентства (Manifesto)", defaultContent: DEFAULT_MANIFESTO_DATA as unknown as Record<string, unknown> },
+  { slug: "process", order: 5, title: "5. Этапы работы (Process)", defaultContent: DEFAULT_PROCESS_DATA as unknown as Record<string, unknown> },
+  { slug: "services", order: 6, title: "6. Услуги (Services Stacking Cards)", defaultContent: DEFAULT_SERVICES_DATA as unknown as Record<string, unknown> },
+  { slug: "work", order: 7, title: "7. Кейсы и Проекты (Work)", defaultContent: DEFAULT_WORK_DATA as unknown as Record<string, unknown> },
+  { slug: "footer", order: 8, title: "8. Контакты и подвал (Footer)", defaultContent: DEFAULT_FOOTER_DATA as unknown as Record<string, unknown> },
+];
+
 export default function ContentList({ blocks, canCreate }: ContentListProps) {
   const router = useRouter();
   const [editingBlock, setEditingBlock] = useState<ContentBlock | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Сортируем блоки строго в порядке появления на лендинге
+  // Гарантируем отображение всех 8 основных экранов сайта в строгом порядке 1..8
+  // Если блок ещё не был записан в БД, подставляем актуальные дефолтные данные — редактирование доступно мгновенно
   const sortedBlocks = useMemo(() => {
-    return [...blocks].sort((a, b) => {
-      const orderA = SECTION_INFO[a.slug]?.order ?? 99;
-      const orderB = SECTION_INFO[b.slug]?.order ?? 99;
-      return orderA - orderB;
+    const canonicalList: ContentBlock[] = CANONICAL_SECTIONS.map((canonical) => {
+      const existing = blocks.find((b) => b.slug === canonical.slug);
+      if (existing) {
+        return existing;
+      }
+      return {
+        id: `default-${canonical.slug}`,
+        slug: canonical.slug,
+        title: canonical.title,
+        content: canonical.defaultContent,
+        status: "published" as const,
+        version: 1,
+        publishedAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
     });
+
+    // Дополнительные пользовательские блоки (исключаем устаревшие блоки из старого шаблона)
+    const obsoleteSlugs = new Set(["cases", "proposal", "logo-section"]);
+    const extraBlocks = blocks.filter(
+      (b) => !SECTION_INFO[b.slug] && !obsoleteSlugs.has(b.slug),
+    );
+
+    return [...canonicalList, ...extraBlocks];
   }, [blocks]);
 
   const handleCancel = useCallback(() => setEditingBlock(null), []);
