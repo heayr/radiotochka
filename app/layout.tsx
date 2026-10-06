@@ -64,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" className="scroll-smooth">
       <head>
         <meta name="yandex-verification" content="ab11e36a0123d865" />
         <link rel="icon" href="/favicon.ico" />

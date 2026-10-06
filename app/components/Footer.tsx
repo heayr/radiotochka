@@ -23,7 +23,7 @@ function BaseFooter({ initialData }: FooterProps) {
   const legalInfo = initialData?.legalInfo || DEFAULT_FOOTER_DATA.legalInfo;
 
   return (
-    <footer className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 pb-8 overflow-hidden">
+    <footer id="contact" className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 pb-8 overflow-hidden">
       <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
         
         {/* ВЕРХНИЙ БЛОК: Бренд и описание на всю ширину слева (как в референсе) */}
@@ -68,7 +68,7 @@ function BaseFooter({ initialData }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
+                <Link href="/#manifesto" className="hover:text-white transition-colors">
                   О нас
                 </Link>
               </li>
