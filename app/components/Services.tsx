@@ -136,7 +136,7 @@ const ServiceCard = memo(function ServiceCard({
       }
     >
       <div
-        className="w-full py-6 sm:py-10 lg:py-12 px-4 sm:px-10 lg:px-14 xl:px-20 border-t border-b border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
+        className="w-full py-6 sm:py-10 lg:py-12 2xl:py-16 px-4 sm:px-10 lg:px-12 2xl:px-16 border-t border-b border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
         style={{
           backgroundColor: "#101115",
           backgroundImage: `
@@ -148,19 +148,19 @@ const ServiceCard = memo(function ServiceCard({
           backgroundBlendMode: "screen, screen, normal, overlay",
         }}
       >
-        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-stretch w-full">
+        <div className="w-full max-w-[1680px] mx-auto flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-12 xl:gap-16 2xl:gap-20 items-stretch">
           {/* ЛЕВАЯ КОЛОНКА: Номер + Портретное фото */}
           <div className="flex gap-3 sm:gap-6 items-start shrink-0">
-            <span className="text-lg sm:text-2xl font-extrabold text-white/90 tracking-tight shrink-0 pt-1">
+            <span className="text-lg sm:text-2xl 2xl:text-3xl font-extrabold text-white/90 tracking-tight shrink-0 pt-1">
               {service.id}
             </span>
 
-            <div className="relative w-full sm:w-[280px] md:w-[320px] lg:w-[340px] xl:w-[380px] aspect-[16/10] sm:aspect-[4/3] lg:aspect-[4/5] rounded-[18px] sm:rounded-3xl overflow-hidden shadow-2xl border border-white/10 group shrink-0">
+            <div className="relative w-full sm:w-[280px] md:w-[320px] lg:w-[340px] xl:w-[380px] 2xl:w-[440px] aspect-[16/10] sm:aspect-[4/3] lg:aspect-[4/5] rounded-[18px] sm:rounded-3xl overflow-hidden shadow-2xl border border-white/10 group shrink-0">
               <SafeImage
                 src={service.image}
                 alt={service.alt}
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 340px, 380px"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 340px, (min-width: 1536px) 440px, 380px"
                 className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
                 priority={index === 0}
               />
@@ -172,7 +172,7 @@ const ServiceCard = memo(function ServiceCard({
             <div>
               {/* Верхняя строка: Категория слева, кнопка Start your project ↗ в правом углу */}
               <div className="flex items-center justify-between gap-4 mb-2 sm:mb-3">
-                <span className="text-xs sm:text-sm font-medium text-white/60 tracking-normal">
+                <span className="text-xs sm:text-sm 2xl:text-base font-medium text-white/60 tracking-normal">
                   {service.category}
                 </span>
 
@@ -180,7 +180,7 @@ const ServiceCard = memo(function ServiceCard({
                   href="tel:+79271370750"
                   variant="primary"
                   size="sm"
-                  className="!inline-flex !w-auto items-center gap-2 !px-6 !py-2.5 sm:!py-3 !rounded-full !bg-[#FF385C] hover:!bg-[#E02D50] !border-transparent !text-white font-semibold text-xs sm:text-sm shadow-xl hover:scale-105 active:scale-95 transition-all shrink-0"
+                  className="!inline-flex !w-auto items-center gap-2 !px-6 2xl:!px-8 !py-2.5 sm:!py-3 2xl:!py-3.5 !rounded-full !bg-[#FF385C] hover:!bg-[#E02D50] !border-transparent !text-white font-semibold text-xs sm:text-sm 2xl:text-base shadow-xl hover:scale-105 active:scale-95 transition-all shrink-0"
                 >
                   <span>Запустить проект</span>
                   <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -190,32 +190,32 @@ const ServiceCard = memo(function ServiceCard({
               </div>
 
               {/* Крупный заголовок в точности по референсу */}
-              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12] mb-5 sm:mb-6">
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl 2xl:text-[54px] font-extrabold text-white tracking-tight leading-[1.12] mb-5 sm:mb-6 2xl:mb-8">
                 {service.title}
               </h3>
 
               {/* Метрика и текстовое описание */}
               <div className="mb-6 sm:mb-8">
                 <div className="flex flex-wrap items-baseline gap-2.5 sm:gap-3 mb-2.5">
-                  <span className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+                  <span className="text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl font-extrabold text-white tracking-tight">
                     {service.statNumber}
                   </span>
-                  <span className="text-base sm:text-lg lg:text-xl text-white/70 font-normal">
+                  <span className="text-base sm:text-lg lg:text-xl 2xl:text-2xl text-white/70 font-normal">
                     {service.statLabel}
                   </span>
                 </div>
-                <p className="text-sm sm:text-base text-white/75 font-normal leading-relaxed max-w-4xl">
+                <p className="text-sm sm:text-base 2xl:text-lg text-white/75 font-normal leading-relaxed max-w-4xl 2xl:max-w-5xl">
                   {service.description}
                 </p>
               </div>
             </div>
 
             {/* 3 КРУПНЫЕ СВЕТЛО-БЕЖЕВЫЕ КАРТОЧКИ В РЯД (ТОЧНО КАК В РЕФЕРЕНСЕ) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full mt-auto pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 2xl:gap-5 w-full mt-auto pt-2">
               {(Array.isArray(service.tags) ? service.tags : []).map((tag, tagIdx) => (
                 <div
                   key={`${tag}-${tagIdx}`}
-                  className="bg-[#F0ECE4] text-[#0A0A0A] font-bold text-sm sm:text-base p-5 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm min-h-[110px] sm:min-h-[125px] flex items-center justify-start text-left whitespace-pre-line leading-snug transition-transform hover:scale-[1.02]"
+                  className="bg-[#F0ECE4] text-[#0A0A0A] font-bold text-sm sm:text-base 2xl:text-lg p-5 sm:p-6 2xl:p-7 rounded-2xl sm:rounded-3xl shadow-sm min-h-[110px] sm:min-h-[125px] 2xl:min-h-[140px] flex items-center justify-start text-left whitespace-pre-line leading-snug transition-transform hover:scale-[1.02]"
                 >
                   {tag}
                 </div>
@@ -248,17 +248,17 @@ function BaseServices({ initialData }: ServicesProps) {
   const items = isCompatible ? rawItems : DEFAULT_SERVICES_DATA.items;
 
   return (
-    <section id="services" className="w-full bg-[#F3EFE8] pt-12 sm:pt-24 pb-16 sm:pb-32">
+    <section id="services" className="w-full bg-[#F3EFE8] pt-12 sm:pt-24 2xl:pt-32 pb-16 sm:pb-32 2xl:pb-40">
       {/* ЗАГОЛОВОК СЕКЦИИ */}
-      <div className="w-full px-4 sm:px-8 lg:px-12 text-center max-w-5xl mx-auto mb-8 sm:mb-14 lg:mb-20">
-        <p className="text-xs sm:text-sm font-semibold tracking-[0.2em] text-[#737373] uppercase mb-3 flex items-center justify-center gap-2">
+      <div className="w-full px-4 sm:px-8 lg:px-12 text-center max-w-5xl 2xl:max-w-6xl mx-auto mb-8 sm:mb-14 lg:mb-20 2xl:mb-24">
+        <p className="text-xs sm:text-sm 2xl:text-base font-semibold tracking-[0.2em] text-[#737373] uppercase mb-3 flex items-center justify-center gap-2">
           <span className="w-2 h-2 rounded-full bg-brand-pink" />
           Радиоточка / Спектр услуг
         </p>
-        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#0A0A0A] tracking-tight leading-[1.15] mb-3 sm:mb-4">
+        <h2 className="text-2xl sm:text-4xl lg:text-5xl 2xl:text-6xl font-extrabold text-[#0A0A0A] tracking-tight leading-[1.15] mb-3 sm:mb-4">
           {initialData?.title || "Продвижение вашего бизнеса по всем направлениям в Балаково"}
         </h2>
-        <p className="text-sm sm:text-base lg:text-lg text-[#555555] font-normal leading-relaxed max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base lg:text-lg 2xl:text-xl text-[#555555] font-normal leading-relaxed max-w-2xl 2xl:max-w-3xl mx-auto">
           Радиоэфир, наружная реклама, собственная звуковая студия и полиграфия. Более 20 лет работаем с ведущими предпринимателями региона.
         </p>
       </div>

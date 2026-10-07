@@ -58,8 +58,13 @@ const config: Config = {
         "fluid-btn-lg-x": "clamp(1.25rem, 3vw, 2rem)",
         "fluid-btn-lg-y": "clamp(0.75rem, 2vw, 1rem)",
       },
+      screens: {
+        "3xl": "1920px",
+        "2k": "2560px",
+      },
       maxWidth: {
-        container: "clamp(320px, 88%, 1200px)",
+        container: "clamp(320px, 92%, 1680px)",
+        "content-wide": "1680px",
       },
       // Tailwind-style hamburger sizes (rem-based, fluid)
       width: {

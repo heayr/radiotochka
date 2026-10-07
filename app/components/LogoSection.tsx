@@ -134,7 +134,7 @@ const ClientCard = memo(function ClientCard({ item }: ClientCardProps) {
   return (
     <Component
       {...linkProps}
-      className={`group/card relative bg-white rounded-[16px] sm:rounded-[28px] border border-[#E5DFD5]/90 shadow-[0_2px_12px_rgba(0,0,0,0.02)] min-w-[170px] sm:min-w-[280px] lg:min-w-[340px] h-[72px] sm:h-[110px] lg:h-[135px] flex items-center justify-center px-4 sm:px-8 transition-[border-color,box-shadow] duration-200 ease-out hover:border-[#ea5670]/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] select-none shrink-0 ${
+      className={`group/card relative bg-white rounded-[16px] sm:rounded-[28px] border border-[#E5DFD5]/90 shadow-[0_2px_12px_rgba(0,0,0,0.02)] min-w-[170px] sm:min-w-[280px] lg:min-w-[340px] 2xl:min-w-[360px] h-[72px] sm:h-[110px] lg:h-[135px] 2xl:h-[145px] flex items-center justify-center px-4 sm:px-8 transition-[border-color,box-shadow] duration-200 ease-out hover:border-[#ea5670]/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] select-none shrink-0 ${
         item.href ? "cursor-pointer" : ""
       }`}
     >
@@ -167,18 +167,22 @@ export default function LogoSection({ initialData }: LogoSectionProps) {
       : DEFAULT_LOGO_SECTION_DATA.logos;
 
   // Динамическая адаптивная длительность анимации:
-  // При добавлении большого количества логотипов скорость остается комфортной (~3.5с на карточку)
-  const animationDuration = `${Math.max(36, logos.length * 3.5)}s`;
+  // При 4 циклах дорожки (2 в каждой половине) скорость остается комфортной (~3с на карточку в цикле)
+  const animationDuration = `${Math.max(48, logos.length * 2 * 3.2)}s`;
+
+  // Формируем 2 идентичные половины дорожки. В каждой половине — по 2 прогона списка логотипов.
+  // Это гарантирует, что первая половина имеет ширину > 4800px, что с огромным запасом перекрывает 2K (2560px) и Ultrawide (3440px).
+  const halfLogos = logos.concat(logos);
 
   return (
-    <section id="clients" className="w-full bg-[#F4F0EB] pt-6 sm:pt-10 pb-20 sm:pb-28">
+    <section id="clients" className="w-full bg-[#F4F0EB] pt-6 sm:pt-10 pb-20 sm:pb-28 2xl:pb-36">
       {/* Заголовок и подзаголовок в точном соответствии с референсом */}
-      <div className="px-[20px] sm:px-[30px] lg:px-[60px] mb-8 sm:mb-12">
+      <div className="w-full max-w-[1680px] mx-auto px-[20px] sm:px-[30px] lg:px-10 2xl:px-12 mb-8 sm:mb-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
-          <h2 className="text-4xl sm:text-5xl lg:text-[56px] font-bold text-[#0A0A0A] tracking-[-0.03em] leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-[56px] 2xl:text-[64px] font-bold text-[#0A0A0A] tracking-[-0.03em] leading-tight">
             {title}
           </h2>
-          <div className="text-left md:text-right text-[#7E7971] text-xs sm:text-[14px] leading-relaxed select-none">
+          <div className="text-left md:text-right text-[#7E7971] text-xs sm:text-[14px] 2xl:text-[16px] leading-relaxed select-none">
             <p className="font-medium text-[#4A4742]">{subtitle}</p>
             <p className="text-[#8E8B85]">{subtext}</p>
           </div>
@@ -191,12 +195,12 @@ export default function LogoSection({ initialData }: LogoSectionProps) {
           className="animate-cards-marquee flex items-center gap-4 sm:gap-6 pr-4 sm:pr-6"
           style={{ animationDuration }}
         >
-          {/* 1-й цикл */}
-          {logos.map((item, idx) => (
+          {/* 1-я половина дорожки (гарантированно шире 2K и Ultrawide мониторов) */}
+          {halfLogos.map((item, idx) => (
             <ClientCard key={`card-1-${idx}-${item.alt}`} item={item} />
           ))}
-          {/* 2-й цикл (для непрерывного бесконечного скролла) */}
-          {logos.map((item, idx) => (
+          {/* 2-я половина дорожки (идентичный дубликат для бесконечного плавного сдвига -50%) */}
+          {halfLogos.map((item, idx) => (
             <ClientCard key={`card-2-${idx}-${item.alt}`} item={item} />
           ))}
         </div>
