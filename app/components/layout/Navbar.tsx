@@ -53,17 +53,19 @@ function BaseNavbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`group relative overflow-hidden inline-flex py-2 px-2.5 -my-2 -mx-2.5 rounded-lg transition-colors hover:bg-black/[0.03] ${
+                className={`group inline-flex items-center py-2 px-2.5 -my-2 -mx-2.5 rounded-lg transition-colors hover:bg-black/[0.03] ${
                   isActive ? "font-semibold text-black" : "text-[#333333]"
                 }`}
               >
-                <span className="relative inline-flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full">
-                  {/* Первый (видимый) текст */}
-                  <span className="block">{link.label}</span>
-                  
-                  {/* Второй текст, который выезжает снизу и красится в фиолетовый */}
-                  <span className="absolute top-full left-0 block text-brand-purple" aria-hidden="true">
-                    {link.label}
+                <span className="relative overflow-hidden h-[1.35em] inline-block">
+                  <span className="relative inline-flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full">
+                    {/* Первый (видимый) текст */}
+                    <span className="block leading-[1.35]">{link.label}</span>
+                    
+                    {/* Второй текст, который выезжает снизу и красится в фиолетовый */}
+                    <span className="absolute top-full left-0 block text-brand-purple leading-[1.35]" aria-hidden="true">
+                      {link.label}
+                    </span>
                   </span>
                 </span>
               </Link>
