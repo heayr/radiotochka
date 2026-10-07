@@ -28,8 +28,8 @@ function BaseNavbar() {
   }, []);
 
   return (
-    <nav className="w-full bg-[#F3EFE8] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 transition-all relative z-40">
-      <div className="w-full flex items-center justify-between">
+    <nav className="w-full bg-[#F3EFE8] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 2xl:px-12 transition-all relative z-40">
+      <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between">
 
         {/* Логотип слева в точности по левому отступу референса */}
         <Link href="/" className="flex items-center gap-1 group select-none">

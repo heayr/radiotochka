@@ -89,11 +89,11 @@ export default function Hero({ initialData }: HeroProps) {
         - px-4 sm:px-8 lg:px-[60px]: боковые отступы по краям экрана
         =====================================================================
       */}
-      <div className="w-full px-4 sm:px-8 lg:px-[60px] pt-2 sm:pt-3 flex items-center justify-between">
-        <span className="text-[20px] sm:text-[32px] font-bold text-[#0A0A0A] tracking-tight">
+      <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 flex items-center justify-between">
+        <span className="text-[20px] sm:text-[32px] 2xl:text-[36px] font-bold text-[#0A0A0A] tracking-tight">
           {copyrightYear}
         </span>
-        <span className="text-[14px] sm:text-[28px] font-bold tracking-widest text-[#0A0A0A] uppercase">
+        <span className="text-[14px] sm:text-[28px] 2xl:text-[30px] font-bold tracking-widest text-[#0A0A0A] uppercase">
           {agencyLabel}
         </span>
       </div>
@@ -104,22 +104,24 @@ export default function Hero({ initialData }: HeroProps) {
         
         ОТСТУПЫ СНАРУЖИ:
         - pt-2 sm:pt-3: расстояние от верхней строки (©2026 / АГЕНТСТВО) до надписи
-        - mb-[20px]: отступ СНИЗУ от букв до следующего блока со студией (задай любое число)
-        - px-4 sm:px-8 lg:px-12: отступы от краев экрана
+        - mb-[20px] 2xl:mb-[32px]: отступ СНИЗУ от букв до следующего блока со студией
+        - max-w-[1680px] mx-auto: контейнерная гармония на 2K экранах
         
         ВЫСОТА НАДПИСИ (в классе svg):
         - h-[85px]    -> на смартфонах (до 640px)
         - sm:h-[180px]-> на больших телефонах
         - md:h-[230px]-> на планшетах
         - lg:h-[280px]-> на ноутбуках и ПК (эталон)
-        - xl:h-[295px]-> на больших мониторах
+        - xl:h-[295px]-> на больших экранах
+        - 2xl:h-[350px]-> на 2K-мониторах (сохраняет пропорции Oswald без сплющивания)
+        - 3xl:h-[380px]-> на сверхшироких экранах
         =====================================================================
       */}
-      <div className="w-full px-4 sm:px-8 lg:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] select-none flex justify-center items-center">
+      <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center">
         <svg
           viewBox={viewBox}
           preserveAspectRatio="none"
-          className="w-full h-[85px] sm:h-[180px] md:h-[230px] lg:h-[280px] xl:h-[295px] block overflow-hidden"
+          className="w-full h-[85px] sm:h-[180px] md:h-[230px] lg:h-[280px] xl:h-[295px] 2xl:h-[350px] 3xl:h-[380px] block overflow-hidden"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >

@@ -23,17 +23,17 @@ function BaseFooter({ initialData }: FooterProps) {
   const legalInfo = initialData?.legalInfo || DEFAULT_FOOTER_DATA.legalInfo;
 
   return (
-    <footer id="contact" className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 pb-8 overflow-hidden">
-      <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
+    <footer id="contact" className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 2xl:pt-36 pb-8 overflow-hidden">
+      <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16">
         
         {/* ВЕРХНИЙ БЛОК: Бренд и описание на всю ширину слева (как в референсе) */}
-        <div className="max-w-xl mb-16 sm:mb-20">
+        <div className="max-w-xl 2xl:max-w-2xl mb-16 sm:mb-20 2xl:mb-24">
           <Link href="/" className="inline-block select-none group mb-4">
-            <span className="text-3xl sm:text-4xl font-bold tracking-tight text-white block">
+            <span className="text-3xl sm:text-4xl 2xl:text-5xl font-bold tracking-tight text-white block">
               Радиоточка
             </span>
           </Link>
-          <p className="text-sm sm:text-base text-white/60 leading-relaxed font-normal">
+          <p className="text-sm sm:text-base 2xl:text-lg text-white/60 leading-relaxed font-normal">
             {brandDescription}
           </p>
         </div>
@@ -236,10 +236,10 @@ function BaseFooter({ initialData }: FooterProps) {
         - Тонкие изящные буквы (fontWeight="200") без сплющивания (lengthAdjust="spacing")
         - Запас 80px сверху и 70px снизу исключает любое обрезание
       */}
-      <div className="w-full overflow-hidden select-none pointer-events-none my-6 sm:my-12">
+      <div className="w-full max-w-[1720px] mx-auto overflow-hidden select-none pointer-events-none my-6 sm:my-12 2xl:my-16 px-4 flex justify-center">
         <svg
           viewBox="0 0 1400 320"
-          className="w-full h-auto block"
+          className="w-full max-h-[280px] 2xl:max-h-[320px] h-auto block"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -266,9 +266,9 @@ function BaseFooter({ initialData }: FooterProps) {
         </svg>
       </div>
 
-      <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
+      <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16">
         {/* Нижний копирайт, блок разработчика и ссылка на панель модерации */}
-        <div className="pt-8 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-white/40">
+        <div className="pt-8 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs 2xl:text-sm text-white/40">
           <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2.5 text-center sm:text-left">
             <p>© {new Date().getFullYear()} Рекламное агентство «Радиоточка». г. Балаково.</p>
             {legalInfo && (

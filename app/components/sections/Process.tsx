@@ -15,14 +15,14 @@ interface ProcessCardProps {
 
 const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
   return (
-    <div className="group relative w-full h-[440px] sm:h-[470px] lg:h-[460px] xl:h-[480px] rounded-[24px] sm:rounded-[28px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform pointer-events-auto">
+    <div className="group relative w-full h-[440px] sm:h-[470px] lg:h-[460px] xl:h-[480px] 2xl:h-[520px] rounded-[24px] sm:rounded-[28px] 2xl:rounded-[32px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform pointer-events-auto">
       {/* Фоновое атмосферное изображение без зума */}
       <div className="absolute inset-0 z-0">
         <SafeImage
           src={step.imageSrc}
           alt={step.title}
           fill
-          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1536px) 380px, (min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover object-center"
           priority={idx < 2}
         />
@@ -35,23 +35,23 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
       <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/85 via-[#ea5670]/35 via-50% to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
 
       {/* Содержимое карточки: текст приподнят ближе к оптической середине (pb-12 lg:pb-14 xl:pb-16) */}
-      <div className="relative z-20 h-full flex flex-col justify-between p-6 sm:p-7 pb-12 sm:pb-14 lg:pb-14 xl:pb-16 select-none">
+      <div className="relative z-20 h-full flex flex-col justify-between p-6 sm:p-7 2xl:p-8 pb-12 sm:pb-14 lg:pb-14 xl:pb-16 2xl:pb-18 select-none">
         {/* Верхняя зона: воздушный тонкий номер на фиксированной высоте */}
-        <div className="h-[64px] flex items-start justify-end">
-          <span className="text-7xl sm:text-8xl lg:text-[84px] font-extralight tracking-tight text-white/70 group-hover:text-white transition-colors duration-500 leading-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
+        <div className="h-[64px] 2xl:h-[76px] flex items-start justify-end">
+          <span className="text-7xl sm:text-8xl lg:text-[84px] 2xl:text-[96px] font-extralight tracking-tight text-white/70 group-hover:text-white transition-colors duration-500 leading-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
             {step.number}
           </span>
         </div>
 
         {/* Зона контента: приподнята в фокусный центр карточки, строго по одной линии */}
         <div className="flex flex-col justify-end">
-          <div className="h-[34px] flex items-end mb-2.5">
-            <h3 className="text-2xl sm:text-[25px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <div className="h-[34px] 2xl:h-[40px] flex items-end mb-2.5">
+            <h3 className="text-2xl sm:text-[25px] 2xl:text-[27px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               {step.title}
             </h3>
           </div>
-          <div className="h-[54px] flex items-start">
-            <p className="text-sm sm:text-[14px] text-white/90 leading-[1.5] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+          <div className="h-[54px] 2xl:h-[62px] flex items-start">
+            <p className="text-sm sm:text-[14px] 2xl:text-[15px] text-white/90 leading-[1.5] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {step.description}
             </p>
           </div>
@@ -240,9 +240,9 @@ function BaseProcess({ initialData }: ProcessProps) {
       }
 
       const listRect = list.getBoundingClientRect();
-      const cardHeight = window.innerWidth >= 1280 ? 480 : 460;
-      const stickyTop = window.innerWidth >= 1280 ? 245 : 220;
-      const headerTop = window.innerWidth >= 1280 ? 85 : 70;
+      const cardHeight = window.innerWidth >= 1536 ? 520 : window.innerWidth >= 1280 ? 480 : 460;
+      const stickyTop = window.innerWidth >= 1536 ? 260 : window.innerWidth >= 1280 ? 245 : 220;
+      const headerTop = window.innerWidth >= 1536 ? 90 : window.innerWidth >= 1280 ? 85 : 70;
 
       // Точка, где полностью пристыкованные карточки начинают подниматься наверх
       const liftThreshold = stickyTop + cardHeight;
@@ -254,7 +254,7 @@ function BaseProcess({ initialData }: ProcessProps) {
       } else {
         // Карточки поднимаются вверх и перекрывают заголовок -> плавное растворение
         const currentCardsTop = listRect.bottom - cardHeight;
-        const fadeDistance = stickyTop - headerTop; // ~150-165px
+        const fadeDistance = stickyTop - headerTop; // ~150-170px
 
         if (currentCardsTop <= headerTop) {
           header.style.opacity = "0";
@@ -317,16 +317,16 @@ function BaseProcess({ initialData }: ProcessProps) {
       ref={sectionRef}
       id="process"
       aria-label="Наш процесс работы"
-      className="relative w-full bg-[#0A0A0A] text-white py-16 sm:py-20 lg:py-[80px]"
+      className="relative w-full bg-[#0A0A0A] text-white py-16 sm:py-20 lg:py-[80px] 2xl:py-[100px]"
     >
-      <div className="w-full max-w-[1240px] mx-auto px-[20px] sm:px-[30px] flex flex-col items-center relative">
+      <div className="w-full max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-[20px] sm:px-[30px] lg:px-10 2xl:px-12 flex flex-col items-center relative">
         {/* Заголовок в 2 строчки и описание: sticky с растворением при подъеме карточек */}
         <div
           ref={headerRef}
-          className="w-full lg:sticky lg:top-[70px] xl:top-[85px] z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 lg:mb-10 pointer-events-none select-none will-change-transform"
+          className="w-full lg:sticky lg:top-[70px] xl:top-[85px] 2xl:top-[90px] z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 lg:mb-10 2xl:mb-12 pointer-events-none select-none will-change-transform"
         >
           <div>
-            <h2 className="text-4xl sm:text-5xl lg:text-[54px] font-bold text-white tracking-[-0.03em] leading-[1.05]">
+            <h2 className="text-4xl sm:text-5xl lg:text-[54px] 2xl:text-[62px] font-bold text-white tracking-[-0.03em] leading-[1.05]">
               {initialData?.title ? (
                 initialData.title
               ) : (
@@ -334,7 +334,7 @@ function BaseProcess({ initialData }: ProcessProps) {
               )}
             </h2>
           </div>
-          <p className="text-white/60 text-sm sm:text-base lg:text-[15px] font-normal leading-relaxed max-w-md text-left md:text-right">
+          <p className="text-white/60 text-sm sm:text-base lg:text-[15px] 2xl:text-[17px] font-normal leading-relaxed max-w-md 2xl:max-w-lg text-left md:text-right">
             Дисциплинированный четырехэтапный фреймворк, который исключает догадки и обеспечивает прогнозируемый рост продаж.
           </p>
         </div>
@@ -345,12 +345,12 @@ function BaseProcess({ initialData }: ProcessProps) {
         {/* На десктопе: аутентичный каскадный CSS Sticky Stacking из Framer Our Process */}
         <div
           ref={listRef}
-          className="hidden lg:block w-full relative z-20 h-[1840px] xl:h-[1920px]"
+          className="hidden lg:block w-full relative z-20 h-[1840px] xl:h-[1920px] 2xl:h-[2080px]"
         >
           {steps.map((step, idx) => (
             <div
               key={`desktop-step-${idx}`}
-              className="sticky top-[220px] xl:top-[245px] w-full grid grid-cols-4 gap-4 xl:gap-5 h-[460px] xl:h-[480px] pointer-events-none"
+              className="sticky top-[220px] xl:top-[245px] 2xl:top-[260px] w-full grid grid-cols-4 gap-4 xl:gap-5 2xl:gap-6 h-[460px] xl:h-[480px] 2xl:h-[520px] pointer-events-none"
             >
               {Array.from({ length: 4 }).map((_, colIdx) =>
                 colIdx === idx ? (
