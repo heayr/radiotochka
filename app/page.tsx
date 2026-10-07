@@ -2,11 +2,11 @@ import Hero from "./components/sections/Hero";
 import Stats from "./components/sections/Stats";
 import Marquee from "./components/sections/Marquee";
 import Manifesto from "./components/sections/Manifesto";
-import LogoSection from "./components/LogoSection";
+import LogoSection from "./components/sections/LogoSection";
 import Process from "./components/sections/Process";
-import Services from "./components/Services";
+import Services from "./components/sections/Services";
 import Work from "./components/sections/Work";
-import Footer from "./components/Footer";
+import Footer from "./components/layout/Footer";
 import { getContentBlockSafe } from "@/lib/services/content.service";
 import {
   DEFAULT_SERVICES_DATA,

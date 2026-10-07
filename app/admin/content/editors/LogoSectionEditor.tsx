@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Button from "@/app/components/Button";
 import { ImageField } from "./ImageField";
-import { defaultLogos } from "@/app/components/LogoSection";
+import { defaultLogos } from "@/app/components/sections/LogoSection";
 import { EditorFormFooter } from "@/app/components/ui/EditorFormFooter";
 import type { EditorProps } from "./editor-types";
 import {

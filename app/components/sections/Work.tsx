@@ -83,7 +83,7 @@ const WorkCard = memo(function WorkCard({
             <div>
               <Link
                 href={project.href || "#contact"}
-                className="group inline-flex items-center justify-center w-full sm:w-auto gap-2.5 px-6 2xl:px-8 py-3.5 2xl:py-4 rounded-full bg-[#0A0A0A] hover:bg-brand-pink text-white font-semibold text-sm 2xl:text-base transition-all duration-300 shadow-md hover:scale-105 active:scale-95"
+                className="group inline-flex items-center justify-center w-full sm:w-auto gap-2.5 px-6 2xl:px-8 py-3.5 2xl:py-4 rounded-full bg-[#0A0A0A] hover:bg-brand-pink text-white font-semibold text-sm 2xl:text-base transition-all duration-200 shadow-md hover:shadow-xl active:scale-[0.98]"
               >
                 <span>Обсудить похожий проект</span>
                 <svg
