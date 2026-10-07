@@ -32,13 +32,13 @@ function BaseNavbar() {
       <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between">
 
         {/* Логотип слева в точности по левому отступу референса */}
-        <Link href="/" className="flex items-center gap-1 group select-none">
+        <Link href="/" className="flex items-center gap-1.5 group select-none py-1">
           <Image
             src="/images/main-logo.svg"
             alt="Радиоточка"
             width={34}
             height={34}
-            className="h-8 w-8 sm:h-[34px] sm:w-[34px] transition-transform group-hover:scale-105"
+            className="h-8 w-8 sm:h-[34px] sm:w-[34px] transition-opacity group-hover:opacity-90"
             priority
           />
           <span className="font-bold text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none">
@@ -47,14 +47,14 @@ function BaseNavbar() {
         </Link>
 
         {/* Центр: Утонченные ссылки на Google Font Onest (как на референсе Framer) */}
-        <div className="hidden lg:flex items-center gap-7 xl:gap-7 text-[15px] xl:text-[16px] font-medium text-[#262626]">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-7 text-[15px] xl:text-[16px] font-medium text-[#262626]">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`group relative overflow-hidden inline-flex ${
+                className={`group relative overflow-hidden inline-flex py-2 px-2.5 -my-2 -mx-2.5 rounded-lg transition-colors hover:bg-black/[0.03] ${
                   isActive ? "font-semibold text-black" : "text-[#333333]"
                 }`}
               >
@@ -72,11 +72,11 @@ function BaseNavbar() {
           })}
         </div>
 
-        {/* Правая часть: Капсульная кнопка Связаться ↗ как в Framer GrowthLab */}
+        {/* Правая часть: Капсульная кнопка Связаться ↗ (стабильный хитбокс без дергания на ховере) */}
         <div className="hidden sm:flex items-center">
           <a
-            href="tel:+79271370750"
-            className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-brand-pink hover:bg-brand-pink-hover text-white font-semibold text-[15px] shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+            href="#contact"
+            className="inline-flex items-center gap-2.5 px-6 2xl:px-7 py-3 rounded-full bg-brand-pink hover:bg-brand-pink-hover text-white font-semibold text-[15px] 2xl:text-[16px] shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200"
           >
             <span>Связаться</span>
             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -85,11 +85,11 @@ function BaseNavbar() {
           </a>
         </div>
 
-        {/* Гамбургер для мобильных */}
+        {/* Гамбургер для мобильных с удобным тач-таргетом 44x44px */}
         <button
           type="button"
           onClick={handleToggleMenu}
-          className="lg:hidden p-2 rounded-xl text-gray-800 hover:bg-black/5 transition-colors"
+          className="lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-xl text-gray-800 hover:bg-black/5 active:scale-95 transition-all"
           aria-label="Открыть меню"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

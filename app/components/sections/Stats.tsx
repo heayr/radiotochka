@@ -65,32 +65,41 @@ function BaseStats({ initialData }: StatsProps) {
 
       {/* Контентный контейнер с ограничением 1680px для гармонии на 2K экранах */}
       <div className="relative z-10 w-full max-w-[1680px] mx-auto flex flex-col justify-between flex-1">
-        {/* Верхний блок: Метрики агентства - в 3 колонки на всех экранах */}
+        {/* Верхний блок: Метрики агентства - сбалансированное распределение по всей ширине на больших экранах */}
         <div className="w-full grid grid-cols-3 gap-2 sm:gap-10 pb-4 sm:pb-8">
-          {metrics.map((metric, idx) => (
-            <div key={metric.value || idx} className="flex flex-col">
-              <span className="font-sans text-lg sm:text-[22px] 2xl:text-[26px] font-semibold text-white mb-0.5 sm:mb-1 leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-                {metric.value}
-              </span>
-              <span className="text-[11px] sm:text-[15px] 2xl:text-[16px] text-white/95 font-normal leading-snug drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
-                {metric.label}
-              </span>
-            </div>
-          ))}
+          {metrics.map((metric, idx) => {
+            const alignClass =
+              idx === 0
+                ? "text-left items-start"
+                : idx === 1
+                ? "text-left sm:text-center sm:items-center"
+                : "text-left sm:text-right sm:items-end";
+
+            return (
+              <div key={metric.value || idx} className={`flex flex-col ${alignClass}`}>
+                <span className="font-sans text-lg sm:text-[22px] 2xl:text-[30px] font-semibold text-white mb-0.5 sm:mb-1 leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                  {metric.value}
+                </span>
+                <span className="text-[11px] sm:text-[15px] 2xl:text-[17px] text-white/95 font-normal leading-snug drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
+                  {metric.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
         {/* Нижний блок: Оффер + кнопки в фирменных цветах и плавающие капсулы без стрелочек */}
         <div className="w-full pt-6 sm:pt-14 2xl:pt-20 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-14 items-end">
           {/* Слева: Текстовый оффер и капсульные кнопки в фирменных цветах */}
           <div className="lg:col-span-7 flex flex-col items-start">
-            <p className="text-sm sm:text-xl lg:text-[22px] 2xl:text-[24px] text-white font-normal leading-relaxed mb-6 sm:mb-8 max-w-2xl 2xl:max-w-3xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+            <p className="text-sm sm:text-xl lg:text-[22px] 2xl:text-[26px] text-white font-normal leading-relaxed mb-6 sm:mb-8 max-w-2xl 2xl:max-w-3xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               {offerText}
             </p>
 
             <div className="flex flex-col sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3 sm:gap-4">
               <a
-                href="tel:+79271370750"
-                className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 2xl:px-8 py-3 sm:py-3.5 2xl:py-4 rounded-full bg-brand-pink hover:bg-brand-pink-hover text-white font-bold text-sm sm:text-base shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                href="#contact"
+                className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 2xl:px-8 py-3.5 sm:py-4 rounded-full bg-brand-pink hover:bg-brand-pink-hover text-white font-bold text-sm sm:text-base 2xl:text-lg shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all duration-200"
               >
                 <span>Запустить проект</span>
                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -102,7 +111,7 @@ function BaseStats({ initialData }: StatsProps) {
                 href="https://t.me/+79271370750"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 2xl:px-8 py-3 sm:py-3.5 2xl:py-4 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 text-white font-semibold text-sm sm:text-base backdrop-blur-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 2xl:px-8 py-3.5 sm:py-4 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 hover:border-white/50 text-white font-semibold text-sm sm:text-base 2xl:text-lg backdrop-blur-md shadow-lg hover:shadow-xl active:scale-[0.98] transition-all duration-200"
               >
                 <span>Обсудить в Telegram ↗</span>
               </a>
@@ -115,7 +124,7 @@ function BaseStats({ initialData }: StatsProps) {
               <a
                 key={pill.label || idx}
                 href={pill.href}
-                className="inline-flex items-center px-5 2xl:px-6 py-2.5 2xl:py-3 rounded-full bg-black/40 hover:bg-brand-purple/50 border border-white/20 hover:border-white/40 text-white font-medium text-xs sm:text-sm 2xl:text-base backdrop-blur-md shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex items-center px-5 2xl:px-7 py-2.5 2xl:py-3.5 rounded-full bg-black/40 hover:bg-brand-purple/60 border border-white/20 hover:border-white/40 text-white font-medium text-xs sm:text-sm 2xl:text-base backdrop-blur-md shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200"
               >
                 <span>{pill.label}</span>
               </a>

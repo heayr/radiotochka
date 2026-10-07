@@ -1,5 +1,8 @@
+"use client";
+
 import React, { memo } from "react";
 import Link from "next/link";
+import { copyToClipboard } from "@/app/components/Toast";
 import {
   DEFAULT_FOOTER_DATA,
   type FooterSectionData,
@@ -27,48 +30,48 @@ function BaseFooter({ initialData }: FooterProps) {
       <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16">
         
         {/* ВЕРХНИЙ БЛОК: Бренд и описание на всю ширину слева (как в референсе) */}
-        <div className="max-w-xl 2xl:max-w-2xl mb-16 sm:mb-20 2xl:mb-24">
+        <div className="max-w-xl 2xl:max-w-3xl mb-14 sm:mb-20 2xl:mb-24">
           <Link href="/" className="inline-block select-none group mb-4">
             <span className="text-3xl sm:text-4xl 2xl:text-5xl font-bold tracking-tight text-white block">
               Радиоточка
             </span>
           </Link>
-          <p className="text-sm sm:text-base 2xl:text-lg text-white/60 leading-relaxed font-normal">
+          <p className="text-sm sm:text-base 2xl:text-xl text-white/60 leading-relaxed font-normal">
             {brandDescription}
           </p>
         </div>
 
-        {/* СЕТКА КОЛОНОК: В один горизонтальный ряд на всю ширину (как в референсе) */}
+        {/* СЕТКА КОЛОНОК: В один горизонтальный ряд на всю ширину с комфортной зоной нажатия */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12 pb-8 sm:pb-16">
           
           {/* Колонка 1: Навигация */}
           <div>
-            <h4 className="text-sm font-medium text-white/50 mb-5">
+            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Навигация
             </h4>
-            <ul className="space-y-3 text-sm font-normal text-white/80">
+            <ul className="space-y-1 sm:space-y-1.5 text-sm 2xl:text-[17px] font-normal text-white/80">
               <li>
-                <Link href="/" className="hover:text-white transition-colors">
+                <Link href="/" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   Главная
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="hover:text-white transition-colors">
+                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   Услуги
                 </Link>
               </li>
               <li>
-                <Link href="/#process" className="hover:text-white transition-colors">
+                <Link href="/#process" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   Процесс
                 </Link>
               </li>
               <li>
-                <Link href="/#work" className="hover:text-white transition-colors">
+                <Link href="/#work" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   Кейсы
                 </Link>
               </li>
               <li>
-                <Link href="/#manifesto" className="hover:text-white transition-colors">
+                <Link href="/#manifesto" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   О нас
                 </Link>
               </li>
@@ -77,32 +80,32 @@ function BaseFooter({ initialData }: FooterProps) {
 
           {/* Колонка 2: Услуги */}
           <div>
-            <h4 className="text-sm font-medium text-white/50 mb-5">
+            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Услуги
             </h4>
-            <ul className="space-y-3 text-sm font-normal text-white/80">
+            <ul className="space-y-1 sm:space-y-1.5 text-sm 2xl:text-[17px] font-normal text-white/80">
               <li>
-                <Link href="/#services" className="hover:text-white transition-colors">
+                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   Дорожное радио
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="hover:text-white transition-colors">
+                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   НАШЕ Радио
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="hover:text-white transition-colors">
+                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   Щиты 3х6
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="hover:text-white transition-colors">
+                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   Звукозапись
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="hover:text-white transition-colors">
+                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
                   Полиграфия
                 </Link>
               </li>
@@ -111,30 +114,30 @@ function BaseFooter({ initialData }: FooterProps) {
 
           {/* Колонка 3: Офис */}
           <div>
-            <h4 className="text-sm font-medium text-white/50 mb-5">
+            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Офис
             </h4>
-            <div className="space-y-3 text-sm font-normal text-white/80">
-              <p className="text-white/60">
+            <div className="text-sm 2xl:text-[17px] font-normal text-white/80">
+              <p className="text-white/60 leading-relaxed py-1.5 2xl:py-2">
                 {officeAddress}
               </p>
             </div>
           </div>
 
-          {/* Колонка 4: Соцсети (ЧИСТЫЙ ТЕКСТОВЫЙ СПИСОК КАК В РЕФЕРЕНСЕ, БЕЗ КНОПОК) */}
+          {/* Колонка 4: Соцсети */}
           <div>
-            <h4 className="text-sm font-medium text-white/50 mb-5">
+            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Соцсети
             </h4>
-            <ul className="space-y-3 text-sm font-normal text-white/80">
+            <ul className="space-y-1 sm:space-y-1.5 text-sm 2xl:text-[17px] font-normal text-white/80">
               <li>
                 <a
                   href={vkUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white transition-colors block"
+                  className="block py-1.5 2xl:py-2 hover:text-white transition-colors"
                 >
-                  ВКонтакте
+                  ВКонтакте ↗
                 </a>
               </li>
               <li>
@@ -142,9 +145,9 @@ function BaseFooter({ initialData }: FooterProps) {
                   href={telegramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white transition-colors block"
+                  className="block py-1.5 2xl:py-2 hover:text-white transition-colors"
                 >
-                  Telegram
+                  Telegram ↗
                 </a>
               </li>
               <li>
@@ -152,72 +155,79 @@ function BaseFooter({ initialData }: FooterProps) {
                   href={maxUrl || "#"}
                   target={maxUrl && maxUrl !== "#" ? "_blank" : undefined}
                   rel={maxUrl && maxUrl !== "#" ? "noopener noreferrer" : undefined}
-                  className="hover:text-white transition-colors block cursor-pointer"
+                  className="block py-1.5 2xl:py-2 hover:text-white transition-colors cursor-pointer"
                 >
-                  МАКС
+                  МАКС ↗
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Колонка 5: Есть вопросы? (ПРЯМЫЕ ИКОНКИ БЕЗ КВАДРАТОВ И БЕЙДЖЕЙ, КАК В РЕФЕРЕНСЕ) */}
+          {/* Колонка 5: Есть вопросы? (Комфортная зона клика + копирование на десктопе) */}
           <div className="col-span-2 sm:col-span-1">
-            <h4 className="text-sm font-medium text-white/50 mb-5">
+            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Есть вопросы?
             </h4>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               
-              {/* Телефон через +7 */}
-              <div className="flex items-start gap-3">
+              {/* Телефон через +7 с умным копированием на десктопе */}
+              <div className="group flex items-start gap-3 p-2 -m-2 rounded-xl hover:bg-white/5 transition-all">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="shrink-0 text-white mt-0.5"
+                  className="shrink-0 text-white/80 group-hover:text-brand-pink transition-colors mt-0.5"
                 >
                   <path
                     fill="currentColor"
                     d="M19.95 21q-3.125 0-6.175-1.362t-5.55-3.863q-2.5-2.5-3.862-5.55T3 4.05q0-.45.3-.75t.75-.3h3.05q.35 0 .625.238t.325.562l.65 3.5q.05.35-.025.638T8.4 8.45L6.1 10.75q1.125 1.95 2.575 3.4t3.4 2.575l2.3-2.3q.25-.25.55-.337t.65-.013l3.5.7q.35.075.575.338t.225.612v3.05q0 .45-.3.75t-.75.3Z"
                   />
                 </svg>
-                <div>
+                <div className="flex-1 min-w-0">
                   <a
                     href={`tel:${phonePrimary.replace(/[^\d+]/g, "")}`}
-                    className="text-sm font-medium text-white hover:text-brand-pink transition-colors block leading-tight"
+                    onClick={(e) => {
+                      if (typeof window !== "undefined" && window.innerWidth >= 768) {
+                        e.preventDefault();
+                        copyToClipboard(phonePrimary, `Телефон скопирован: ${phonePrimary}`);
+                      }
+                    }}
+                    title="Нажмите для вызова или копирования"
+                    className="text-sm 2xl:text-[17px] font-medium text-white group-hover:text-brand-pink transition-colors block leading-tight cursor-pointer"
                   >
                     {phonePrimary}
                   </a>
-                  <span className="text-xs text-white/40 block mt-0.5">
+                  <span className="text-xs 2xl:text-sm text-white/40 block mt-1">
                     Пн–Пт с 9:00 до 18:00
                   </span>
                 </div>
               </div>
 
               {/* Email */}
-              <div className="flex items-start gap-3">
+              <div className="group flex items-start gap-3 p-2 -m-2 rounded-xl hover:bg-white/5 transition-all">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="shrink-0 text-white mt-0.5"
+                  className="shrink-0 text-white/80 group-hover:text-brand-pink transition-colors mt-0.5"
                 >
                   <path
                     fill="currentColor"
                     d="M4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20H4Zm8-7l8-5V6l-8 5l-8-5v2l8 5Z"
                   />
                 </svg>
-                <div>
+                <div className="flex-1 min-w-0">
                   <a
                     href={`mailto:${email}`}
-                    className="text-sm font-medium text-white hover:text-brand-pink transition-colors block leading-tight"
+                    className="text-sm 2xl:text-[17px] font-medium text-white group-hover:text-brand-pink transition-colors block leading-tight"
                   >
                     {email}
                   </a>
-                  <span className="text-xs text-white/40 block mt-0.5">
+                  <span className="text-xs 2xl:text-sm text-white/40 block mt-1">
                     Медиапланы и документооборот
                   </span>
                 </div>
@@ -286,7 +296,7 @@ function BaseFooter({ initialData }: FooterProps) {
                 href="https://yegor-dev.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white/75 hover:text-white underline underline-offset-2 transition-colors font-medium"
+                className="text-white/75 hover:text-white underline underline-offset-2 transition-colors font-medium py-1 inline-block"
               >
                 yegor-dev.vercel.app
               </a>
@@ -294,13 +304,13 @@ function BaseFooter({ initialData }: FooterProps) {
             <span className="hidden sm:inline text-white/20">·</span>
             <a
               href="mailto:egormyshinsky@gmail.com"
-              className="text-white/60 hover:text-brand-pink transition-colors"
+              className="text-white/60 hover:text-brand-pink transition-colors py-1 inline-block"
             >
               egormyshinsky@gmail.com
             </a>
           </div>
 
-          <a href="/admin/content" className="hover:text-white/70 transition-colors">
+          <a href="/admin/content" className="hover:text-white/70 transition-colors py-1 px-2.5 -mx-2.5 rounded-md hover:bg-white/5 inline-block">
             Панель модерации
           </a>
         </div>
