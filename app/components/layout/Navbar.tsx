@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState, useCallback, memo } from "react";
 import { usePathname } from "next/navigation";
-import Button from "./Button";
 
 const navLinks = [
   { label: "Главная", href: "/" },
