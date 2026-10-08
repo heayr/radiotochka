@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import {
@@ -17,9 +18,11 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Начало сидинга...");
 
-  // Создаём супер-админа
-  const adminEmail = "admin@radiotochka.example.com";
-  const adminPassword = "REDACTED_ADMIN_PASSWORD";
+  // Создаём супер-админа через переменные окружения либо генерируем безопасный пароль
+  const adminEmail = process.env.INITIAL_ADMIN_EMAIL || "admin@radiotochka.ru";
+  const adminPassword =
+    process.env.INITIAL_ADMIN_PASSWORD ||
+    crypto.randomBytes(12).toString("base64url");
 
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail },
