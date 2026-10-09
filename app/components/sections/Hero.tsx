@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { DEFAULT_HERO_DATA, type HeroSectionData } from "@/types/site-content";
-import { radioAudio } from "@/lib/audio/radio-audio";
 
 interface HeroProps {
   initialData?: Partial<HeroSectionData>;
@@ -52,7 +51,7 @@ function getHeroTypography(word: string) {
 }
 
 /**
- * Генерация единого SVG Path для всех столбиков эквалайзера с закругленными верхушками
+ * Генерация SVG Path для столбиков спектрального эквалайзера
  */
 function buildEqualizerBarsPath(
   width: number,
@@ -61,16 +60,16 @@ function buildEqualizerBarsPath(
   yBase: number,
   barWidth: number
 ): string {
-  const margin = 48;
+  const margin = 45;
   const avail = width - margin * 2;
   const step = avail / numBars;
   let d = "";
 
   for (let i = 0; i < numBars; i++) {
     const x = margin + i * step + (step - barWidth) / 2;
-    const h = Math.max(5, heights[i]);
+    const h = Math.max(14, heights[i]);
     const yTop = yBase - h;
-    const r = Math.min(4, barWidth / 2);
+    const r = Math.min(5, barWidth / 2);
 
     d += `M ${x + r} ${yTop} `;
     d += `H ${x + barWidth - r} `;
@@ -85,7 +84,7 @@ function buildEqualizerBarsPath(
 }
 
 /**
- * Генерация пиковых меток эквалайзера (Peak Hold dots)
+ * Генерация пиковых меток эквалайзера (Peak Hold)
  */
 function buildEqualizerPeaksPath(
   width: number,
@@ -94,15 +93,15 @@ function buildEqualizerPeaksPath(
   yBase: number,
   barWidth: number
 ): string {
-  const margin = 48;
+  const margin = 45;
   const avail = width - margin * 2;
   const step = avail / numBars;
   let d = "";
 
   for (let i = 0; i < numBars; i++) {
     const x = margin + i * step + (step - barWidth) / 2;
-    const pY = yBase - peaks[i] - 6;
-    d += `M ${x} ${pY} H ${x + barWidth} V ${pY + 3.5} H ${x} Z `;
+    const pY = yBase - peaks[i] - 7;
+    d += `M ${x} ${pY} H ${x + barWidth} V ${pY + 4} H ${x} Z `;
   }
 
   return d;
@@ -116,12 +115,11 @@ export default function Hero({ initialData }: HeroProps) {
   const { viewBox, centerX, textBaselineY, fontSize, bannerWord, viewBoxWidth, viewBoxTop, viewBoxHeight } =
     getHeroTypography(rawWord);
 
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // SVG Refs для эквалайзера и стрелки настройки
+  // SVG Refs для анимации эквалайзера
   const eqBarsRef = useRef<SVGPathElement>(null);
   const eqPeaksRef = useRef<SVGPathElement>(null);
-  const needleRef = useRef<SVGLineElement>(null);
 
   const activityRef = useRef(0);
   const targetMouseXRef = useRef(viewBoxWidth / 2);
@@ -130,107 +128,73 @@ export default function Hero({ initialData }: HeroProps) {
   const lastPosRef = useRef({ x: 0, y: 0 });
   const lastMoveTimeRef = useRef(0);
 
-  // Включаем только на ПК с мышью
   useEffect(() => {
-    const checkIsDesktop = () => {
-      const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
-      const isWideScreen = window.innerWidth >= 1024;
-      setIsDesktop(hasFinePointer && isWideScreen);
-    };
-
-    checkIsDesktop();
-    window.addEventListener("resize", checkIsDesktop);
-    return () => window.removeEventListener("resize", checkIsDesktop);
+    setMounted(true);
   }, []);
 
-  // Разблокировка Web Audio API при первом жесте
+  // Анимационный цикл 60fps для эквалайзера
   useEffect(() => {
-    if (!isDesktop) return;
-
-    const unlockAudio = () => {
-      radioAudio.ensureRunning();
-    };
-
-    window.addEventListener("pointerdown", unlockAudio, { passive: true });
-    window.addEventListener("mousemove", unlockAudio, { once: true, passive: true });
-    window.addEventListener("keydown", unlockAudio, { passive: true });
-
-    return () => {
-      window.removeEventListener("pointerdown", unlockAudio);
-      window.removeEventListener("mousemove", unlockAudio);
-      window.removeEventListener("keydown", unlockAudio);
-    };
-  }, [isDesktop]);
-
-  // Анимационный цикл эквалайзера 60-120fps
-  useEffect(() => {
-    if (!isDesktop) return;
+    if (!mounted) return;
 
     let animId: number;
     let phase = 0;
 
-    const NUM_BARS = 48;
-    const BAR_WIDTH = 20;
-    const STATIONS_POS = [0.18, 0.50, 0.82];
+    const NUM_BARS = 44;
+    const BAR_WIDTH = 22;
 
     const currentHeights = new Float32Array(NUM_BARS);
     const peakHeights = new Float32Array(NUM_BARS);
 
-    const margin = 48;
+    // Начальные высоты эквалайзера, чтобы он сразу был виден на экране
+    for (let i = 0; i < NUM_BARS; i++) {
+      currentHeights[i] = 70 + Math.sin(i * 0.3) * 30;
+      peakHeights[i] = currentHeights[i] + 10;
+    }
+
+    const margin = 45;
     const avail = viewBoxWidth - margin * 2;
     const step = avail / NUM_BARS;
 
     const render = () => {
       activityRef.current = Math.max(0, activityRef.current * 0.94);
-      currentMouseXRef.current += (targetMouseXRef.current - currentMouseXRef.current) * 0.15;
+      currentMouseXRef.current += (targetMouseXRef.current - currentMouseXRef.current) * 0.16;
 
       const act = activityRef.current;
-      phase += 0.045 + act * 0.08;
+      phase += 0.05 + act * 0.06;
 
       const mX = currentMouseXRef.current;
-      const xRatio = mX / viewBoxWidth;
-
-      // Проверка наведения на радиостанцию
-      const isLocked = STATIONS_POS.some((pos) => Math.abs(xRatio - pos) < 0.055);
+      const isHovered = isHoveredRef.current;
 
       for (let i = 0; i < NUM_BARS; i++) {
         const barCenterX = margin + i * step + step / 2;
-        const distToMouse = Math.abs(barCenterX - mX) / 160;
-        const mouseBoost = Math.exp(-distToMouse * distToMouse) * act * 155;
+        const distToMouse = Math.abs(barCenterX - mX) / 170;
 
-        // Гармонический ритм эквалайзера
-        let dynamicH = 0;
-        if (isLocked) {
-          // Танцующий музыкальный спектр пойманной радиостанции
-          const beat1 = Math.sin(i * 0.38 + phase * 2.2) * 50;
-          const beat2 = Math.cos(i * 0.72 - phase * 1.6) * 35;
-          const beat3 = Math.sin(phase * 4.0) * 20;
-          dynamicH = 45 + Math.abs(beat1 + beat2 + beat3) * 0.9 + mouseBoost * 0.8;
-        } else if (act > 0.05) {
-          // Реакция на движение мыши в эфире: спектральные всплески
-          const wave = Math.sin(i * 0.5 + phase) * 35 + Math.sin(i * 1.3 - phase * 1.8) * 25;
-          dynamicH = 12 + Math.abs(wave) * act + mouseBoost;
-        } else {
-          // Мягкое фоновое дыхание эквалайзера в покое
-          const idleWave = Math.sin(i * 0.28 + phase * 0.7) * 9 + Math.cos(i * 0.45 - phase * 0.5) * 6;
-          dynamicH = 12 + Math.abs(idleWave);
-        }
+        // При наведении мыши — мощный всплеск спектра вокруг курсора (до +90px)
+        const mouseBoost = isHovered
+          ? Math.exp(-distToMouse * distToMouse) * (65 + act * 75)
+          : 0;
 
-        // Ограничение максимальной высоты внутри букв
-        const targetH = Math.min(195, Math.max(6, dynamicH));
+        // Живой танец спектроанализатора
+        const wave1 = Math.sin(i * 0.42 + phase * 1.8) * 44;
+        const wave2 = Math.cos(i * 0.78 - phase * 1.2) * 26;
+        const wave3 = Math.sin(phase * 3.2 + i * 0.18) * 14;
 
-        // Плавная интерполяция высоты столбика
-        currentHeights[i] += (targetH - currentHeights[i]) * 0.28;
+        // Базовая высота: уверенно танцует от 50px до 125px (внутри букв)
+        const baseH = 75 + wave1 + wave2 * 0.6 + wave3 * 0.4;
+        const targetH = Math.min(195, Math.max(18, baseH + mouseBoost));
 
-        // Гравитационное падение пиковых точек (Peak Hold)
+        // Плавная интерполяция
+        currentHeights[i] += (targetH - currentHeights[i]) * 0.22;
+
+        // Падение пиковых отметок (Peak hold с гравитацией)
         if (currentHeights[i] >= peakHeights[i]) {
           peakHeights[i] = currentHeights[i];
         } else {
-          peakHeights[i] = Math.max(currentHeights[i], peakHeights[i] - 1.8);
+          peakHeights[i] = Math.max(currentHeights[i], peakHeights[i] - 2.2);
         }
       }
 
-      // Обновление SVG путей столбиков и пиков напрямую в DOM
+      // Обновление SVG путей
       if (eqBarsRef.current) {
         eqBarsRef.current.setAttribute(
           "d",
@@ -245,18 +209,6 @@ export default function Hero({ initialData }: HeroProps) {
         );
       }
 
-      // Стрелка настройки радио (tuner needle)
-      if (needleRef.current) {
-        if (isHoveredRef.current) {
-          needleRef.current.setAttribute("x1", mX.toFixed(1));
-          needleRef.current.setAttribute("x2", mX.toFixed(1));
-          const opacity = Math.min(1, act * 0.7 + 0.4);
-          needleRef.current.setAttribute("opacity", opacity.toFixed(2));
-        } else {
-          needleRef.current.setAttribute("opacity", "0");
-        }
-      }
-
       animId = requestAnimationFrame(render);
     };
 
@@ -264,15 +216,12 @@ export default function Hero({ initialData }: HeroProps) {
 
     return () => {
       cancelAnimationFrame(animId);
-      radioAudio.fadeStop();
     };
-  }, [isDesktop, viewBoxWidth, textBaselineY]);
+  }, [mounted, viewBoxWidth, textBaselineY]);
 
-  // Движение мыши над надписью
+  // Интерактив при движении курсора
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!isDesktop) return;
-
       const rect = e.currentTarget.getBoundingClientRect();
       const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       const svgX = relX * viewBoxWidth;
@@ -286,40 +235,30 @@ export default function Hero({ initialData }: HeroProps) {
       lastPosRef.current = { x: e.clientX, y: e.clientY };
       lastMoveTimeRef.current = now;
 
-      activityRef.current = Math.min(1, activityRef.current + speed * 0.45 + 0.2);
+      activityRef.current = Math.min(1, activityRef.current + speed * 0.5 + 0.25);
       isHoveredRef.current = true;
-
-      // Воспроизведение звука лампового радио
-      radioAudio.triggerTuning(relX, speed);
     },
-    [isDesktop, viewBoxWidth]
+    [viewBoxWidth]
   );
 
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!isDesktop) return;
       isHoveredRef.current = true;
       const rect = e.currentTarget.getBoundingClientRect();
       const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       targetMouseXRef.current = relX * viewBoxWidth;
       currentMouseXRef.current = relX * viewBoxWidth;
     },
-    [isDesktop, viewBoxWidth]
+    [viewBoxWidth]
   );
 
   const handleMouseLeave = useCallback(() => {
-    if (!isDesktop) return;
     isHoveredRef.current = false;
-    radioAudio.fadeStop();
-  }, [isDesktop]);
+  }, []);
 
   return (
     <section id="hero" className="relative w-full bg-[#F3EFE8] pt-1 sm:pt-2 overflow-hidden">
-      {/* 
-        =====================================================================
-        ВЕРХНЯЯ СТРОКА: Исходный дизайн (год и статус агентства без лишних кнопок)
-        =====================================================================
-      */}
+      {/* Верхняя строка: копирайт и статус агентства */}
       <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 flex items-center justify-between">
         <span className="text-[20px] sm:text-[32px] 2xl:text-[36px] font-bold text-[#0A0A0A] tracking-tight">
           {copyrightYear}
@@ -330,17 +269,14 @@ export default function Hero({ initialData }: HeroProps) {
       </div>
 
       {/* 
-        =====================================================================
-        ГЛАВНЫЙ БАННЕР С НАДПИСЬЮ (МАРКЕТИНГ):
-        Буквы ВСЕГДА на 100% видны в фирменном градиенте.
-        На ПК внутри букв анимируются столбики живого аудио-эквалайзера!
-        =====================================================================
+        ГЛАВНЫЙ БАННЕР С НАДПИСЬЮ:
+        Буквы наполнены живым, танцующим спектральным аудио-эквалайзером.
       */}
       <div
         className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center cursor-pointer"
-        onMouseMove={isDesktop ? handleMouseMove : undefined}
-        onMouseEnter={isDesktop ? handleMouseEnter : undefined}
-        onMouseLeave={isDesktop ? handleMouseLeave : undefined}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <svg
           viewBox={viewBox}
@@ -350,17 +286,18 @@ export default function Hero({ initialData }: HeroProps) {
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
+            {/* Базовый фирменный градиент */}
             <linearGradient id="heroRefinedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#EA5670" />
               <stop offset="50%" stopColor="#B35284" />
               <stop offset="100%" stopColor="#824E98" />
             </linearGradient>
 
-            {/* Градиент столбиков эквалайзера (от фирменного розового до неонового белого верха) */}
-            <linearGradient id="eqBarGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+            {/* Яркий спектральный градиент столбиков эквалайзера */}
+            <linearGradient id="eqBarVividGradient" x1="0%" y1="100%" x2="0%" y2="0%">
               <stop offset="0%" stopColor="#EA5670" stopOpacity="0.85" />
-              <stop offset="50%" stopColor="#FF6584" stopOpacity="0.95" />
-              <stop offset="85%" stopColor="#FBBF24" stopOpacity="0.98" />
+              <stop offset="45%" stopColor="#FF3366" stopOpacity="0.95" />
+              <stop offset="80%" stopColor="#FBBF24" stopOpacity="0.98" />
               <stop offset="100%" stopColor="#FFFFFF" stopOpacity="1" />
             </linearGradient>
 
@@ -378,11 +315,26 @@ export default function Hero({ initialData }: HeroProps) {
                 {bannerWord}
               </text>
             </clipPath>
+
+            <mask id="heroWordMask" maskUnits="userSpaceOnUse" x="0" y="0" width={viewBoxWidth} height="400">
+              <text
+                x={centerX}
+                y={textBaselineY}
+                textAnchor="middle"
+                fill="#FFFFFF"
+                fontFamily="'Oswald', Impact, sans-serif"
+                fontWeight="700"
+                fontSize={fontSize}
+                className="uppercase"
+              >
+                {bannerWord}
+              </text>
+            </mask>
           </defs>
 
           {/* 
             1. БАЗОВЫЙ ПЛАКАТНЫЙ ТЕКСТ:
-            Всегда отображается напрямую! Никогда не пропадает ни на мобилках, ни на ПК.
+            Создает объемный фон букв с фирменным градиентом
           */}
           <text
             x={centerX}
@@ -393,36 +345,22 @@ export default function Hero({ initialData }: HeroProps) {
             fontWeight="700"
             fontSize={fontSize}
             className="uppercase"
+            opacity="0.32"
           >
             {bannerWord}
           </text>
 
           {/* 
-            2. СЛОЙ ЖИВОГО АУДИО-ЭКВАЛАЙЗЕРА (ТОЛЬКО НА ПК):
-            Замаскирован строго по силуэту букв слова «МАРКЕТИНГ»!
+            2. ТАНЦУЮЩИЙ АУДИО-ЭКВАЛАЙЗЕР ВНУТРИ БУКВ:
+            Замаскирован строго по контуру букв через clipPath и mask!
           */}
-          {isDesktop && (
-            <g clipPath="url(#heroWordClip)" className="pointer-events-none">
-              {/* Столбики спектрального эквалайзера */}
-              <path ref={eqBarsRef} fill="url(#eqBarGradient)" />
+          <g clipPath="url(#heroWordClip)" mask="url(#heroWordMask)" className="pointer-events-none">
+            {/* Яркие спектральные столбики эквалайзера */}
+            <path ref={eqBarsRef} fill="url(#eqBarVividGradient)" />
 
-              {/* Пиковые отметки эквалайзера (Peak Hold) */}
-              <path ref={eqPeaksRef} fill="#FFFFFF" opacity="0.95" />
-
-              {/* Тонкая вертикальная визирная стрелка шкалы тюнера */}
-              <line
-                ref={needleRef}
-                x1="0"
-                y1={viewBoxTop}
-                x2="0"
-                y2={viewBoxTop + viewBoxHeight}
-                stroke="#FFFFFF"
-                strokeWidth="2.5"
-                strokeDasharray="6 4"
-                opacity="0"
-              />
-            </g>
-          )}
+            {/* Белые неоновые пиковые метки эквалайзера (Peak Hold) */}
+            <path ref={eqPeaksRef} fill="#FFFFFF" opacity="0.95" />
+          </g>
         </svg>
       </div>
     </section>
