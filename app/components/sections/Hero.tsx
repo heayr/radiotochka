@@ -51,63 +51,6 @@ function getHeroTypography(word: string) {
   };
 }
 
-/**
- * Генерация SVG Path для столбиков спектрального эквалайзера
- */
-function buildEqualizerBarsPath(
-  width: number,
-  numBars: number,
-  heights: number[],
-  yBase: number,
-  barWidth: number
-): string {
-  const margin = 45;
-  const avail = width - margin * 2;
-  const step = avail / numBars;
-  let d = "";
-
-  for (let i = 0; i < numBars; i++) {
-    const x = margin + i * step + (step - barWidth) / 2;
-    const h = Math.max(14, heights[i]);
-    const yTop = yBase - h;
-    const r = Math.min(5, barWidth / 2);
-
-    d += `M ${x + r} ${yTop} `;
-    d += `H ${x + barWidth - r} `;
-    d += `Q ${x + barWidth} ${yTop} ${x + barWidth} ${yTop + r} `;
-    d += `V ${yBase} `;
-    d += `H ${x} `;
-    d += `V ${yTop + r} `;
-    d += `Q ${x} ${yTop} ${x + r} ${yTop} Z `;
-  }
-
-  return d;
-}
-
-/**
- * Генерация пиковых меток эквалайзера (Peak Hold)
- */
-function buildEqualizerPeaksPath(
-  width: number,
-  numBars: number,
-  peaks: number[],
-  yBase: number,
-  barWidth: number
-): string {
-  const margin = 45;
-  const avail = width - margin * 2;
-  const step = avail / numBars;
-  let d = "";
-
-  for (let i = 0; i < numBars; i++) {
-    const x = margin + i * step + (step - barWidth) / 2;
-    const pY = yBase - peaks[i] - 7;
-    d += `M ${x} ${pY} H ${x + barWidth} V ${pY + 4} H ${x} Z `;
-  }
-
-  return d;
-}
-
 export default function Hero({ initialData }: HeroProps) {
   const copyrightYear = initialData?.copyrightYear || DEFAULT_HERO_DATA.copyrightYear;
   const agencyLabel = initialData?.agencyLabel || DEFAULT_HERO_DATA.agencyLabel;
@@ -118,13 +61,17 @@ export default function Hero({ initialData }: HeroProps) {
 
   const [mounted, setMounted] = useState(false);
 
-  // SVG Refs для анимации эквалайзера
-  const eqBarsRef = useRef<SVGPathElement>(null);
-  const eqPeaksRef = useRef<SVGPathElement>(null);
+  // SVG Refs для анимации неонового визира шкалы радио
+  const tunerGroupRef = useRef<SVGGElement>(null);
+  const tunerGlowBeamRef = useRef<SVGRectElement>(null);
+  const tunerNeedleRef = useRef<SVGLineElement>(null);
+  const tunerStationFlareRef = useRef<SVGRectElement>(null);
+  const tunerIndicatorTopRef = useRef<SVGCircleElement>(null);
+  const tunerIndicatorBottomRef = useRef<SVGCircleElement>(null);
 
-  const activityRef = useRef(0);
   const targetMouseXRef = useRef(viewBoxWidth / 2);
   const currentMouseXRef = useRef(viewBoxWidth / 2);
+  const visibilityRef = useRef(0);
   const isHoveredRef = useRef(false);
   const lastPosRef = useRef({ x: 0, y: 0 });
   const lastMoveTimeRef = useRef(0);
@@ -133,81 +80,76 @@ export default function Hero({ initialData }: HeroProps) {
     setMounted(true);
   }, []);
 
-  // Анимационный цикл 60fps для эквалайзера
+  // Анимационный цикл 60fps для неонового визира радио
   useEffect(() => {
     if (!mounted) return;
 
     let animId: number;
-    let phase = 0;
-
-    const NUM_BARS = 44;
-    const BAR_WIDTH = 22;
-
-    const currentHeights = new Float32Array(NUM_BARS);
-    const peakHeights = new Float32Array(NUM_BARS);
-
-    // Начальные высоты эквалайзера, чтобы он сразу был виден на экране
-    for (let i = 0; i < NUM_BARS; i++) {
-      currentHeights[i] = 70 + Math.sin(i * 0.3) * 30;
-      peakHeights[i] = currentHeights[i] + 10;
-    }
-
-    const margin = 45;
-    const avail = viewBoxWidth - margin * 2;
-    const step = avail / NUM_BARS;
+    const RADIO_STATION_POSITIONS = [0.18, 0.50, 0.82];
 
     const render = () => {
-      activityRef.current = Math.max(0, activityRef.current * 0.94);
-      currentMouseXRef.current += (targetMouseXRef.current - currentMouseXRef.current) * 0.16;
+      // Плавное следование за курсором (lerp)
+      currentMouseXRef.current += (targetMouseXRef.current - currentMouseXRef.current) * 0.22;
 
-      const act = activityRef.current;
-      phase += 0.05 + act * 0.06;
-
-      const mX = currentMouseXRef.current;
+      // Управление видимостью: если мышь наведена и двигалась — плавно проявляем, иначе мягко растворяем
       const isHovered = isHoveredRef.current;
+      const now = performance.now();
+      const isRecentlyMoved = now - lastMoveTimeRef.current < 220;
 
-      for (let i = 0; i < NUM_BARS; i++) {
-        const barCenterX = margin + i * step + step / 2;
-        const distToMouse = Math.abs(barCenterX - mX) / 170;
+      if (isHovered && isRecentlyMoved) {
+        visibilityRef.current = Math.min(1, visibilityRef.current + 0.16);
+      } else {
+        // Мягкое плавное угасание в покое (буквы остаются идеально чистыми)
+        visibilityRef.current = Math.max(0, visibilityRef.current * 0.90);
+      }
 
-        // При наведении мыши — мощный всплеск спектра вокруг курсора (до +90px)
-        const mouseBoost = isHovered
-          ? Math.exp(-distToMouse * distToMouse) * (65 + act * 75)
-          : 0;
+      const vis = visibilityRef.current;
 
-        // Живой танец спектроанализатора
-        const wave1 = Math.sin(i * 0.42 + phase * 1.8) * 44;
-        const wave2 = Math.cos(i * 0.78 - phase * 1.2) * 26;
-        const wave3 = Math.sin(phase * 3.2 + i * 0.18) * 14;
-
-        // Базовая высота: уверенно танцует от 50px до 125px (внутри букв)
-        const baseH = 75 + wave1 + wave2 * 0.6 + wave3 * 0.4;
-        const targetH = Math.min(195, Math.max(18, baseH + mouseBoost));
-
-        // Плавная интерполяция
-        currentHeights[i] += (targetH - currentHeights[i]) * 0.22;
-
-        // Падение пиковых отметок (Peak hold с гравитацией)
-        if (currentHeights[i] >= peakHeights[i]) {
-          peakHeights[i] = currentHeights[i];
+      if (tunerGroupRef.current) {
+        if (vis < 0.005) {
+          tunerGroupRef.current.style.opacity = "0";
         } else {
-          peakHeights[i] = Math.max(currentHeights[i], peakHeights[i] - 2.2);
+          const curX = currentMouseXRef.current;
+          tunerGroupRef.current.setAttribute("transform", `translate(${curX.toFixed(1)}, 0)`);
+          tunerGroupRef.current.style.opacity = vis.toFixed(3);
+
+          // Расчет попадания на радиостанцию (золотистое свечение)
+          const xRatio = Math.max(0, Math.min(1, curX / viewBoxWidth));
+          let minDist = 999;
+          for (const pos of RADIO_STATION_POSITIONS) {
+            const d = Math.abs(xRatio - pos);
+            if (d < minDist) minDist = d;
+          }
+
+          const lockRadius = 0.045;
+          const isLocking = minDist < lockRadius;
+          const lockStrength = isLocking ? Math.pow(1 - minDist / lockRadius, 1.4) : 0;
+
+          // Вспышка захвата станции
+          if (tunerStationFlareRef.current) {
+            tunerStationFlareRef.current.style.opacity = (lockStrength * 0.92).toFixed(3);
+          }
+
+          // Неоновая игла
+          if (tunerNeedleRef.current) {
+            const strokeColor = lockStrength > 0.1 ? "#FFFBEB" : "#FFFFFF";
+            const strokeWidth = (3.2 + lockStrength * 2.8).toFixed(1);
+            tunerNeedleRef.current.setAttribute("stroke", strokeColor);
+            tunerNeedleRef.current.setAttribute("stroke-width", strokeWidth);
+          }
+
+          // Точечные индикаторы
+          const dotColor = lockStrength > 0.1 ? "#FBBF24" : "#FFFFFF";
+          const dotRadius = (3.5 + lockStrength * 2).toFixed(1);
+          if (tunerIndicatorTopRef.current) {
+            tunerIndicatorTopRef.current.setAttribute("fill", dotColor);
+            tunerIndicatorTopRef.current.setAttribute("r", dotRadius);
+          }
+          if (tunerIndicatorBottomRef.current) {
+            tunerIndicatorBottomRef.current.setAttribute("fill", dotColor);
+            tunerIndicatorBottomRef.current.setAttribute("r", dotRadius);
+          }
         }
-      }
-
-      // Обновление SVG путей
-      if (eqBarsRef.current) {
-        eqBarsRef.current.setAttribute(
-          "d",
-          buildEqualizerBarsPath(viewBoxWidth, NUM_BARS, Array.from(currentHeights), textBaselineY, BAR_WIDTH)
-        );
-      }
-
-      if (eqPeaksRef.current) {
-        eqPeaksRef.current.setAttribute(
-          "d",
-          buildEqualizerPeaksPath(viewBoxWidth, NUM_BARS, Array.from(peakHeights), textBaselineY, BAR_WIDTH)
-        );
       }
 
       animId = requestAnimationFrame(render);
@@ -218,7 +160,7 @@ export default function Hero({ initialData }: HeroProps) {
     return () => {
       cancelAnimationFrame(animId);
     };
-  }, [mounted, viewBoxWidth, textBaselineY]);
+  }, [mounted, viewBoxWidth]);
 
   // Разблокировка звука радио при первом жесте
   useEffect(() => {
@@ -246,11 +188,9 @@ export default function Hero({ initialData }: HeroProps) {
 
       lastPosRef.current = { x: e.clientX, y: e.clientY };
       lastMoveTimeRef.current = now;
-
-      activityRef.current = Math.min(1, activityRef.current + speed * 0.5 + 0.25);
       isHoveredRef.current = true;
 
-      // Воспроизведение звука настройки радио (чистое шипение и пойманная станция)
+      // Мягкое воспроизведение звука настройки радио (тихий шепот эфира и пойманная станция)
       radioAudio.triggerTuning(relX, speed);
     },
     [viewBoxWidth]
@@ -259,6 +199,7 @@ export default function Hero({ initialData }: HeroProps) {
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       isHoveredRef.current = true;
+      lastMoveTimeRef.current = performance.now();
       const rect = e.currentTarget.getBoundingClientRect();
       const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       targetMouseXRef.current = relX * viewBoxWidth;
@@ -286,7 +227,8 @@ export default function Hero({ initialData }: HeroProps) {
 
       {/* 
         ГЛАВНЫЙ БАННЕР С НАДПИСЬЮ:
-        Буквы наполнены живым, танцующим спектральным аудио-эквалайзером.
+        100% сочные, яркие фирменные буквы.
+        При движении мыши по шкале скользит неоновый визир радиочастоты со световым ореолом.
       */}
       <div
         className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center cursor-pointer"
@@ -302,36 +244,32 @@ export default function Hero({ initialData }: HeroProps) {
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            {/* Базовый фирменный градиент */}
+            {/* Базовый фирменный градиент (100% насыщенный и сочный) */}
             <linearGradient id="heroRefinedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#EA5670" />
               <stop offset="50%" stopColor="#B35284" />
               <stop offset="100%" stopColor="#824E98" />
             </linearGradient>
 
-            {/* Яркий спектральный градиент столбиков эквалайзера */}
-            <linearGradient id="eqBarVividGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="#EA5670" stopOpacity="0.85" />
-              <stop offset="45%" stopColor="#FF3366" stopOpacity="0.95" />
-              <stop offset="80%" stopColor="#FBBF24" stopOpacity="0.98" />
-              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="1" />
+            {/* Мягкий неоновый ореол луча визира (горизонтальное рассеивание света) */}
+            <linearGradient id="tunerGlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
+              <stop offset="35%" stopColor="#FFA6BD" stopOpacity="0.45" />
+              <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.85" />
+              <stop offset="65%" stopColor="#FFA6BD" stopOpacity="0.45" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
             </linearGradient>
 
-            {/* Маска по силуэту букв слова: эквалайзер живет строго внутри букв */}
-            <clipPath id="heroWordClip" clipPathUnits="userSpaceOnUse">
-              <text
-                x={centerX}
-                y={textBaselineY}
-                textAnchor="middle"
-                fontFamily="'Oswald', Impact, sans-serif"
-                fontWeight="700"
-                fontSize={fontSize}
-                className="uppercase"
-              >
-                {bannerWord}
-              </text>
-            </clipPath>
+            {/* Золотисто-белый акцент при фиксации на волне станции */}
+            <linearGradient id="tunerStationGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FBBF24" stopOpacity="0" />
+              <stop offset="30%" stopColor="#F59E0B" stopOpacity="0.5" />
+              <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.95" />
+              <stop offset="70%" stopColor="#F59E0B" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#FBBF24" stopOpacity="0" />
+            </linearGradient>
 
+            {/* Высокоточная маска по контурам букв */}
             <mask id="heroWordMask" maskUnits="userSpaceOnUse" x="0" y="0" width={viewBoxWidth} height="400">
               <text
                 x={centerX}
@@ -350,7 +288,7 @@ export default function Hero({ initialData }: HeroProps) {
 
           {/* 
             1. БАЗОВЫЙ ПЛАКАТНЫЙ ТЕКСТ:
-            Создает объемный фон букв с фирменным градиентом
+            100% сочный, яркий фирменный градиент без выцветания
           */}
           <text
             x={centerX}
@@ -361,21 +299,54 @@ export default function Hero({ initialData }: HeroProps) {
             fontWeight="700"
             fontSize={fontSize}
             className="uppercase"
-            opacity="0.32"
+            opacity="1"
           >
             {bannerWord}
           </text>
 
           {/* 
-            2. ТАНЦУЮЩИЙ АУДИО-ЭКВАЛАЙЗЕР ВНУТРИ БУКВ:
-            Замаскирован строго по контуру букв через clipPath и mask!
+            2. НЕОНОВЫЙ ВИЗИР РАДИОЧАСТОТЫ:
+            Скользит внутри букв строго по контуру (через mask), подсвечивая их изнутри
           */}
           <g mask="url(#heroWordMask)" className="pointer-events-none">
-            {/* Яркие спектральные столбики эквалайзера */}
-            <path ref={eqBarsRef} fill="url(#eqBarVividGradient)" />
+            <g ref={tunerGroupRef} style={{ opacity: 0 }}>
+              {/* Мягкий рассеянный световой луч визира (ширина 140px) */}
+              <rect
+                ref={tunerGlowBeamRef}
+                x="-70"
+                y={viewBoxTop}
+                width="140"
+                height={viewBoxHeight}
+                fill="url(#tunerGlowGradient)"
+              />
 
-            {/* Белые неоновые пиковые метки эквалайзера (Peak Hold) */}
-            <path ref={eqPeaksRef} fill="#FFFFFF" opacity="0.95" />
+              {/* Золотистая вспышка при попадании на радиостанцию */}
+              <rect
+                ref={tunerStationFlareRef}
+                x="-90"
+                y={viewBoxTop}
+                width="180"
+                height={viewBoxHeight}
+                fill="url(#tunerStationGradient)"
+                opacity="0"
+              />
+
+              {/* Центральная неоновая игла визира настройки */}
+              <line
+                ref={tunerNeedleRef}
+                x1="0"
+                y1={viewBoxTop}
+                x2="0"
+                y2={viewBoxTop + viewBoxHeight}
+                stroke="#FFFFFF"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              />
+
+              {/* Верхний и нижний маркеры шкалы */}
+              <circle ref={tunerIndicatorTopRef} cx="0" cy={viewBoxTop + 14} r="4" fill="#FFFFFF" />
+              <circle ref={tunerIndicatorBottomRef} cx="0" cy={viewBoxTop + viewBoxHeight - 14} r="4" fill="#FFFFFF" />
+            </g>
           </g>
         </svg>
       </div>
