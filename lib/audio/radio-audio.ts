@@ -47,13 +47,13 @@ class RadioAudioEngine {
 
       this.ctx = new AudioCtx();
 
-      // Мастер-громкость (деликатная, ненавязчивая)
+      // Мастер-громкость (сбалансированная и чистая)
       this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+      this.masterGain.gain.setValueAtTime(0.28, this.ctx.currentTime);
       this.masterGain.connect(this.ctx.destination);
 
       // =========================================================================
-      // 1. АНАЛОГОВОЕ ШИПЕНИЕ ЭФИРА (Теплый мягкий розовый шум, тихий фоновый шепот)
+      // 1. АНАЛОГОВОЕ ШИПЕНИЕ ЭФИРА (Теплый мягкий розовый шум, комфортный уровень)
       // =========================================================================
       const sampleRate = this.ctx.sampleRate;
       const bufferSize = sampleRate * 2;
@@ -67,8 +67,8 @@ class RadioAudioEngine {
         b0 = 0.99886 * b0 + white * 0.045;
         b1 = 0.99332 * b1 + white * 0.060;
         b2 = 0.96900 * b2 + white * 0.120;
-        // Тихий, комфортный уровень сигнала без резких щелчков
-        const sample = (b0 + b1 + b2 + white * 0.3) * 0.14;
+        // Сбалансированный комфортный уровень сигнала
+        const sample = (b0 + b1 + b2 + white * 0.35) * 0.16;
         data[i] = sample;
       }
 
@@ -173,9 +173,9 @@ class RadioAudioEngine {
     const noiseFreq = 850 + xRatio * 950;
     this.noiseFilter.frequency.setTargetAtTime(noiseFreq, now, 0.05);
 
-    // Уровень шипения: деликатный шепот (max ~0.14), чтобы не раздражать слух
+    // Уровень шипения: четко слышимый, но комфортный фоновый шепот эфира
     // При попадании на станцию шум мягко затихает (FM quieting)
-    const targetNoiseVol = Math.max(0, 0.14 * clampedSpeed * (1 - lockStrength * 0.95));
+    const targetNoiseVol = Math.max(0, 0.19 * clampedSpeed * (1 - lockStrength * 0.95));
     this.noiseGain.gain.setTargetAtTime(targetNoiseVol, now, 0.04);
 
     // 2. ЗВУК СТАНЦИИ:

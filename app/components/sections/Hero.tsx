@@ -162,13 +162,21 @@ export default function Hero({ initialData }: HeroProps) {
     };
   }, [mounted, viewBoxWidth]);
 
-  // Разблокировка звука радио при первом жесте
+  // Разблокировка звука радио при любом первом взаимодействии пользователя
   useEffect(() => {
     const unlock = () => radioAudio.ensureRunning();
     window.addEventListener("pointerdown", unlock, { passive: true });
-    window.addEventListener("mousemove", unlock, { once: true, passive: true });
+    window.addEventListener("click", unlock, { passive: true });
+    window.addEventListener("touchstart", unlock, { passive: true });
+    window.addEventListener("keydown", unlock, { passive: true });
+    window.addEventListener("wheel", unlock, { passive: true });
+    window.addEventListener("mousemove", unlock, { passive: true });
     return () => {
       window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("click", unlock);
+      window.removeEventListener("touchstart", unlock);
+      window.removeEventListener("keydown", unlock);
+      window.removeEventListener("wheel", unlock);
       window.removeEventListener("mousemove", unlock);
     };
   }, []);
@@ -204,6 +212,7 @@ export default function Hero({ initialData }: HeroProps) {
       const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       targetMouseXRef.current = relX * viewBoxWidth;
       currentMouseXRef.current = relX * viewBoxWidth;
+      radioAudio.ensureRunning();
     },
     [viewBoxWidth]
   );
@@ -235,6 +244,8 @@ export default function Hero({ initialData }: HeroProps) {
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onPointerDown={() => radioAudio.ensureRunning()}
+        onClick={() => radioAudio.ensureRunning()}
       >
         <svg
           viewBox={viewBox}
