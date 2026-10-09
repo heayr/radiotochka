@@ -1,17 +1,17 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: pet-b-fm-db-dev
+    container_name: radiotochka-db-dev
     environment:
-      POSTGRES_USER: REDACTED_DB_USER
-      POSTGRES_PASSWORD: REDACTED_DB_PASSWORD
-      POSTGRES_DB: REDACTED_DB_NAME
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: radiotochka_dev
     ports:
       - "5432:5432"
     volumes:
       - pgdata_dev:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U REDACTED_DB_USER -d REDACTED_DB_NAME"]
+      test: ["CMD-SHELL", "pg_isready -U devuser -d radiotochka_dev"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: pet-b-fm-dev
+    container_name: radiotochka-web-dev
     command: sh -c "npx prisma generate && npx prisma migrate deploy && npx prisma db seed || true && npm run dev"
     ports:
       - "3000:3000"
@@ -46,7 +46,8 @@ services:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
-      - DATABASE_URL=postgresql://REDACTED_DB_USER:REDACTED_DB_PASSWORD@db:5432/REDACTED_DB_NAME?schema=public
+      - DATABASE_URL=postgresql://devuser:devpassword@db:5432/radiotochka_dev?schema=public
+      - AUTH_SECRET=dev-secret-only-for-local-testing-not-for-prod-32chars
     depends_on:
       db:
         condition: service_healthy

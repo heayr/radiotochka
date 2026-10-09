@@ -11,9 +11,10 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://REDACTED_DB_USER:REDACTED_DB_PASSWORD@db:5432/REDACTED_DB_NAME?schema=public
-      - NEXTAUTH_URL=https://radiotochka.nologs.site
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-change-me-in-production}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-radiotochka}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-radiotochka}?schema=public
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-https://radiotochka.nologs.site}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - AUTH_SECRET=${AUTH_SECRET:-${NEXTAUTH_SECRET}}
       - RESEND_API_KEY=${RESEND_API_KEY:-}
       - AUTH_TRUST_HOST=true
       - NEXT_PUBLIC_ACCESS_KEY_WEB_FORM=${NEXT_PUBLIC_ACCESS_KEY_WEB_FORM:-}
@@ -24,7 +25,7 @@ services:
       - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.radiotochka.rule=Host(`radiotochka.nologs.site`)"
+      - "traefik.http.routers.radiotochka.rule=Host(`${APP_DOMAIN:-radiotochka.nologs.site}`)"
       - "traefik.http.routers.radiotochka.entrypoints=websecure"
       - "traefik.http.routers.radiotochka.tls=true"
       - "traefik.http.routers.radiotochka.tls.certresolver=letsencrypt"
@@ -34,13 +35,13 @@ services:
     image: postgres:16-alpine
     container_name: radiotochka-db
     environment:
-      POSTGRES_USER: REDACTED_DB_USER
-      POSTGRES_PASSWORD: REDACTED_DB_PASSWORD
-      POSTGRES_DB: REDACTED_DB_NAME
+      POSTGRES_USER: ${POSTGRES_USER:-radiotochka}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-radiotochka}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U REDACTED_DB_USER -d REDACTED_DB_NAME"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-radiotochka} -d ${POSTGRES_DB:-radiotochka}"]
       interval: 5s
       timeout: 5s
       retries: 5
