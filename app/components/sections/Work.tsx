@@ -142,7 +142,7 @@ export default function Work({ initialData }: WorkProps) {
   const items = isCompatible ? rawItems : DEFAULT_WORK_DATA.items;
 
   return (
-    <section id="work" className="w-full bg-[#F3EFE8] py-14 sm:py-28 2xl:py-36 px-4 sm:px-8 lg:px-10 2xl:px-12">
+    <section id="work" className="w-full bg-[#F3EFE8] pt-14 sm:pt-20 2xl:pt-24 pb-8 sm:pb-12 lg:pb-14 px-4 sm:px-8 lg:px-10 2xl:px-12">
       <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto">
         
         {/* Заголовок секции */}
@@ -160,7 +160,7 @@ export default function Work({ initialData }: WorkProps) {
         </div>
 
         {/* Стек карточек проектов с наслоением при скролле */}
-        <div className="flex flex-col gap-8 sm:gap-16 pb-8 sm:pb-16">
+        <div className="flex flex-col gap-8 sm:gap-16 pb-2 sm:pb-4">
           {items.map((project, index) => (
             <WorkCard
               key={project.id || index}

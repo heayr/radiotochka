@@ -52,7 +52,7 @@ function BaseFooter({ initialData }: FooterProps) {
     <footer
       ref={footerRef}
       id="contact"
-      className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 2xl:pt-36 pb-8 overflow-hidden"
+      className="w-full bg-[#0A0A0A] text-white pt-10 sm:pt-14 lg:pt-16 pb-8 overflow-hidden"
     >
       <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16">
         {/* ВЕРХНИЙ БЛОК: Бренд и описание */}

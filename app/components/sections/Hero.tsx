@@ -75,32 +75,36 @@ export default function Hero({ initialData }: HeroProps) {
   const isHoveredRef = useRef(false);
   const lastPosRef = useRef({ x: 0, y: 0 });
   const lastMoveTimeRef = useRef(0);
+  const isAnimatingRef = useRef(false);
+  const animIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
+    return () => {
+      if (animIdRef.current) cancelAnimationFrame(animIdRef.current);
+    };
   }, []);
 
-  // Анимационный цикл 60fps для неонового визира радио
-  useEffect(() => {
-    if (!mounted) return;
+  // Высокопроизводительный цикл анимации (запускается по требованию, 0% CPU в покое)
+  const startAnimationLoop = useCallback(() => {
+    if (isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
 
-    let animId: number;
     const RADIO_STATION_POSITIONS = [0.18, 0.50, 0.82];
 
     const render = () => {
       // Плавное следование за курсором (lerp)
       currentMouseXRef.current += (targetMouseXRef.current - currentMouseXRef.current) * 0.22;
 
-      // Управление видимостью: если мышь наведена и двигалась — плавно проявляем, иначе мягко растворяем
       const isHovered = isHoveredRef.current;
       const now = performance.now();
-      const isRecentlyMoved = now - lastMoveTimeRef.current < 220;
+      const isRecentlyMoved = now - lastMoveTimeRef.current < 200;
 
       if (isHovered && isRecentlyMoved) {
         visibilityRef.current = Math.min(1, visibilityRef.current + 0.16);
       } else {
-        // Мягкое плавное угасание в покое (буквы остаются идеально чистыми)
-        visibilityRef.current = Math.max(0, visibilityRef.current * 0.90);
+        // Мягкое угасание
+        visibilityRef.current = Math.max(0, visibilityRef.current * 0.88);
       }
 
       const vis = visibilityRef.current;
@@ -108,59 +112,40 @@ export default function Hero({ initialData }: HeroProps) {
       if (tunerGroupRef.current) {
         if (vis < 0.005) {
           tunerGroupRef.current.style.opacity = "0";
-        } else {
-          const curX = currentMouseXRef.current;
-          tunerGroupRef.current.setAttribute("transform", `translate(${curX.toFixed(1)}, 0)`);
-          tunerGroupRef.current.style.opacity = vis.toFixed(3);
+          // Полная остановка цикла в покое: 0% нагрузки на CPU/GPU в Safari
+          isAnimatingRef.current = false;
+          animIdRef.current = null;
+          return;
+        }
 
-          // Расчет попадания на радиостанцию (золотистое свечение)
-          const xRatio = Math.max(0, Math.min(1, curX / viewBoxWidth));
-          let minDist = 999;
-          for (const pos of RADIO_STATION_POSITIONS) {
-            const d = Math.abs(xRatio - pos);
-            if (d < minDist) minDist = d;
-          }
+        const curX = currentMouseXRef.current;
+        // Аппаратное ускорение через CSS 3D Transform (Metal / GPU compositing в Safari)
+        tunerGroupRef.current.style.transform = `translate3d(${curX.toFixed(1)}px, 0, 0)`;
+        tunerGroupRef.current.style.opacity = vis.toFixed(3);
 
-          const lockRadius = 0.045;
-          const isLocking = minDist < lockRadius;
-          const lockStrength = isLocking ? Math.pow(1 - minDist / lockRadius, 1.4) : 0;
+        // Расчет захвата радиостанции
+        const xRatio = Math.max(0, Math.min(1, curX / viewBoxWidth));
+        let minDist = 999;
+        for (const pos of RADIO_STATION_POSITIONS) {
+          const d = Math.abs(xRatio - pos);
+          if (d < minDist) minDist = d;
+        }
 
-          // Вспышка захвата станции
-          if (tunerStationFlareRef.current) {
-            tunerStationFlareRef.current.style.opacity = (lockStrength * 0.92).toFixed(3);
-          }
+        const lockRadius = 0.045;
+        const isLocking = minDist < lockRadius;
+        const lockStrength = isLocking ? Math.pow(1 - minDist / lockRadius, 1.4) : 0;
 
-          // Неоновая игла
-          if (tunerNeedleRef.current) {
-            const strokeColor = lockStrength > 0.1 ? "#FFFBEB" : "#FFFFFF";
-            const strokeWidth = (3.2 + lockStrength * 2.8).toFixed(1);
-            tunerNeedleRef.current.setAttribute("stroke", strokeColor);
-            tunerNeedleRef.current.setAttribute("stroke-width", strokeWidth);
-          }
-
-          // Точечные индикаторы
-          const dotColor = lockStrength > 0.1 ? "#FBBF24" : "#FFFFFF";
-          const dotRadius = (3.5 + lockStrength * 2).toFixed(1);
-          if (tunerIndicatorTopRef.current) {
-            tunerIndicatorTopRef.current.setAttribute("fill", dotColor);
-            tunerIndicatorTopRef.current.setAttribute("r", dotRadius);
-          }
-          if (tunerIndicatorBottomRef.current) {
-            tunerIndicatorBottomRef.current.setAttribute("fill", dotColor);
-            tunerIndicatorBottomRef.current.setAttribute("r", dotRadius);
-          }
+        // Золотистая вспышка фиксации станции через прозрачность GPU-слоя
+        if (tunerStationFlareRef.current) {
+          tunerStationFlareRef.current.style.opacity = (lockStrength * 0.95).toFixed(3);
         }
       }
 
-      animId = requestAnimationFrame(render);
+      animIdRef.current = requestAnimationFrame(render);
     };
 
-    animId = requestAnimationFrame(render);
-
-    return () => {
-      cancelAnimationFrame(animId);
-    };
-  }, [mounted, viewBoxWidth]);
+    animIdRef.current = requestAnimationFrame(render);
+  }, [viewBoxWidth]);
 
   // Разблокировка звука радио при любом первом взаимодействии пользователя
   useEffect(() => {
@@ -198,10 +183,12 @@ export default function Hero({ initialData }: HeroProps) {
       lastMoveTimeRef.current = now;
       isHoveredRef.current = true;
 
-      // Мягкое воспроизведение звука настройки радио (тихий шепот эфира и пойманная станция)
+      startAnimationLoop();
+
+      // Мягкое воспроизведение звука настройки радио
       radioAudio.triggerTuning(relX, speed);
     },
-    [viewBoxWidth]
+    [viewBoxWidth, startAnimationLoop]
   );
 
   const handleMouseEnter = useCallback(
@@ -213,8 +200,9 @@ export default function Hero({ initialData }: HeroProps) {
       targetMouseXRef.current = relX * viewBoxWidth;
       currentMouseXRef.current = relX * viewBoxWidth;
       radioAudio.ensureRunning();
+      startAnimationLoop();
     },
-    [viewBoxWidth]
+    [viewBoxWidth, startAnimationLoop]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -280,13 +268,12 @@ export default function Hero({ initialData }: HeroProps) {
               <stop offset="100%" stopColor="#FBBF24" stopOpacity="0" />
             </linearGradient>
 
-            {/* Высокоточная маска по контурам букв */}
-            <mask id="heroWordMask" maskUnits="userSpaceOnUse" x="0" y="0" width={viewBoxWidth} height="400">
+            {/* Аппаратный векторный клип по силуэту букв (GPU Stencil / Metal в Safari) */}
+            <clipPath id="heroWordClip" clipPathUnits="userSpaceOnUse">
               <text
                 x={centerX}
                 y={textBaselineY}
                 textAnchor="middle"
-                fill="#FFFFFF"
                 fontFamily="'Oswald', Impact, sans-serif"
                 fontWeight="700"
                 fontSize={fontSize}
@@ -294,7 +281,7 @@ export default function Hero({ initialData }: HeroProps) {
               >
                 {bannerWord}
               </text>
-            </mask>
+            </clipPath>
           </defs>
 
           {/* 
@@ -317,10 +304,10 @@ export default function Hero({ initialData }: HeroProps) {
 
           {/* 
             2. НЕОНОВЫЙ ВИЗИР РАДИОЧАСТОТЫ:
-            Скользит внутри букв строго по контуру (через mask), подсвечивая их изнутри
+            Аппаратно заклиплен через clipPath и скомпонован на GPU (без лагов в Safari)
           */}
-          <g mask="url(#heroWordMask)" className="pointer-events-none">
-            <g ref={tunerGroupRef} style={{ opacity: 0 }}>
+          <g clipPath="url(#heroWordClip)" className="pointer-events-none">
+            <g ref={tunerGroupRef} style={{ opacity: 0, willChange: "transform, opacity" }}>
               {/* Мягкий рассеянный световой луч визира (ширина 140px) */}
               <rect
                 ref={tunerGlowBeamRef}
