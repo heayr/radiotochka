@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
 import { DEFAULT_HERO_DATA, type HeroSectionData } from "@/types/site-content";
-import { radioAudio } from "@/lib/audio/radio-audio";
 
 interface HeroProps {
   initialData?: Partial<HeroSectionData>;
@@ -30,13 +28,32 @@ function getHeroTypography(word: string) {
   for (const c of cleanWord) {
     rawSum += OSWALD_GLYPH_WIDTHS[c] || 160;
   }
+  // Учитываем парный кернинг в сплошном тексте Oswald
   const textWidth = Math.round(rawSum * 0.925);
+
+  // =========================================================================
+  // 🎛 НАСТРОЙКИ ПОЗИЦИОНИРОВАНИЯ БУКВ ВНУТРИ SVG:
+  // =========================================================================
+
+  // 1. Боковой запас слева и справа (px):
+  //    Гарантирует, что крайние ножки букв «М» и «А» не будут срезаться рамкой SVG.
   const padX = 57;
+
+  // 2. Верхняя граница окна SVG (viewBox Y):
   const viewBoxTop = 38;
+
+  // 3. Высота окна SVG (viewBox Height):
   const viewBoxHeight = 242;
+
+  // 4. Базовая линия шрифта (Y посадки текста):
   const textBaselineY = 260;
+
+  // 5. Кегль шрифта внутри SVG:
   const fontSize = 280;
+
+  // Итоговая ширина окна SVG с учетом текста и боковых отступов
   const viewBoxWidth = textWidth + padX * 2;
+  // Центр по горизонтали: текст всегда идеально отцентрирован, ни один край не обрежется
   const centerX = viewBoxWidth / 2;
 
   return {
@@ -45,9 +62,6 @@ function getHeroTypography(word: string) {
     textBaselineY,
     fontSize,
     bannerWord: cleanWord,
-    viewBoxWidth,
-    viewBoxHeight,
-    viewBoxTop,
   };
 }
 
@@ -56,163 +70,15 @@ export default function Hero({ initialData }: HeroProps) {
   const agencyLabel = initialData?.agencyLabel || DEFAULT_HERO_DATA.agencyLabel;
   const rawWord = initialData?.bannerWord || DEFAULT_HERO_DATA.bannerWord;
 
-  const { viewBox, centerX, textBaselineY, fontSize, bannerWord, viewBoxWidth, viewBoxTop, viewBoxHeight } =
-    getHeroTypography(rawWord);
-
-  const [mounted, setMounted] = useState(false);
-
-  // SVG Refs для анимации неонового визира шкалы радио
-  const tunerGroupRef = useRef<SVGGElement>(null);
-  const tunerGlowBeamRef = useRef<SVGRectElement>(null);
-  const tunerNeedleRef = useRef<SVGLineElement>(null);
-  const tunerStationFlareRef = useRef<SVGRectElement>(null);
-  const tunerIndicatorTopRef = useRef<SVGCircleElement>(null);
-  const tunerIndicatorBottomRef = useRef<SVGCircleElement>(null);
-
-  const targetMouseXRef = useRef(viewBoxWidth / 2);
-  const currentMouseXRef = useRef(viewBoxWidth / 2);
-  const visibilityRef = useRef(0);
-  const isHoveredRef = useRef(false);
-  const lastPosRef = useRef({ x: 0, y: 0 });
-  const lastMoveTimeRef = useRef(0);
-  const isAnimatingRef = useRef(false);
-  const animIdRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-    return () => {
-      if (animIdRef.current) cancelAnimationFrame(animIdRef.current);
-    };
-  }, []);
-
-  // Высокопроизводительный цикл анимации (запускается по требованию, 0% CPU в покое)
-  const startAnimationLoop = useCallback(() => {
-    if (isAnimatingRef.current) return;
-    isAnimatingRef.current = true;
-
-    const RADIO_STATION_POSITIONS = [0.18, 0.50, 0.82];
-
-    const render = () => {
-      // Плавное следование за курсором (lerp)
-      currentMouseXRef.current += (targetMouseXRef.current - currentMouseXRef.current) * 0.22;
-
-      const isHovered = isHoveredRef.current;
-      const now = performance.now();
-      const isRecentlyMoved = now - lastMoveTimeRef.current < 200;
-
-      if (isHovered && isRecentlyMoved) {
-        visibilityRef.current = Math.min(1, visibilityRef.current + 0.16);
-      } else {
-        // Мягкое угасание
-        visibilityRef.current = Math.max(0, visibilityRef.current * 0.88);
-      }
-
-      const vis = visibilityRef.current;
-
-      if (tunerGroupRef.current) {
-        if (vis < 0.005) {
-          tunerGroupRef.current.style.opacity = "0";
-          // Полная остановка цикла в покое: 0% нагрузки на CPU/GPU в Safari
-          isAnimatingRef.current = false;
-          animIdRef.current = null;
-          return;
-        }
-
-        const curX = currentMouseXRef.current;
-        // Аппаратное ускорение через CSS 3D Transform (Metal / GPU compositing в Safari)
-        tunerGroupRef.current.style.transform = `translate3d(${curX.toFixed(1)}px, 0, 0)`;
-        tunerGroupRef.current.style.opacity = vis.toFixed(3);
-
-        // Расчет захвата радиостанции
-        const xRatio = Math.max(0, Math.min(1, curX / viewBoxWidth));
-        let minDist = 999;
-        for (const pos of RADIO_STATION_POSITIONS) {
-          const d = Math.abs(xRatio - pos);
-          if (d < minDist) minDist = d;
-        }
-
-        const lockRadius = 0.045;
-        const isLocking = minDist < lockRadius;
-        const lockStrength = isLocking ? Math.pow(1 - minDist / lockRadius, 1.4) : 0;
-
-        // Золотистая вспышка фиксации станции через прозрачность GPU-слоя
-        if (tunerStationFlareRef.current) {
-          tunerStationFlareRef.current.style.opacity = (lockStrength * 0.95).toFixed(3);
-        }
-      }
-
-      animIdRef.current = requestAnimationFrame(render);
-    };
-
-    animIdRef.current = requestAnimationFrame(render);
-  }, [viewBoxWidth]);
-
-  // Разблокировка звука радио при любом первом взаимодействии пользователя
-  useEffect(() => {
-    const unlock = () => radioAudio.ensureRunning();
-    window.addEventListener("pointerdown", unlock, { passive: true });
-    window.addEventListener("click", unlock, { passive: true });
-    window.addEventListener("touchstart", unlock, { passive: true });
-    window.addEventListener("keydown", unlock, { passive: true });
-    window.addEventListener("wheel", unlock, { passive: true });
-    window.addEventListener("mousemove", unlock, { passive: true });
-    return () => {
-      window.removeEventListener("pointerdown", unlock);
-      window.removeEventListener("click", unlock);
-      window.removeEventListener("touchstart", unlock);
-      window.removeEventListener("keydown", unlock);
-      window.removeEventListener("wheel", unlock);
-      window.removeEventListener("mousemove", unlock);
-    };
-  }, []);
-
-  // Интерактив при движении курсора
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      const svgX = relX * viewBoxWidth;
-      targetMouseXRef.current = svgX;
-
-      const now = performance.now();
-      const dt = Math.max(1, now - lastMoveTimeRef.current);
-      const dist = Math.hypot(e.clientX - lastPosRef.current.x, e.clientY - lastPosRef.current.y);
-      const speed = Math.min(1, dist / (dt * 0.6));
-
-      lastPosRef.current = { x: e.clientX, y: e.clientY };
-      lastMoveTimeRef.current = now;
-      isHoveredRef.current = true;
-
-      startAnimationLoop();
-
-      // Мягкое воспроизведение звука настройки радио
-      radioAudio.triggerTuning(relX, speed);
-    },
-    [viewBoxWidth, startAnimationLoop]
-  );
-
-  const handleMouseEnter = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      isHoveredRef.current = true;
-      lastMoveTimeRef.current = performance.now();
-      const rect = e.currentTarget.getBoundingClientRect();
-      const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      targetMouseXRef.current = relX * viewBoxWidth;
-      currentMouseXRef.current = relX * viewBoxWidth;
-      radioAudio.ensureRunning();
-      startAnimationLoop();
-    },
-    [viewBoxWidth, startAnimationLoop]
-  );
-
-  const handleMouseLeave = useCallback(() => {
-    isHoveredRef.current = false;
-    radioAudio.fadeStop();
-  }, []);
+  const { viewBox, centerX, textBaselineY, fontSize, bannerWord } = getHeroTypography(rawWord);
 
   return (
     <section id="hero" className="relative w-full bg-[#F3EFE8] pt-1 sm:pt-2 overflow-hidden">
-      {/* Верхняя строка: копирайт и статус агентства */}
+      {/* 
+        =====================================================================
+        ВЕРХНЯЯ СТРОКА: Год копирайта и статус агентства
+        =====================================================================
+      */}
       <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 flex items-center justify-between">
         <span className="text-[20px] sm:text-[32px] 2xl:text-[36px] font-bold text-[#0A0A0A] tracking-tight">
           {copyrightYear}
@@ -223,18 +89,12 @@ export default function Hero({ initialData }: HeroProps) {
       </div>
 
       {/* 
-        ГЛАВНЫЙ БАННЕР С НАДПИСЬЮ:
-        100% сочные, яркие фирменные буквы.
-        При движении мыши по шкале скользит неоновый визир радиочастоты со световым ореолом.
+        =====================================================================
+        ГЛАВНЫЙ БАННЕР С НАДПИСЬЮ (МАРКЕТИНГА):
+        Чистый, монументальный плакатный текст без лишних визуальных эффектов и звука.
+        =====================================================================
       */}
-      <div
-        className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center cursor-pointer"
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onPointerDown={() => radioAudio.ensureRunning()}
-        onClick={() => radioAudio.ensureRunning()}
-      >
+      <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center">
         <svg
           viewBox={viewBox}
           preserveAspectRatio="none"
@@ -243,51 +103,14 @@ export default function Hero({ initialData }: HeroProps) {
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            {/* Базовый фирменный градиент (100% насыщенный и сочный) */}
             <linearGradient id="heroRefinedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#EA5670" />
               <stop offset="50%" stopColor="#B35284" />
               <stop offset="100%" stopColor="#824E98" />
             </linearGradient>
-
-            {/* Мягкий неоновый ореол луча визира (горизонтальное рассеивание света) */}
-            <linearGradient id="tunerGlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
-              <stop offset="35%" stopColor="#FFA6BD" stopOpacity="0.45" />
-              <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.85" />
-              <stop offset="65%" stopColor="#FFA6BD" stopOpacity="0.45" />
-              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-            </linearGradient>
-
-            {/* Золотисто-белый акцент при фиксации на волне станции */}
-            <linearGradient id="tunerStationGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#FBBF24" stopOpacity="0" />
-              <stop offset="30%" stopColor="#F59E0B" stopOpacity="0.5" />
-              <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.95" />
-              <stop offset="70%" stopColor="#F59E0B" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#FBBF24" stopOpacity="0" />
-            </linearGradient>
-
-            {/* Аппаратный векторный клип по силуэту букв (GPU Stencil / Metal в Safari) */}
-            <clipPath id="heroWordClip" clipPathUnits="userSpaceOnUse">
-              <text
-                x={centerX}
-                y={textBaselineY}
-                textAnchor="middle"
-                fontFamily="'Oswald', Impact, sans-serif"
-                fontWeight="700"
-                fontSize={fontSize}
-                className="uppercase"
-              >
-                {bannerWord}
-              </text>
-            </clipPath>
           </defs>
 
-          {/* 
-            1. БАЗОВЫЙ ПЛАКАТНЫЙ ТЕКСТ:
-            100% сочный, яркий фирменный градиент без выцветания
-          */}
+          {/* Плакатный текст: Oswald bold, монументальный и сочный */}
           <text
             x={centerX}
             y={textBaselineY}
@@ -297,55 +120,9 @@ export default function Hero({ initialData }: HeroProps) {
             fontWeight="700"
             fontSize={fontSize}
             className="uppercase"
-            opacity="1"
           >
             {bannerWord}
           </text>
-
-          {/* 
-            2. НЕОНОВЫЙ ВИЗИР РАДИОЧАСТОТЫ:
-            Аппаратно заклиплен через clipPath и скомпонован на GPU (без лагов в Safari)
-          */}
-          <g clipPath="url(#heroWordClip)" className="pointer-events-none">
-            <g ref={tunerGroupRef} style={{ opacity: 0, willChange: "transform, opacity" }}>
-              {/* Мягкий рассеянный световой луч визира (ширина 140px) */}
-              <rect
-                ref={tunerGlowBeamRef}
-                x="-70"
-                y={viewBoxTop}
-                width="140"
-                height={viewBoxHeight}
-                fill="url(#tunerGlowGradient)"
-              />
-
-              {/* Золотистая вспышка при попадании на радиостанцию */}
-              <rect
-                ref={tunerStationFlareRef}
-                x="-90"
-                y={viewBoxTop}
-                width="180"
-                height={viewBoxHeight}
-                fill="url(#tunerStationGradient)"
-                opacity="0"
-              />
-
-              {/* Центральная неоновая игла визира настройки */}
-              <line
-                ref={tunerNeedleRef}
-                x1="0"
-                y1={viewBoxTop}
-                x2="0"
-                y2={viewBoxTop + viewBoxHeight}
-                stroke="#FFFFFF"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-              />
-
-              {/* Верхний и нижний маркеры шкалы */}
-              <circle ref={tunerIndicatorTopRef} cx="0" cy={viewBoxTop + 14} r="4" fill="#FFFFFF" />
-              <circle ref={tunerIndicatorBottomRef} cx="0" cy={viewBoxTop + viewBoxHeight - 14} r="4" fill="#FFFFFF" />
-            </g>
-          </g>
         </svg>
       </div>
     </section>

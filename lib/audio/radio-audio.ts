@@ -150,7 +150,7 @@ class RadioAudioEngine {
     }
 
     const now = this.ctx.currentTime;
-    const clampedSpeed = Math.min(1, Math.max(0.15, speed * 1.6));
+    const clampedSpeed = Math.min(1, Math.max(0.35, speed * 1.6));
 
     // Находим ближайшую станцию
     let nearestStation = STATIONS[0];
@@ -175,7 +175,7 @@ class RadioAudioEngine {
 
     // Уровень шипения: четко слышимый, но комфортный фоновый шепот эфира
     // При попадании на станцию шум мягко затихает (FM quieting)
-    const targetNoiseVol = Math.max(0, 0.19 * clampedSpeed * (1 - lockStrength * 0.95));
+    const targetNoiseVol = Math.max(0, 0.23 * clampedSpeed * (1 - lockStrength * 0.95));
     this.noiseGain.gain.setTargetAtTime(targetNoiseVol, now, 0.04);
 
     // 2. ЗВУК СТАНЦИИ:
