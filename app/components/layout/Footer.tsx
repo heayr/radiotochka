@@ -214,15 +214,9 @@ function BaseFooter({ initialData }: FooterProps) {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <div className="flex items-center gap-2 mb-3 sm:mb-5 2xl:mb-6">
-              <h4 className="text-sm 2xl:text-base font-semibold text-white/50">
-                Контакты
-              </h4>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] 2xl:text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                На связи
-              </span>
-            </div>
+            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
+              Контакты
+            </h4>
 
             <div className="space-y-3 sm:space-y-4">
               {/* Телефон: периодический микро-подскок волна 1 */}

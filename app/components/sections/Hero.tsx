@@ -299,7 +299,7 @@ export default function Hero({ initialData }: HeroProps) {
         =====================================================================
       */}
       <div
-        className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center cursor-crosshair"
+        className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center cursor-pointer"
         onMouseMove={isDesktop ? handleMouseMove : undefined}
         onMouseEnter={isDesktop ? handleMouseEnter : undefined}
         onMouseLeave={isDesktop ? handleMouseLeave : undefined}
