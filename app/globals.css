@@ -118,3 +118,30 @@ input[type="reset"] {
   will-change: transform;
 }
 
+/* Периодический живой подскок контактов (тренды 2026/2027: физика пружины) */
+@keyframes contact-nudge {
+  0%, 82%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  86% {
+    transform: translateY(-6px) scale(1.02);
+  }
+  90% {
+    transform: translateY(1.5px) scale(0.99);
+  }
+  94% {
+    transform: translateY(-2px) scale(1.008);
+  }
+  97% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-contact-nudge-1 {
+  animation: contact-nudge 6.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.animate-contact-nudge-2 {
+  animation: contact-nudge 6.5s cubic-bezier(0.25, 1, 0.5, 1) infinite 0.24s;
+}
+

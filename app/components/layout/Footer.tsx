@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { copyToClipboard } from "@/app/components/Toast";
 import {
@@ -25,12 +25,42 @@ function BaseFooter({ initialData }: FooterProps) {
   const maxUrl = initialData?.maxUrl || DEFAULT_FOOTER_DATA.maxUrl;
   const legalInfo = initialData?.legalInfo || DEFAULT_FOOTER_DATA.legalInfo;
 
+  const footerRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Однократное появление при скролле (отрабатывает ровно 1 раз)
+  useEffect(() => {
+    const el = footerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.08 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <footer id="contact" className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 2xl:pt-36 pb-8 overflow-hidden">
+    <footer
+      ref={footerRef}
+      id="contact"
+      className="w-full bg-[#0A0A0A] text-white pt-20 sm:pt-28 2xl:pt-36 pb-8 overflow-hidden"
+    >
       <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16">
-        
-        {/* ВЕРХНИЙ БЛОК: Бренд и описание на всю ширину слева (как в референсе) */}
-        <div className="max-w-xl 2xl:max-w-3xl mb-14 sm:mb-20 2xl:mb-24">
+        {/* ВЕРХНИЙ БЛОК: Бренд и описание */}
+        <div
+          className={`max-w-xl 2xl:max-w-3xl mb-14 sm:mb-20 2xl:mb-24 transition-all duration-700 ease-out ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           <Link href="/" className="inline-block select-none group mb-4">
             <span className="text-3xl sm:text-4xl 2xl:text-5xl font-bold tracking-tight text-white block">
               Радиоточка
@@ -41,11 +71,14 @@ function BaseFooter({ initialData }: FooterProps) {
           </p>
         </div>
 
-        {/* СЕТКА КОЛОНОК: В один горизонтальный ряд на всю ширину с комфортной зоной нажатия */}
+        {/* СЕТКА КОЛОНОК: Каскадное появление колонок с задержкой */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12 pb-8 sm:pb-16">
-          
           {/* Колонка 1: Навигация */}
-          <div>
+          <div
+            className={`transition-all duration-700 ease-out delay-100 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
             <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Навигация
             </h4>
@@ -79,7 +112,11 @@ function BaseFooter({ initialData }: FooterProps) {
           </div>
 
           {/* Колонка 2: Услуги */}
-          <div>
+          <div
+            className={`transition-all duration-700 ease-out delay-200 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
             <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Услуги
             </h4>
@@ -113,7 +150,11 @@ function BaseFooter({ initialData }: FooterProps) {
           </div>
 
           {/* Колонка 3: Офис */}
-          <div>
+          <div
+            className={`transition-all duration-700 ease-out delay-300 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
             <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Офис
             </h4>
@@ -125,7 +166,11 @@ function BaseFooter({ initialData }: FooterProps) {
           </div>
 
           {/* Колонка 4: Соцсети */}
-          <div>
+          <div
+            className={`transition-all duration-700 ease-out delay-400 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
             <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
               Соцсети
             </h4>
@@ -163,22 +208,32 @@ function BaseFooter({ initialData }: FooterProps) {
             </ul>
           </div>
 
-          {/* Колонка 5: Есть вопросы? (Комфортная зона клика + копирование на десктопе) */}
-          <div className="col-span-2 sm:col-span-1">
-            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
-              Есть вопросы?
-            </h4>
+          {/* Колонка 5: Контакты (с живым микро-интерактивом подскока и статусом связи) */}
+          <div
+            className={`col-span-2 sm:col-span-1 transition-all duration-700 ease-out delay-500 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-3 sm:mb-5 2xl:mb-6">
+              <h4 className="text-sm 2xl:text-base font-semibold text-white/50">
+                Контакты
+              </h4>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] 2xl:text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                На связи
+              </span>
+            </div>
+
             <div className="space-y-3 sm:space-y-4">
-              
-              {/* Телефон через +7 с умным копированием на десктопе */}
-              <div className="group flex items-start gap-3 p-2 -m-2 rounded-xl hover:bg-white/5 transition-all">
+              {/* Телефон: периодический микро-подскок волна 1 */}
+              <div className="group animate-contact-nudge-1 hover:[animation-play-state:paused] flex items-start gap-3 p-2.5 -m-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10 transition-all duration-300">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="shrink-0 text-white/80 group-hover:text-brand-pink transition-colors mt-0.5"
+                  className="shrink-0 text-white/80 group-hover:text-brand-pink group-hover:scale-110 transition-all mt-0.5"
                 >
                   <path
                     fill="currentColor"
@@ -205,15 +260,15 @@ function BaseFooter({ initialData }: FooterProps) {
                 </div>
               </div>
 
-              {/* Email */}
-              <div className="group flex items-start gap-3 p-2 -m-2 rounded-xl hover:bg-white/5 transition-all">
+              {/* Email: периодический микро-подскок волна 2 (с задержкой 240мс) */}
+              <div className="group animate-contact-nudge-2 hover:[animation-play-state:paused] flex items-start gap-3 p-2.5 -m-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10 transition-all duration-300">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="shrink-0 text-white/80 group-hover:text-brand-pink transition-colors mt-0.5"
+                  className="shrink-0 text-white/80 group-hover:text-brand-pink group-hover:scale-110 transition-all mt-0.5"
                 >
                   <path
                     fill="currentColor"
@@ -232,21 +287,20 @@ function BaseFooter({ initialData }: FooterProps) {
                   </span>
                 </div>
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
 
       {/* 
         ВОДЯНОЙ ЗНАК «РАДИОТОЧКА» НА ВСЮ ШИРИНУ ЭКРАНА:
-        - Занимает 100% ширины экрана от левого до правого края (w-full, px-0)
-        - Крупный по высоте (fontSize="240", просторный viewBox 1400x320)
-        - Тонкие изящные буквы (fontWeight="200") без сплющивания (lengthAdjust="spacing")
-        - Запас 80px сверху и 70px снизу исключает любое обрезание
+        Кинематографичное проявление со скейлом
       */}
-      <div className="w-full max-w-[1720px] mx-auto overflow-hidden select-none pointer-events-none my-6 sm:my-12 2xl:my-16 px-4 flex justify-center">
+      <div
+        className={`w-full max-w-[1720px] mx-auto overflow-hidden select-none pointer-events-none my-6 sm:my-12 2xl:my-16 px-4 flex justify-center transition-all duration-1000 ease-out delay-700 ${
+          isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+        }`}
+      >
         <svg
           viewBox="0 0 1400 320"
           className="w-full max-h-[280px] 2xl:max-h-[320px] h-auto block"
@@ -276,7 +330,11 @@ function BaseFooter({ initialData }: FooterProps) {
         </svg>
       </div>
 
-      <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16">
+      <div
+        className={`max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16 transition-all duration-700 ease-out delay-800 ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+        }`}
+      >
         {/* Нижний копирайт, блок разработчика и ссылка на панель модерации */}
         <div className="pt-8 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs 2xl:text-sm text-white/40">
           <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2.5 text-center sm:text-left">
@@ -310,7 +368,10 @@ function BaseFooter({ initialData }: FooterProps) {
             </a>
           </div>
 
-          <a href="/admin/content" className="hover:text-white/70 transition-colors py-1 px-2.5 -mx-2.5 rounded-md hover:bg-white/5 inline-block">
+          <a
+            href="/admin/content"
+            className="hover:text-white/70 transition-colors py-1 px-2.5 -mx-2.5 rounded-md hover:bg-white/5 inline-block"
+          >
             Панель модерации
           </a>
         </div>
