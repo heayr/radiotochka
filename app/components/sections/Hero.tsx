@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { DEFAULT_HERO_DATA, type HeroSectionData } from "@/types/site-content";
+import { radioAudio } from "@/lib/audio/radio-audio";
 
 interface HeroProps {
   initialData?: Partial<HeroSectionData>;
@@ -219,6 +220,17 @@ export default function Hero({ initialData }: HeroProps) {
     };
   }, [mounted, viewBoxWidth, textBaselineY]);
 
+  // Разблокировка звука радио при первом жесте
+  useEffect(() => {
+    const unlock = () => radioAudio.ensureRunning();
+    window.addEventListener("pointerdown", unlock, { passive: true });
+    window.addEventListener("mousemove", unlock, { once: true, passive: true });
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("mousemove", unlock);
+    };
+  }, []);
+
   // Интерактив при движении курсора
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -237,6 +249,9 @@ export default function Hero({ initialData }: HeroProps) {
 
       activityRef.current = Math.min(1, activityRef.current + speed * 0.5 + 0.25);
       isHoveredRef.current = true;
+
+      // Воспроизведение звука настройки радио (чистое шипение и пойманная станция)
+      radioAudio.triggerTuning(relX, speed);
     },
     [viewBoxWidth]
   );
@@ -254,6 +269,7 @@ export default function Hero({ initialData }: HeroProps) {
 
   const handleMouseLeave = useCallback(() => {
     isHoveredRef.current = false;
+    radioAudio.fadeStop();
   }, []);
 
   return (
@@ -354,7 +370,7 @@ export default function Hero({ initialData }: HeroProps) {
             2. ТАНЦУЮЩИЙ АУДИО-ЭКВАЛАЙЗЕР ВНУТРИ БУКВ:
             Замаскирован строго по контуру букв через clipPath и mask!
           */}
-          <g clipPath="url(#heroWordClip)" mask="url(#heroWordMask)" className="pointer-events-none">
+          <g mask="url(#heroWordMask)" className="pointer-events-none">
             {/* Яркие спектральные столбики эквалайзера */}
             <path ref={eqBarsRef} fill="url(#eqBarVividGradient)" />
 
