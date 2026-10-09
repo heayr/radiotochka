@@ -30,42 +30,16 @@ function getHeroTypography(word: string) {
   for (const c of cleanWord) {
     rawSum += OSWALD_GLYPH_WIDTHS[c] || 160;
   }
-  // Учитываем парный кернинг в сплошном тексте Oswald
   const textWidth = Math.round(rawSum * 0.925);
-
-  // =========================================================================
-  // 🎛 НАСТРОЙКИ ПОЗИЦИОНИРОВАНИЯ БУКВ ВНУТРИ SVG (МЕНЯЙ ЗДЕСЬ):
-  // =========================================================================
-
-  // 1. Боковой запас слева и справа (px):
-  //    Гарантирует, что крайние ножки букв «М» и «А» не будут срезаться рамкой SVG.
-  //    Увеличь (например, 60 или 70), если хочешь ещё больше воздуха по бокам.
   const padX = 57;
-
-  // 2. Верхняя граница окна SVG (viewBox Y):
-  //    Уменьшаешь (например, 20 или 25) -> буквы опускаются ниже внутри блока.
-  //    Увеличиваешь (например, 45 или 50) -> буквы поднимаются выше.
   const viewBoxTop = 38;
-
-  // 3. Высота окна SVG (viewBox Height):
-  //    Чем меньше число (например, 230) -> буквы сильнее вытягиваются в высоту.
-  //    Чем больше число (например, 260) -> буквы становятся чуть ниже и компактнее.
   const viewBoxHeight = 242;
-
-  // 4. Базовая линия шрифта (Y посадки текста):
-  //    260 — идеальная оптическая посадка для кегля 280.
-  //    Увеличиваешь -> буквы смещаются вниз; уменьшаешь -> вверх.
   const textBaselineY = 260;
-
-  // 5. Кегль шрифта внутри SVG:
   const fontSize = 280;
-
-  // Итоговая ширина окна SVG с учетом текста и боковых отступов
   const viewBoxWidth = textWidth + padX * 2;
-  // Центр по горизонтали: текст всегда идеально отцентрирован, ни один край не обрежется
   const centerX = viewBoxWidth / 2;
 
-    return {
+  return {
     viewBox: `0 ${viewBoxTop} ${viewBoxWidth} ${viewBoxHeight}`,
     centerX,
     textBaselineY,
@@ -77,6 +51,9 @@ function getHeroTypography(word: string) {
   };
 }
 
+/**
+ * Генерация пути синусоидальной радиоволны / осциллограммы
+ */
 function generateWavePath(
   width: number,
   centerY: number,
@@ -84,28 +61,30 @@ function generateWavePath(
   freq: number,
   phase: number,
   mouseX: number,
-  activity: number
+  activity: number,
+  isLocked: boolean
 ): string {
-  const step = 22;
+  const step = 20;
   let d = "";
 
   for (let x = 0; x <= width + step; x += step) {
     const curX = Math.min(x, width);
-    // Сглаживание амплитуды у краев баннера
     const edgeRatio = curX / width;
     const envelope = Math.sin(edgeRatio * Math.PI);
 
-    // Локальное возмущение/резонанс вокруг курсора мыши
-    const distToMouse = (curX - mouseX) / 160;
-    const mouseBoost = Math.exp(-distToMouse * distToMouse) * activity * 1.5;
+    // Локальный резонанс возле курсора
+    const distToMouse = (curX - mouseX) / 150;
+    const mouseBoost = Math.exp(-distToMouse * distToMouse) * activity * 1.8;
 
-    // Сложение гармонических синусоид для аутентичной звуковой осциллограммы
+    // В зоне станции — идеальная чистая гармоника. В шуме — радиопомехи.
+    const noiseJitter = !isLocked && activity > 0.1 ? Math.sin(curX * 0.15 + phase * 3) * (activity * 5) : 0;
+
     const s1 = Math.sin(curX * freq + phase);
-    const s2 = Math.sin(curX * freq * 2.2 - phase * 1.3) * 0.45;
-    const s3 = Math.cos(curX * freq * 0.55 + phase * 0.75) * 0.3;
+    const s2 = Math.sin(curX * freq * 2.1 - phase * 1.2) * 0.4;
+    const s3 = Math.cos(curX * freq * 0.5 + phase * 0.7) * 0.25;
 
-    const dynamicAmp = (baseAmp + activity * 22 + mouseBoost * 30) * envelope;
-    const curY = centerY + (s1 + s2 + s3) * dynamicAmp;
+    const dynamicAmp = (baseAmp + activity * 35 + mouseBoost * 45) * envelope;
+    const curY = centerY + (s1 + s2 + s3) * dynamicAmp + noiseJitter;
 
     if (x === 0) {
       d += `M ${curX.toFixed(1)} ${curY.toFixed(1)}`;
@@ -125,21 +104,17 @@ export default function Hero({ initialData }: HeroProps) {
   const { viewBox, centerX, textBaselineY, fontSize, bannerWord, viewBoxWidth, viewBoxHeight, viewBoxTop } =
     getHeroTypography(rawWord);
 
-  // Центр букв по вертикали для оси звуковой волны
   const centerY = 160;
 
-  // Определение десктопной версии (мышь + экран от 1024px)
   const [isDesktop, setIsDesktop] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
 
-  // SVG Refs для анимации 60fps без ререндеров React
+  // SVG Refs для волн и стрелки
   const wave1Ref = useRef<SVGPathElement>(null);
   const wave2Ref = useRef<SVGPathElement>(null);
   const wave3Ref = useRef<SVGPathElement>(null);
   const wave4Ref = useRef<SVGPathElement>(null);
   const needleRef = useRef<SVGLineElement>(null);
 
-  // Интерактивное состояние курсора
   const activityRef = useRef(0);
   const targetMouseXRef = useRef(viewBoxWidth / 2);
   const currentMouseXRef = useRef(viewBoxWidth / 2);
@@ -147,7 +122,7 @@ export default function Hero({ initialData }: HeroProps) {
   const lastPosRef = useRef({ x: 0, y: 0 });
   const lastMoveTimeRef = useRef(0);
 
-  // Проверка устройства: включаем ТОЛЬКО на ПК с физической мышью
+  // Только на ПК с физической мышью
   useEffect(() => {
     const checkIsDesktop = () => {
       const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
@@ -160,65 +135,85 @@ export default function Hero({ initialData }: HeroProps) {
     return () => window.removeEventListener("resize", checkIsDesktop);
   }, []);
 
-  // Анимационный цикл requestAnimationFrame для десктопа
+  // Разблокировка Web Audio API при первом клике или движении
+  useEffect(() => {
+    if (!isDesktop) return;
+
+    const unlockAudio = () => {
+      radioAudio.ensureRunning();
+    };
+
+    window.addEventListener("pointerdown", unlockAudio, { passive: true });
+    window.addEventListener("mousemove", unlockAudio, { once: true, passive: true });
+    window.addEventListener("keydown", unlockAudio, { passive: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudio);
+      window.removeEventListener("mousemove", unlockAudio);
+      window.removeEventListener("keydown", unlockAudio);
+    };
+  }, [isDesktop]);
+
+  // Анимационный цикл requestAnimationFrame для волн
   useEffect(() => {
     if (!isDesktop) return;
 
     let animId: number;
     let phase = 0;
 
-    const render = () => {
-      // Плавное затухание возбуждения волны
-      activityRef.current = Math.max(0, activityRef.current * 0.94);
+    const STATIONS_POS = [0.18, 0.50, 0.82];
 
-      // Плавное следование за курсором
-      currentMouseXRef.current += (targetMouseXRef.current - currentMouseXRef.current) * 0.12;
+    const render = () => {
+      activityRef.current = Math.max(0, activityRef.current * 0.95);
+      currentMouseXRef.current += (targetMouseXRef.current - currentMouseXRef.current) * 0.14;
 
       const act = activityRef.current;
-      // В спокойном состоянии волна дышит медленно, при движении ускоряется
-      phase += 0.035 + act * 0.085;
+      phase += 0.04 + act * 0.09;
 
       const mX = currentMouseXRef.current;
+      const xRatio = mX / viewBoxWidth;
+
+      // Проверка, попадаем ли на станцию
+      const isLocked = STATIONS_POS.some((pos) => Math.abs(xRatio - pos) < 0.05);
 
       // 1. Белый яркий луч несущей частоты
       if (wave1Ref.current) {
         wave1Ref.current.setAttribute(
           "d",
-          generateWavePath(viewBoxWidth, centerY, 14, 0.011, phase, mX, act)
+          generateWavePath(viewBoxWidth, centerY, 18, 0.010, phase, mX, act, isLocked)
         );
       }
 
-      // 2. Неоново-розовая радиоволна
+      // 2. Неоново-бирюзовая звуковая синусоида
       if (wave2Ref.current) {
         wave2Ref.current.setAttribute(
           "d",
-          generateWavePath(viewBoxWidth, centerY + 3, 11, 0.016, -phase * 0.9 + 1.2, mX, act)
+          generateWavePath(viewBoxWidth, centerY + 2, 14, 0.015, -phase * 0.9 + 1.2, mX, act, isLocked)
         );
       }
 
-      // 3. Кибер-пурпурная гармоника
+      // 3. Неоново-розовая волна гармоники
       if (wave3Ref.current) {
         wave3Ref.current.setAttribute(
           "d",
-          generateWavePath(viewBoxWidth, centerY - 3, 9, 0.022, phase * 1.3 + 2.5, mX, act)
+          generateWavePath(viewBoxWidth, centerY - 2, 11, 0.021, phase * 1.3 + 2.4, mX, act, isLocked)
         );
       }
 
-      // 4. Тонкие высокочастотные колебания (помехи эфира)
+      // 4. Золотистая радиоволна
       if (wave4Ref.current) {
         wave4Ref.current.setAttribute(
           "d",
-          generateWavePath(viewBoxWidth, centerY, 6, 0.031, -phase * 1.6, mX, act)
+          generateWavePath(viewBoxWidth, centerY, 8, 0.030, -phase * 1.5, mX, act, isLocked)
         );
       }
 
-      // Стрелка радио-тюнера
+      // Вертикальная шкала настройки тюнера
       if (needleRef.current) {
         if (isHoveredRef.current) {
           needleRef.current.setAttribute("x1", mX.toFixed(1));
           needleRef.current.setAttribute("x2", mX.toFixed(1));
-          const opacity = Math.min(0.9, act * 0.7 + 0.3);
-          needleRef.current.setAttribute("opacity", opacity.toFixed(2));
+          needleRef.current.setAttribute("opacity", Math.min(1, act * 0.8 + 0.35).toFixed(2));
         } else {
           needleRef.current.setAttribute("opacity", "0");
         }
@@ -235,7 +230,7 @@ export default function Hero({ initialData }: HeroProps) {
     };
   }, [isDesktop, viewBoxWidth, centerY]);
 
-  // Обработчик движения мыши (активен только на ПК)
+  // Движение мыши над баннером (настройка частоты)
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!isDesktop) return;
@@ -248,15 +243,15 @@ export default function Hero({ initialData }: HeroProps) {
       const now = performance.now();
       const dt = Math.max(1, now - lastMoveTimeRef.current);
       const dist = Math.hypot(e.clientX - lastPosRef.current.x, e.clientY - lastPosRef.current.y);
-      const speed = Math.min(1, dist / (dt * 0.7));
+      const speed = Math.min(1, dist / (dt * 0.6));
 
       lastPosRef.current = { x: e.clientX, y: e.clientY };
       lastMoveTimeRef.current = now;
 
-      activityRef.current = Math.min(1, activityRef.current + speed * 0.4 + 0.15);
+      activityRef.current = Math.min(1, activityRef.current + speed * 0.45 + 0.18);
       isHoveredRef.current = true;
 
-      // Запуск процедурного синтезатора радио
+      // Воспроизведение звука настройки, шипения и попадания на волну
       radioAudio.triggerTuning(relX, speed);
     },
     [isDesktop, viewBoxWidth]
@@ -280,59 +275,31 @@ export default function Hero({ initialData }: HeroProps) {
     radioAudio.fadeStop();
   }, [isDesktop]);
 
-  const handleToggleMute = () => {
-    const nextMuted = radioAudio.toggleMute();
-    setIsMuted(nextMuted);
-  };
-
   return (
     <section id="hero" className="relative w-full bg-[#F3EFE8] pt-1 sm:pt-2 overflow-hidden">
       {/* 
         =====================================================================
-        ВЕРХНЯЯ СТРОКА: Год копирайта и статус агентства
-        - pt-2 sm:pt-3: отступ сверху от шапки меню
-        - px-4 sm:px-8 lg:px-[60px]: боковые отступы по краям экрана
+        ВЕРХНЯЯ СТРОКА: Исходный дизайн (год и статус агентства без лишних кнопок)
         =====================================================================
       */}
       <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 flex items-center justify-between">
         <span className="text-[20px] sm:text-[32px] 2xl:text-[36px] font-bold text-[#0A0A0A] tracking-tight">
           {copyrightYear}
         </span>
-
-        <div className="flex items-center gap-4">
-          {/* Индикатор/переключатель звука радио (только для ПК) */}
-          {isDesktop && (
-            <button
-              onClick={handleToggleMute}
-              type="button"
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-wider transition-all bg-[#0A0A0A]/5 hover:bg-[#0A0A0A]/10 text-[#0A0A0A]/75 hover:text-[#0A0A0A] border border-[#0A0A0A]/10 cursor-pointer select-none"
-              title="Звук настройки радиоприемника при движении курсора"
-            >
-              <span
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  isMuted ? "bg-neutral-400" : "bg-emerald-500 animate-pulse"
-                }`}
-              />
-              <span>📻 104.2 FM • ЗВУК: {isMuted ? "ВЫКЛ" : "ВКЛ"}</span>
-            </button>
-          )}
-
-          <span className="text-[14px] sm:text-[28px] 2xl:text-[30px] font-bold tracking-widest text-[#0A0A0A] uppercase">
-            {agencyLabel}
-          </span>
-        </div>
+        <span className="text-[14px] sm:text-[28px] 2xl:text-[30px] font-bold tracking-widest text-[#0A0A0A] uppercase">
+          {agencyLabel}
+        </span>
       </div>
 
       {/* 
         =====================================================================
         ГЛАВНЫЙ БАННЕР С НАДПИСЬЮ (МАРКЕТИНГ):
-        
-        На мобильных — статический плакатный текст Oswald без нагрузки.
-        На ПК — живые волны звука строго внутри маски букв + интерактивное радио-аудио.
+        Буквы ВСЕГДА на 100% видны в фирменном градиенте.
+        На ПК внутри букв анимируются живые звуковые радиоволны осциллографа.
         =====================================================================
       */}
       <div
-        className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center"
+        className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 pb-2 sm:pb-3 mb-[20px] 2xl:mb-[32px] select-none flex justify-center items-center cursor-crosshair"
         onMouseMove={isDesktop ? handleMouseMove : undefined}
         onMouseEnter={isDesktop ? handleMouseEnter : undefined}
         onMouseLeave={isDesktop ? handleMouseLeave : undefined}
@@ -351,105 +318,97 @@ export default function Hero({ initialData }: HeroProps) {
               <stop offset="100%" stopColor="#824E98" />
             </linearGradient>
 
-            {/* Маска по силуэту букв слова: ни один пиксель волны не выходит за их рамки */}
-            {isDesktop && (
-              <clipPath id="heroWordClip">
-                <text
-                  x={centerX}
-                  y={textBaselineY}
-                  textAnchor="middle"
-                  fontFamily="'Oswald', Impact, sans-serif"
-                  fontWeight="700"
-                  fontSize={fontSize}
-                  className="uppercase"
-                >
-                  {bannerWord}
-                </text>
-              </clipPath>
-            )}
+            {/* Маска по силуэту букв слова: обрезает волны строго по очертаниям букв */}
+            <clipPath id="heroWordClip" clipPathUnits="userSpaceOnUse">
+              <text
+                x={centerX}
+                y={textBaselineY}
+                textAnchor="middle"
+                fontFamily="'Oswald', Impact, sans-serif"
+                fontWeight="700"
+                fontSize={fontSize}
+                className="uppercase"
+              >
+                {bannerWord}
+              </text>
+            </clipPath>
           </defs>
 
-          {!isDesktop ? (
-            /* Мобильная версия: чистый плакатный текст без накладных расходов */
-            <text
-              x={centerX}
-              y={textBaselineY}
-              textAnchor="middle"
-              fill="url(#heroRefinedGradient)"
-              fontFamily="'Oswald', Impact, sans-serif"
-              fontWeight="700"
-              fontSize={fontSize}
-              className="uppercase"
-            >
-              {bannerWord}
-            </text>
-          ) : (
-            /* ПК версия: живые радиоволны осциллографа внутри маски букв */
-            <g clipPath="url(#heroWordClip)">
-              {/* Базовый фирменный градиент слова */}
-              <rect
-                x="0"
-                y={viewBoxTop}
-                width={viewBoxWidth}
-                height={viewBoxHeight}
-                fill="url(#heroRefinedGradient)"
+          {/* 
+            1. БАЗОВЫЙ ПЛАКАТНЫЙ ТЕКСТ:
+            Всегда отображается напрямую! Никогда не пропадает ни на мобилках, ни на ПК.
+          */}
+          <text
+            x={centerX}
+            y={textBaselineY}
+            textAnchor="middle"
+            fill="url(#heroRefinedGradient)"
+            fontFamily="'Oswald', Impact, sans-serif"
+            fontWeight="700"
+            fontSize={fontSize}
+            className="uppercase"
+          >
+            {bannerWord}
+          </text>
+
+          {/* 
+            2. СЛОЙ ЗВУКОВЫХ РАДИОВОЛН (ТОЛЬКО НА ПК):
+            Накладывается поверх букв и замаскирован через clipPath строго внутри букв слова!
+          */}
+          {isDesktop && (
+            <g clipPath="url(#heroWordClip)" className="pointer-events-none">
+              {/* Волна 1: Яркий белый луч несущей частоты радиостанции */}
+              <path
+                ref={wave1Ref}
+                fill="none"
+                stroke="#FFFFFF"
+                strokeWidth="5"
+                strokeLinecap="round"
+                opacity="0.95"
               />
 
-              {/* Звуковые волны осциллографа */}
-              <g className="mix-blend-screen pointer-events-none">
-                {/* Волна 1: Яркий белый луч несущей частоты радиостанции */}
-                <path
-                  ref={wave1Ref}
-                  fill="none"
-                  stroke="#FFFFFF"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                  opacity="0.95"
-                />
+              {/* Волна 2: Неоново-бирюзовая звуковая волна */}
+              <path
+                ref={wave2Ref}
+                fill="none"
+                stroke="#38BDF8"
+                strokeWidth="4"
+                strokeLinecap="round"
+                opacity="0.9"
+              />
 
-                {/* Волна 2: Неоново-розовая гармоника */}
-                <path
-                  ref={wave2Ref}
-                  fill="none"
-                  stroke="#FF88A8"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  opacity="0.85"
-                />
+              {/* Волна 3: Неоново-розовая гармоника */}
+              <path
+                ref={wave3Ref}
+                fill="none"
+                stroke="#FB7185"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                opacity="0.85"
+              />
 
-                {/* Волна 3: Кибер-пурпурная радиоволна */}
-                <path
-                  ref={wave3Ref}
-                  fill="none"
-                  stroke="#E2A8FF"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  opacity="0.75"
-                />
+              {/* Волна 4: Золотистая радиоволна */}
+              <path
+                ref={wave4Ref}
+                fill="none"
+                stroke="#FDE047"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                opacity="0.8"
+              />
 
-                {/* Волна 4: Золотистая искра накала радиолампы */}
-                <path
-                  ref={wave4Ref}
-                  fill="none"
-                  stroke="#FDE047"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  opacity="0.6"
-                />
-
-                {/* Шкала настройки: вертикальная стрелка тюнера */}
-                <line
-                  ref={needleRef}
-                  x1="0"
-                  y1={viewBoxTop}
-                  x2="0"
-                  y2={viewBoxTop + viewBoxHeight}
-                  stroke="#FFFFFF"
-                  strokeWidth="2"
-                  strokeDasharray="5 3"
-                  opacity="0"
-                />
-              </g>
+              {/* Тонкая вертикальная визирная нить шкалы настройки радио */}
+              <line
+                ref={needleRef}
+                x1="0"
+                y1={viewBoxTop}
+                x2="0"
+                y2={viewBoxTop + viewBoxHeight}
+                stroke="#FFFFFF"
+                strokeWidth="2.5"
+                strokeDasharray="6 4"
+                opacity="0"
+              />
             </g>
           )}
         </svg>
