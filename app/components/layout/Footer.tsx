@@ -2,14 +2,92 @@
 
 import React, { memo, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { copyToClipboard } from "@/app/components/Toast";
+import Button from "@/app/components/ui/Button";
+import { copyToClipboard } from "@/app/components/ui/Toast";
+import {
+  FOOTER_NAV_LINKS,
+  FOOTER_SERVICE_LINKS,
+} from "@/constants/navigation";
 import {
   DEFAULT_FOOTER_DATA,
   type FooterSectionData,
 } from "@/types/site-content";
+import FooterWatermark from "./FooterWatermark";
 
 interface FooterProps {
   initialData?: Partial<FooterSectionData>;
+}
+
+interface FooterColumnProps {
+  title: string;
+  delayClass: string;
+  isVisible: boolean;
+  className?: string;
+  children: React.ReactNode;
+}
+
+/** Универсальная колонка футера с каскадной анимацией появления */
+function FooterColumn({
+  title,
+  delayClass,
+  isVisible,
+  className = "",
+  children,
+}: FooterColumnProps) {
+  return (
+    <div
+      className={`transition-all duration-700 ease-out ${delayClass} ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+      } ${className}`}
+    >
+      <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
+        {title}
+      </h4>
+      {children}
+    </div>
+  );
+}
+
+/** Карточка контактных данных с интерактивной микро-анимацией */
+function ContactCard({
+  icon,
+  label,
+  href,
+  subtext,
+  nudgeClass,
+  onClick,
+  title,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  subtext: string;
+  nudgeClass: string;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  title?: string;
+}) {
+  return (
+    <div
+      className={`group ${nudgeClass} hover:[animation-play-state:paused] flex items-start gap-3 p-2.5 -m-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10 transition-all duration-300`}
+    >
+      <div className="shrink-0 text-white/80 group-hover:text-brand-pink group-hover:scale-110 transition-all mt-0.5">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <a
+          href={href}
+          onClick={onClick}
+          title={title}
+          className="text-sm 2xl:text-[17px] font-medium text-white group-hover:text-brand-pink transition-colors block leading-tight cursor-pointer"
+        >
+          {label}
+        </a>
+        <span className="text-xs 2xl:text-sm text-white/40 block mt-1">
+          {subtext}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 function BaseFooter({ initialData }: FooterProps) {
@@ -28,7 +106,6 @@ function BaseFooter({ initialData }: FooterProps) {
   const footerRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Однократное появление при скролле (отрабатывает ровно 1 раз)
   useEffect(() => {
     const el = footerRef.current;
     if (!el) return;
@@ -48,6 +125,12 @@ function BaseFooter({ initialData }: FooterProps) {
     return () => observer.disconnect();
   }, []);
 
+  const socialLinks = [
+    { label: "ВКонтакте ↗", href: vkUrl, isExternal: true },
+    { label: "Telegram ↗", href: telegramUrl, isExternal: true },
+    { label: "МАКС ↗", href: maxUrl || "#", isExternal: Boolean(maxUrl && maxUrl !== "#") },
+  ];
+
   return (
     <footer
       ref={footerRef}
@@ -55,7 +138,7 @@ function BaseFooter({ initialData }: FooterProps) {
       className="w-full bg-[#0A0A0A] text-white pt-10 sm:pt-14 lg:pt-16 pb-8 overflow-hidden"
     >
       <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16">
-        {/* ВЕРХНИЙ БЛОК: Бренд и описание */}
+        {/* Бренд и описание */}
         <div
           className={`max-w-xl 2xl:max-w-3xl mb-14 sm:mb-20 2xl:mb-24 transition-all duration-700 ease-out ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
@@ -71,265 +154,114 @@ function BaseFooter({ initialData }: FooterProps) {
           </p>
         </div>
 
-        {/* СЕТКА КОЛОНОК: Каскадное появление колонок с задержкой */}
+        {/* Сетка колонок */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12 pb-8 sm:pb-16">
-          {/* Колонка 1: Навигация */}
-          <div
-            className={`transition-all duration-700 ease-out delay-100 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
-              Навигация
-            </h4>
+          <FooterColumn title="Навигация" delayClass="delay-100" isVisible={isVisible}>
             <ul className="space-y-1 sm:space-y-1.5 text-sm 2xl:text-[17px] font-normal text-white/80">
-              <li>
-                <Link href="/" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  Главная
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  Услуги
-                </Link>
-              </li>
-              <li>
-                <Link href="/#process" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  Процесс
-                </Link>
-              </li>
-              <li>
-                <Link href="/#work" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  Кейсы
-                </Link>
-              </li>
-              <li>
-                <Link href="/#manifesto" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  О нас
-                </Link>
-              </li>
+              {FOOTER_NAV_LINKS.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="block py-1.5 2xl:py-2 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-          </div>
+          </FooterColumn>
 
-          {/* Колонка 2: Услуги */}
-          <div
-            className={`transition-all duration-700 ease-out delay-200 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
-              Услуги
-            </h4>
+          <FooterColumn title="Услуги" delayClass="delay-200" isVisible={isVisible}>
             <ul className="space-y-1 sm:space-y-1.5 text-sm 2xl:text-[17px] font-normal text-white/80">
-              <li>
-                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  Дорожное радио
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  НАШЕ Радио
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  Щиты 3х6
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  Звукозапись
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="block py-1.5 2xl:py-2 hover:text-white transition-colors">
-                  Полиграфия
-                </Link>
-              </li>
+              {FOOTER_SERVICE_LINKS.map((service) => (
+                <li key={service.label}>
+                  <Link
+                    href={service.href}
+                    className="block py-1.5 2xl:py-2 hover:text-white transition-colors"
+                  >
+                    {service.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-          </div>
+          </FooterColumn>
 
-          {/* Колонка 3: Офис */}
-          <div
-            className={`transition-all duration-700 ease-out delay-300 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
-              Офис
-            </h4>
+          <FooterColumn title="Офис" delayClass="delay-300" isVisible={isVisible}>
             <div className="text-sm 2xl:text-[17px] font-normal text-white/80">
               <p className="text-white/60 leading-relaxed py-1.5 2xl:py-2">
                 {officeAddress}
               </p>
             </div>
-          </div>
+          </FooterColumn>
 
-          {/* Колонка 4: Соцсети */}
-          <div
-            className={`transition-all duration-700 ease-out delay-400 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
-              Соцсети
-            </h4>
+          <FooterColumn title="Соцсети" delayClass="delay-400" isVisible={isVisible}>
             <ul className="space-y-1 sm:space-y-1.5 text-sm 2xl:text-[17px] font-normal text-white/80">
-              <li>
-                <a
-                  href={vkUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block py-1.5 2xl:py-2 hover:text-white transition-colors"
-                >
-                  ВКонтакте ↗
-                </a>
-              </li>
-              <li>
-                <a
-                  href={telegramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block py-1.5 2xl:py-2 hover:text-white transition-colors"
-                >
-                  Telegram ↗
-                </a>
-              </li>
-              <li>
-                <a
-                  href={maxUrl || "#"}
-                  target={maxUrl && maxUrl !== "#" ? "_blank" : undefined}
-                  rel={maxUrl && maxUrl !== "#" ? "noopener noreferrer" : undefined}
-                  className="block py-1.5 2xl:py-2 hover:text-white transition-colors cursor-pointer"
-                >
-                  МАКС ↗
-                </a>
-              </li>
+              {socialLinks.map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    target={item.isExternal ? "_blank" : undefined}
+                    rel={item.isExternal ? "noopener noreferrer" : undefined}
+                    className="block py-1.5 2xl:py-2 hover:text-white transition-colors"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
             </ul>
-          </div>
+          </FooterColumn>
 
-          {/* Колонка 5: Контакты (с живым микро-интерактивом подскока и статусом связи) */}
-          <div
-            className={`col-span-2 sm:col-span-1 transition-all duration-700 ease-out delay-500 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+          <FooterColumn
+            title="Контакты"
+            delayClass="delay-500"
+            isVisible={isVisible}
+            className="col-span-2 sm:col-span-1"
           >
-            <h4 className="text-sm 2xl:text-base font-semibold text-white/50 mb-3 sm:mb-5 2xl:mb-6">
-              Контакты
-            </h4>
-
             <div className="space-y-3 sm:space-y-4">
-              {/* Телефон: периодический микро-подскок волна 1 */}
-              <div className="group animate-contact-nudge-1 hover:[animation-play-state:paused] flex items-start gap-3 p-2.5 -m-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10 transition-all duration-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="shrink-0 text-white/80 group-hover:text-brand-pink group-hover:scale-110 transition-all mt-0.5"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M19.95 21q-3.125 0-6.175-1.362t-5.55-3.863q-2.5-2.5-3.862-5.55T3 4.05q0-.45.3-.75t.75-.3h3.05q.35 0 .625.238t.325.562l.65 3.5q.05.35-.025.638T8.4 8.45L6.1 10.75q1.125 1.95 2.575 3.4t3.4 2.575l2.3-2.3q.25-.25.55-.337t.65-.013l3.5.7q.35.075.575.338t.225.612v3.05q0 .45-.3.75t-.75.3Z"
-                  />
-                </svg>
-                <div className="flex-1 min-w-0">
-                  <a
-                    href={`tel:${phonePrimary.replace(/[^\d+]/g, "")}`}
-                    onClick={(e) => {
-                      if (typeof window !== "undefined" && window.innerWidth >= 768) {
-                        e.preventDefault();
-                        copyToClipboard(phonePrimary, `Телефон скопирован: ${phonePrimary}`);
-                      }
-                    }}
-                    title="Нажмите для вызова или копирования"
-                    className="text-sm 2xl:text-[17px] font-medium text-white group-hover:text-brand-pink transition-colors block leading-tight cursor-pointer"
-                  >
-                    {phonePrimary}
-                  </a>
-                  <span className="text-xs 2xl:text-sm text-white/40 block mt-1">
-                    Пн–Пт с 9:00 до 18:00
-                  </span>
-                </div>
-              </div>
+              <ContactCard
+                icon={
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path fill="currentColor" d="M19.95 21q-3.125 0-6.175-1.362t-5.55-3.863q-2.5-2.5-3.862-5.55T3 4.05q0-.45.3-.75t.75-.3h3.05q.35 0 .625.238t.325.562l.65 3.5q.05.35-.025.638T8.4 8.45L6.1 10.75q1.125 1.95 2.575 3.4t3.4 2.575l2.3-2.3q.25-.25.55-.337t.65-.013l3.5.7q.35.075.575.338t.225.612v3.05q0 .45-.3.75t-.75.3Z" />
+                  </svg>
+                }
+                label={phonePrimary}
+                href={`tel:${phonePrimary.replace(/[^\d+]/g, "")}`}
+                subtext="Пн–Пт с 9:00 до 18:00"
+                nudgeClass="animate-contact-nudge-1"
+                title="Нажмите для вызова или копирования"
+                onClick={(e) => {
+                  if (typeof window !== "undefined" && window.innerWidth >= 768) {
+                    e.preventDefault();
+                    copyToClipboard(phonePrimary, `Телефон скопирован: ${phonePrimary}`);
+                  }
+                }}
+              />
 
-              {/* Email: периодический микро-подскок волна 2 (с задержкой 240мс) */}
-              <div className="group animate-contact-nudge-2 hover:[animation-play-state:paused] flex items-start gap-3 p-2.5 -m-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10 transition-all duration-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="shrink-0 text-white/80 group-hover:text-brand-pink group-hover:scale-110 transition-all mt-0.5"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20H4Zm8-7l8-5V6l-8 5l-8-5v2l8 5Z"
-                  />
-                </svg>
-                <div className="flex-1 min-w-0">
-                  <a
-                    href={`mailto:${email}`}
-                    className="text-sm 2xl:text-[17px] font-medium text-white group-hover:text-brand-pink transition-colors block leading-tight"
-                  >
-                    {email}
-                  </a>
-                  <span className="text-xs 2xl:text-sm text-white/40 block mt-1">
-                    Медиапланы и документооборот
-                  </span>
-                </div>
-              </div>
+              <ContactCard
+                icon={
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path fill="currentColor" d="M4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20H4Zm8-7l8-5V6l-8 5l-8-5v2l8 5Z" />
+                  </svg>
+                }
+                label={email}
+                href={`mailto:${email}`}
+                subtext="Медиапланы и документооборот"
+                nudgeClass="animate-contact-nudge-2"
+              />
             </div>
-          </div>
+          </FooterColumn>
         </div>
       </div>
 
-      {/* 
-        ВОДЯНОЙ ЗНАК «РАДИОТОЧКА» НА ВСЮ ШИРИНУ ЭКРАНА:
-        Кинематографичное проявление со скейлом
-      */}
-      <div
-        className={`w-full max-w-[1720px] mx-auto overflow-hidden select-none pointer-events-none my-6 sm:my-12 2xl:my-16 px-4 flex justify-center transition-all duration-1000 ease-out delay-700 ${
-          isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
-        }`}
-      >
-        <svg
-          viewBox="0 0 1400 320"
-          className="w-full max-h-[280px] 2xl:max-h-[320px] h-auto block"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <linearGradient id="footerRefinedGradient" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stopColor="#EA5670" stopOpacity="0.55" />
-              <stop offset="35%" stopColor="#EA5670" stopOpacity="0.22" />
-              <stop offset="75%" stopColor="#EA5670" stopOpacity="0.06" />
-              <stop offset="100%" stopColor="#0A0A0A" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <text
-            x="0"
-            y="250"
-            textLength="1400"
-            lengthAdjust="spacing"
-            fill="url(#footerRefinedGradient)"
-            fontSize="240"
-            fontWeight="200"
-            fontFamily="'Onest', -apple-system, BlinkMacSystemFont, sans-serif"
-          >
-            РАДИОТОЧКА
-          </text>
-        </svg>
-      </div>
+      {/* Водяной знак */}
+      <FooterWatermark isVisible={isVisible} />
 
+      {/* Нижний бар */}
       <div
         className={`max-w-[1400px] 2xl:max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-12 2xl:px-16 transition-all duration-700 ease-out delay-800 ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
       >
-        {/* Нижний копирайт, блок разработчика и ссылка на панель модерации */}
         <div className="pt-8 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs 2xl:text-sm text-white/40">
           <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2.5 text-center sm:text-left">
             <p>© {new Date().getFullYear()} Рекламное агентство «Радиоточка». г. Балаково.</p>
@@ -362,17 +294,19 @@ function BaseFooter({ initialData }: FooterProps) {
             </a>
           </div>
 
-          <a
+          <Button
             href="/admin/content"
-            className="hover:text-white/70 transition-colors py-1 px-2.5 -mx-2.5 rounded-md hover:bg-white/5 inline-block"
+            variant="ghost"
+            size="sm"
+            className="text-white/40 hover:text-white hover:bg-white/5 py-1 px-2.5 rounded-md text-xs 2xl:text-sm font-normal"
           >
             Панель модерации
-          </a>
+          </Button>
         </div>
       </div>
     </footer>
   );
 }
 
-const Footer = memo(BaseFooter);
+export const Footer = memo(BaseFooter);
 export default Footer;

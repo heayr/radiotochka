@@ -1,8 +1,8 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import Button from "@/app/components/Button";
-import TwoFactorSetup from "@/app/components/Auth/TwoFactorSetup";
+import Button from "@/app/components/ui/Button";
+import TwoFactorSetup from "@/app/components/auth/TwoFactorSetup";
 
 export function SecurityCard() {
   return (

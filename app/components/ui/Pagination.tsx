@@ -1,4 +1,4 @@
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 
 interface PaginationProps {
   page: number;

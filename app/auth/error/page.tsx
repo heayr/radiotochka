@@ -3,18 +3,21 @@
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 
 function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams?.get("error") ?? null;
 
   const errorMessages: Record<string, string> = {
-    Configuration: "Ошибка конфигурации сервера.",
+    Configuration: "Ошибка конфигурации сервера. Проверьте переменные окружения и подключение к базе данных.",
     AccessDenied: "Доступ запрещён.",
     Verification: "Ошибка верификации. Ссылка устарела или недействительна.",
     Default: "Произошла ошибка при аутентификации.",
     CredentialsSignin: "Неверный email или пароль.",
+    AccountBlocked: "Учётная запись заблокирована.",
+    EmailNotVerified: "Email не подтверждён. Пожалуйста, подтвердите email перед входом.",
+    DatabaseConnectionError: "Не удалось подключиться к базе данных. Проверьте настройки DATABASE_URL.",
   };
 
   const message = error

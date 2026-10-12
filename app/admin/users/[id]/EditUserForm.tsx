@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { updateUser } from "@/lib/actions/admin-actions";
 import { useRouter } from "next/navigation";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 
 interface UserData {
   id: string;

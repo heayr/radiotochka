@@ -5,14 +5,7 @@ import Image from "next/image";
 import React, { useState, useCallback, memo } from "react";
 import { usePathname } from "next/navigation";
 
-const navLinks = [
-  { label: "Главная", href: "/" },
-  { label: "Услуги", href: "/#services" },
-  { label: "Процесс", href: "/#process" },
-  { label: "Кейсы", href: "/#work" },
-  { label: "О нас", href: "/#manifesto" },
-  { label: "Контакты", href: "/#contact" },
-] as const;
+import { MAIN_NAV_LINKS as navLinks } from "@/constants/navigation";
 
 function BaseNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

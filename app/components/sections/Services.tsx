@@ -1,8 +1,8 @@
 "use client";
 
 import React, { memo } from "react";
-import Button from "@/app/components/Button";
-import SafeImage from "@/app/components/SafeImage";
+import Button from "@/app/components/ui/Button";
+import SafeImage from "@/app/components/ui/SafeImage";
 import {
   DEFAULT_SERVICES_DATA,
   type ServiceCardItem,

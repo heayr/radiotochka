@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import SafeImage, { normalizeImageUrl } from "@/app/components/SafeImage";
-import Button from "@/app/components/Button";
+import SafeImage, { normalizeImageUrl } from "@/app/components/ui/SafeImage";
+import Button from "@/app/components/ui/Button";
 import { ImageEditorModal } from "./ImageEditorModal";
 
 interface ImageFieldProps {

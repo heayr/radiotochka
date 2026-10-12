@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useRef, useEffect } from "react";
-import SafeImage from "@/app/components/SafeImage";
+import SafeImage from "@/app/components/ui/SafeImage";
 import {
   DEFAULT_PROCESS_DATA,
   type ProcessStepItem,

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { EditorProps } from "./editor-types";
 import { FormField } from "@/app/components/ui/FormField";
-import { EditorFormFooter } from "@/app/components/ui/EditorFormFooter";
+import { EditorFormFooter } from "./EditorFormFooter";
 
 export function ProposalEditor({ block, onSave, onCancel }: EditorProps) {
   const content = block.content as Record<string, unknown>;

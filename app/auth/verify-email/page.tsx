@@ -4,7 +4,7 @@ import { verifyEmail } from "@/lib/actions/auth-actions";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();

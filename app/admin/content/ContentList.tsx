@@ -6,7 +6,7 @@ import {
   updateContentBlock,
   seedDefaultContentBlocks,
 } from "@/lib/actions/admin-actions";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 import type { ContentBlock } from "@/types/content";
 import { StatusBadge } from "@/app/components/ui/StatusBadge";
 import { STATUS_LABELS, STATUS_COLORS } from "@/constants/statuses";

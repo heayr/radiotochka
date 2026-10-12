@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import SafeImage from "@/app/components/SafeImage";
+import SafeImage from "@/app/components/ui/SafeImage";
 import {
   DEFAULT_LOGO_SECTION_DATA,
   type LogoItem,

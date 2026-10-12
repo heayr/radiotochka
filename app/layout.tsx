@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Navbar from "./components/layout/Navbar";
-import SessionProvider from "./components/SessionProvider";
+import SessionProvider from "./components/providers/SessionProvider";
 import { CookieConsent } from "./components/layout/CookieConsent";
-import Toast from "./components/Toast";
+import Toast from "./components/ui/Toast";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });

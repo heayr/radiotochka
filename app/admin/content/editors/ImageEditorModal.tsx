@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 
 interface ImageEditorModalProps {
   isOpen: boolean;

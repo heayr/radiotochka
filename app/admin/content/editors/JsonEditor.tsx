@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { EditorProps } from "./editor-types";
-import { EditorFormFooter } from "@/app/components/ui/EditorFormFooter";
+import { EditorFormFooter } from "./EditorFormFooter";
 
 export function JsonEditor({ block, onSave, onCancel }: EditorProps) {
   const [json, setJson] = useState(JSON.stringify(block.content, null, 2));

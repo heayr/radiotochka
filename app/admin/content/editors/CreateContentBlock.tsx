@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 import { Alert } from "@/app/components/ui/Alert";
 import { createContentBlock } from "@/lib/actions/admin-actions";
 

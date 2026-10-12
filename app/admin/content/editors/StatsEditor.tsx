@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Button from "@/app/components/Button";
-import { EditorFormFooter } from "@/app/components/ui/EditorFormFooter";
+import Button from "@/app/components/ui/Button";
+import { EditorFormFooter } from "./EditorFormFooter";
 import type { EditorProps } from "./editor-types";
 import { ImageField } from "./ImageField";
 import {

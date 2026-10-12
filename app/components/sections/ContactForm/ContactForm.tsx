@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 import { Alert } from "@/app/components/ui/Alert";
 import { FormField } from "@/app/components/ui/FormField";
 import { SectionHeader } from "@/app/components/sections/SectionHeader";

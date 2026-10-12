@@ -10,8 +10,8 @@ import { resetPasswordAction } from "@/lib/actions/auth-actions";
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import Button from "@/app/components/Button";
-import { AuthFormWrapper } from "@/app/components/Auth/AuthFormWrapper";
+import Button from "@/app/components/ui/Button";
+import { AuthFormWrapper } from "./AuthFormWrapper";
 import { FormField } from "@/app/components/ui/FormField";
 
 export default function ResetPasswordForm() {

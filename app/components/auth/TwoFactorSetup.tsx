@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { twoFactorSchema, type TwoFactorInput } from "@/lib/validations";
 import { useSession } from "next-auth/react";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 import { Alert } from "@/app/components/ui/Alert";
 import { Disable2FA } from "./Disable2FA";
 

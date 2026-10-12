@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import SafeImage from "@/app/components/SafeImage";
-import Button from "@/app/components/Button";
+import SafeImage from "@/app/components/ui/SafeImage";
+import Button from "@/app/components/ui/Button";
 import { ImageHint } from "./ImageHint";
 import { FormField } from "@/app/components/ui/FormField";
-import { EditorFormFooter } from "@/app/components/ui/EditorFormFooter";
+import { EditorFormFooter } from "./EditorFormFooter";
 import type { EditorProps } from "./editor-types";
 
 export function CasesEditor({ block, onSave, onCancel }: EditorProps) {

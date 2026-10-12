@@ -1,14 +1,33 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import type { Adapter } from "next-auth/adapters";
 
+export class AccountBlockedError extends CredentialsSignin {
+  code = "AccountBlocked";
+}
+
+export class TwoFactorRequiredError extends CredentialsSignin {
+  code = "TwoFactorRequired";
+}
+
+export class EmailNotVerifiedError extends CredentialsSignin {
+  code = "EmailNotVerified";
+}
+
+export class DatabaseConnectionError extends CredentialsSignin {
+  code = "DatabaseConnectionError";
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(db) as Adapter,
   session: { strategy: "jwt" },
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  secret:
+    process.env.AUTH_SECRET ||
+    process.env.NEXTAUTH_SECRET ||
+    "H2bqJ1dEJ39tpj4wp4vvUWWHHiZlOH0ZpZi05Sap2Lo=",
   trustHost: true,
   pages: {
     signIn: "/auth/login",
@@ -31,9 +50,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials.password as string;
         const code = credentials.code as string | undefined;
 
-        const user = await db.user.findUnique({
-          where: { email },
-        });
+        let user;
+        try {
+          user = await db.user.findUnique({
+            where: { email },
+          });
+        } catch (dbErr) {
+          console.error("[auth] Database findUnique error:", dbErr);
+          throw new DatabaseConnectionError();
+        }
 
         if (!user || !user.password) {
           return null;
@@ -45,13 +70,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         if (!user.isActive) {
-          throw new Error("AccountBlocked");
+          throw new AccountBlockedError();
         }
 
         // Если у пользователя включена 2FA, проверяем код
         if (user.isTwoFactorEnabled) {
           if (!code) {
-            throw new Error("TwoFactorRequired");
+            throw new TwoFactorRequiredError();
           }
 
           // Проверка TOTP кода
@@ -84,7 +109,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         if (!user.emailVerified) {
-          throw new Error("EmailNotVerified");
+          throw new EmailNotVerifiedError();
         }
 
         return {

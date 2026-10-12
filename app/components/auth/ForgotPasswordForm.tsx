@@ -9,8 +9,8 @@ import {
 import { forgotPasswordAction } from "@/lib/actions/auth-actions";
 import { useState } from "react";
 import Link from "next/link";
-import Button from "@/app/components/Button";
-import { AuthFormWrapper } from "@/app/components/Auth/AuthFormWrapper";
+import Button from "@/app/components/ui/Button";
+import { AuthFormWrapper } from "./AuthFormWrapper";
 
 export default function ForgotPasswordForm() {
   const [error, setError] = useState<string | null>(null);

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { disable2FA } from "@/lib/actions/auth-actions";
 import { useSession } from "next-auth/react";
-import Button from "@/app/components/Button";
+import Button from "@/app/components/ui/Button";
 import { Alert } from "@/app/components/ui/Alert";
 
 export function Disable2FA() {

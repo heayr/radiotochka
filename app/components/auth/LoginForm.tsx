@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import Button from "@/app/components/Button";
-import { AuthFormWrapper } from "@/app/components/Auth/AuthFormWrapper";
+import { useRouter, useSearchParams } from "next/navigation";
+import Button from "@/app/components/ui/Button";
+import { AuthFormWrapper } from "./AuthFormWrapper";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams?.get("callbackUrl") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -38,7 +40,7 @@ export default function LoginForm() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push(callbackUrl);
     router.refresh();
   };
 
