@@ -62,15 +62,15 @@ const WorkCard = memo(function WorkCard({
               <div className="w-full h-px bg-[#D4D4D4]/70 my-3 sm:my-4 2xl:my-5" />
 
               {/* Строка: Услуги */}
-              <div className="flex items-center justify-between py-1 mb-6 sm:mb-8 2xl:mb-10">
-                <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider">
+              <div className="flex flex-col xs:flex-row xs:items-center justify-between py-1 mb-6 sm:mb-8 2xl:mb-10 gap-2">
+                <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0">
                   Услуги:
                 </span>
-                <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2 2xl:gap-2.5">
+                <div className="flex flex-wrap items-center justify-start xs:justify-end gap-1.5 sm:gap-2 2xl:gap-2.5">
                   {(Array.isArray(project.services) ? project.services : []).map((service, sIdx) => (
                     <span
                       key={`${service}-${sIdx}`}
-                      className="px-3 py-1 sm:px-3.5 sm:py-1.5 2xl:px-4 2xl:py-2 rounded-full bg-[#EAE0CF]/50 text-[#0A0A0A] text-xs 2xl:text-sm font-semibold border border-[#D4C8B5]/60"
+                      className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 2xl:px-4 2xl:py-2 rounded-full bg-[#EAE0CF]/50 text-[#0A0A0A] text-[11px] sm:text-xs 2xl:text-sm font-semibold border border-[#D4C8B5]/60"
                     >
                       {service}
                     </span>
@@ -107,7 +107,7 @@ const WorkCard = memo(function WorkCard({
           <div className="w-full lg:w-1/2 order-1 lg:order-2">
             <div className="relative w-full aspect-[16/10] sm:aspect-[4/3] lg:aspect-[1184/1080] rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/5 bg-[#EFECE6] group">
               <SafeImage
-                src={project.imageSrc || (project as any).image || "/images/work/project-01.png"}
+                src={project.imageSrc || (project as { image?: string }).image || "/images/work/project-01.png"}
                 alt={project.title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, (min-width: 1536px) 760px, 580px"
@@ -167,7 +167,7 @@ export default function Work({ initialData }: WorkProps) {
               project={{
                 ...project,
                 services: Array.isArray(project.services) ? project.services : [],
-                imageSrc: project.imageSrc || (project as any).image || "/images/work/project-01.png",
+                imageSrc: project.imageSrc || (project as { image?: string }).image || "/images/work/project-01.png",
               }}
               index={index}
             />

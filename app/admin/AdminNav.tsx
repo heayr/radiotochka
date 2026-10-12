@@ -70,16 +70,17 @@ export function AdminNav({ user }: AdminNavProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                     isActive
                       ? "bg-white/15 text-white font-semibold shadow-inner"
                       : "text-white/70 hover:text-white hover:bg-white/5"
                   }`}
+                  title={item.label}
                 >
                   <span className={isActive ? "text-brand-pink" : "text-white/60"}>
                     {item.icon}
                   </span>
-                  <span>{item.label}</span>
+                  <span className="hidden sm:inline">{item.label}</span>
                 </Link>
               );
             })}

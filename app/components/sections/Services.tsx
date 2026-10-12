@@ -21,7 +21,7 @@ const MobileServiceCard = memo(function MobileServiceCard({
 }) {
   return (
     <div
-      className="w-full rounded-[22px] p-5 sm:p-6 border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between"
+      className="w-full rounded-[22px] p-4 xs:p-5 sm:p-6 border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between"
       style={{
         backgroundColor: "#111216",
         backgroundImage: `
@@ -263,14 +263,14 @@ function BaseServices({ initialData }: ServicesProps) {
         </p>
       </div>
 
-      {/* МОБИЛЬНАЯ ВЕРСИЯ: Чистый аккуратный вертикальный список без наслоения и громоздкости */}
-      <div className="flex flex-col gap-5 lg:hidden px-4">
+      {/* МОБИЛЬНАЯ И ПЛАНШЕТНАЯ ВЕРСИЯ: Чистый вертикальный список на смартфонах и 2-колоночная сетка на планшетах */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:hidden px-4 sm:px-8 max-w-5xl mx-auto">
         {items.map((service, index) => (
           <MobileServiceCard
             key={service.id || index}
             service={{
               ...service,
-              image: service.image || (service as any).imageSrc || "/images/services/service-01-radio-real.jpg",
+              image: service.image || (service as { imageSrc?: string }).imageSrc || "/images/services/service-01-radio-real.jpg",
               tags: Array.isArray(service.tags) ? service.tags : [],
             }}
             index={index}
@@ -285,7 +285,7 @@ function BaseServices({ initialData }: ServicesProps) {
             key={service.id || index}
             service={{
               ...service,
-              image: service.image || (service as any).imageSrc || "/images/services/service-01-radio-real.jpg",
+              image: service.image || (service as { imageSrc?: string }).imageSrc || "/images/services/service-01-radio-real.jpg",
               tags: Array.isArray(service.tags) ? service.tags : [],
             }}
             index={index}

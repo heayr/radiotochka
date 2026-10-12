@@ -15,7 +15,7 @@ interface ProcessCardProps {
 
 const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
   return (
-    <div className="group relative w-full h-[440px] sm:h-[470px] lg:h-[460px] xl:h-[480px] 2xl:h-[520px] rounded-[24px] sm:rounded-[28px] 2xl:rounded-[32px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform pointer-events-auto">
+    <div className="group relative w-full h-full min-h-[350px] lg:h-[460px] xl:h-[480px] 2xl:h-[520px] rounded-[22px] sm:rounded-[28px] 2xl:rounded-[32px] overflow-hidden border border-white/10 hover:border-[#ea5670]/80 transition-all duration-500 ease-out cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_0_40px_rgba(234,86,112,0.35)] bg-[#111111] will-change-transform pointer-events-auto">
       {/* Фоновое атмосферное изображение без зума */}
       <div className="absolute inset-0 z-0">
         <SafeImage
@@ -35,23 +35,23 @@ const ProcessCard = memo(function ProcessCard({ step, idx }: ProcessCardProps) {
       <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#ea5670]/85 via-[#ea5670]/35 via-50% to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out pointer-events-none" />
 
       {/* Содержимое карточки: текст приподнят ближе к оптической середине (pb-12 lg:pb-14 xl:pb-16) */}
-      <div className="relative z-20 h-full flex flex-col justify-between p-6 sm:p-7 2xl:p-8 pb-12 sm:pb-14 lg:pb-14 xl:pb-16 2xl:pb-18 select-none">
+      <div className="relative z-20 h-full flex flex-col justify-between p-5 sm:p-7 lg:p-5 xl:p-7 2xl:p-8 pb-10 sm:pb-14 lg:pb-12 xl:pb-16 2xl:pb-18 select-none">
         {/* Верхняя зона: воздушный тонкий номер на фиксированной высоте */}
-        <div className="h-[64px] 2xl:h-[76px] flex items-start justify-end">
-          <span className="text-7xl sm:text-8xl lg:text-[84px] 2xl:text-[96px] font-extralight tracking-tight text-white/70 group-hover:text-white transition-colors duration-500 leading-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
+        <div className="h-[54px] sm:h-[64px] 2xl:h-[76px] flex items-start justify-end">
+          <span className="text-6xl sm:text-8xl lg:text-[76px] xl:text-[84px] 2xl:text-[96px] font-extralight tracking-tight text-white/70 group-hover:text-white transition-colors duration-500 leading-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
             {step.number}
           </span>
         </div>
 
         {/* Зона контента: приподнята в фокусный центр карточки, строго по одной линии */}
         <div className="flex flex-col justify-end">
-          <div className="h-[34px] 2xl:h-[40px] flex items-end mb-2.5">
-            <h3 className="text-2xl sm:text-[25px] 2xl:text-[27px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <div className="min-h-[30px] sm:h-[34px] 2xl:h-[40px] flex items-end mb-2">
+            <h3 className="text-xl sm:text-[24px] lg:text-[21px] xl:text-[25px] 2xl:text-[27px] font-bold text-white tracking-tight leading-tight transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               {step.title}
             </h3>
           </div>
-          <div className="h-[54px] 2xl:h-[62px] flex items-start">
-            <p className="text-sm sm:text-[14px] 2xl:text-[15px] text-white/90 leading-[1.5] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+          <div className="min-h-[44px] sm:h-[54px] 2xl:h-[62px] flex items-start">
+            <p className="text-xs sm:text-[14px] lg:text-[13px] xl:text-[14px] 2xl:text-[15px] text-white/90 leading-[1.45] sm:leading-[1.5] font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {step.description}
             </p>
           </div>
@@ -178,7 +178,7 @@ const MobileProcessTrack = memo(function MobileProcessTrack({
             {steps.map((step, idx) => (
               <div
                 key={`mobile-step-${idx}`}
-                className="w-[82vw] max-w-[320px] h-[430px] shrink-0"
+                className="w-[82vw] max-w-[320px] h-[min(430px,calc(100dvh-130px))] min-h-[350px] shrink-0"
               >
                 <ProcessCard step={step} idx={idx} />
               </div>

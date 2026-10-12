@@ -79,11 +79,11 @@ export default function Hero({ initialData }: HeroProps) {
         ВЕРХНЯЯ СТРОКА: Год копирайта и статус агентства
         =====================================================================
       */}
-      <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 flex items-center justify-between">
-        <span className="text-[20px] sm:text-[32px] 2xl:text-[36px] font-bold text-[#0A0A0A] tracking-tight">
+      <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-8 lg:px-10 2xl:px-12 pt-2 sm:pt-3 flex items-center justify-between gap-2">
+        <span className="text-[17px] xs:text-[20px] sm:text-[32px] 2xl:text-[36px] font-bold text-[#0A0A0A] tracking-tight shrink-0">
           {copyrightYear}
         </span>
-        <span className="text-[14px] sm:text-[28px] 2xl:text-[30px] font-bold tracking-widest text-[#0A0A0A] uppercase">
+        <span className="text-[11px] xs:text-[13px] sm:text-[24px] md:text-[28px] 2xl:text-[30px] font-bold tracking-wider sm:tracking-widest text-[#0A0A0A] uppercase text-right">
           {agencyLabel}
         </span>
       </div>
@@ -98,7 +98,7 @@ export default function Hero({ initialData }: HeroProps) {
         <svg
           viewBox={viewBox}
           preserveAspectRatio="none"
-          className="w-full h-[85px] sm:h-[180px] md:h-[230px] lg:h-[280px] xl:h-[295px] 2xl:h-[350px] 3xl:h-[380px] block overflow-hidden"
+          className="w-full h-[clamp(75px,22vw,95px)] sm:h-[180px] md:h-[230px] lg:h-[280px] xl:h-[295px] 2xl:h-[350px] 3xl:h-[380px] block overflow-hidden"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >

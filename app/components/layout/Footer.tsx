@@ -155,7 +155,7 @@ function BaseFooter({ initialData }: FooterProps) {
         </div>
 
         {/* Сетка колонок */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12 pb-8 sm:pb-16">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-12 pb-8 sm:pb-16">
           <FooterColumn title="Навигация" delayClass="delay-100" isVisible={isVisible}>
             <ul className="space-y-1 sm:space-y-1.5 text-sm 2xl:text-[17px] font-normal text-white/80">
               {FOOTER_NAV_LINKS.map((link) => (
@@ -215,7 +215,7 @@ function BaseFooter({ initialData }: FooterProps) {
             title="Контакты"
             delayClass="delay-500"
             isVisible={isVisible}
-            className="col-span-2 sm:col-span-1"
+            className="col-span-2 sm:col-span-2 lg:col-span-1"
           >
             <div className="space-y-3 sm:space-y-4">
               <ContactCard

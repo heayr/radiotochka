@@ -30,10 +30,10 @@ function BaseNavbar() {
             alt="Радиоточка"
             width={34}
             height={34}
-            className="h-8 w-8 sm:h-[34px] sm:w-[34px] transition-opacity group-hover:opacity-90"
+            className="h-7 w-7 sm:h-[34px] sm:w-[34px] transition-opacity group-hover:opacity-90"
             priority
           />
-          <span className="font-bold text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none">
+          <span className="font-bold text-xl xs:text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none">
             Радиоточка
           </span>
         </Link>
@@ -110,12 +110,21 @@ function BaseNavbar() {
               {link.label}
             </Link>
           ))}
-          <a
-            href="tel:+79271370750"
-            className="mt-2 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-brand-pink hover:bg-brand-pink-hover text-white font-bold text-sm shadow-sm"
-          >
-            <span>Позвонить: 8 (927) 137-07-50 ↗</span>
-          </a>
+          <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-[#EAE0CF]">
+            <a
+              href="tel:+79271370750"
+              className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-brand-pink hover:bg-brand-pink-hover text-white font-bold text-xs xs:text-sm shadow-sm w-full"
+            >
+              <span>Позвонить: 8 (927) 137-07-50 ↗</span>
+            </a>
+            <a
+              href="#contact"
+              onClick={handleCloseMenu}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-black/5 hover:bg-black/10 text-gray-800 font-semibold text-xs xs:text-sm w-full transition-colors"
+            >
+              <span>Связаться с нами</span>
+            </a>
+          </div>
         </div>
       )}
     </nav>
