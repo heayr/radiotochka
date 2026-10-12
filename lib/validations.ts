@@ -119,6 +119,23 @@ export const adminUpdateUserSchema = z.object({
   emailVerified: z.boolean().optional(),
 });
 
+export const adminCreateUserSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Имя обязательно")
+    .max(50, "Имя не должно превышать 50 символов"),
+  email: z
+    .string()
+    .min(1, "Email обязателен")
+    .email("Введите корректный email"),
+  password: z
+    .string()
+    .min(6, "Пароль должен быть не менее 6 символов")
+    .max(100, "Пароль слишком длинный"),
+  role: z.enum(["super_admin", "admin", "moderator", "user"]).default("user"),
+  emailVerified: z.boolean().default(true),
+});
+
 export const contentBlockSchema = z.object({
   slug: z
     .string()
@@ -137,4 +154,5 @@ export type TwoFactorInput = z.infer<typeof twoFactorSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 export type PasswordChangeInput = z.infer<typeof passwordChangeSchema>;
 export type AdminUpdateUserInput = z.infer<typeof adminUpdateUserSchema>;
+export type AdminCreateUserInput = z.infer<typeof adminCreateUserSchema>;
 export type ContentBlockInput = z.infer<typeof contentBlockSchema>;

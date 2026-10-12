@@ -15,8 +15,7 @@ export default async function AdminUsersPage() {
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">Управление пользователями</h1>
-      <UsersList />
+      <UsersList currentUserRole={session.user.role} />
     </div>
   );
 }

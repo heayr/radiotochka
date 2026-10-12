@@ -1,8 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
-import { adminUpdateUserSchema, contentBlockSchema } from "@/lib/validations";
+import {
+  adminUpdateUserSchema,
+  adminCreateUserSchema,
+  type AdminCreateUserInput,
+  contentBlockSchema,
+} from "@/lib/validations";
 import { createAuditLog } from "@/lib/audit";
 import { requireRole, requireAdmin } from "@/lib/auth-helpers";
 import * as userService from "@/lib/services/user.service";
@@ -79,6 +85,64 @@ export async function updateUser(
   });
 
   return { success: true, message: "Пользователь обновлён" };
+}
+
+export async function createAdminUser(input: AdminCreateUserInput) {
+  const session = await requireRole(["super_admin", "admin"]);
+
+  const validated = adminCreateUserSchema.safeParse(input);
+  if (!validated.success) {
+    return { error: validated.error.errors[0]?.message || "Ошибка валидации" };
+  }
+
+  const { name, email, password, role, emailVerified } = validated.data;
+
+  // Ограничение прав: обычный admin не может создавать admin или super_admin
+  if (session.user.role !== "super_admin" && (role === "super_admin" || role === "admin")) {
+    return { error: "Администратор может создавать только пользователей с ролью модератора или пользователя" };
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+  const existingUser = await userService.findUserByEmail(normalizedEmail);
+  if (existingUser) {
+    return { error: "Пользователь с таким email уже существует" };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 12);
+
+  const newUser = await userService.createUser({
+    name: name.trim(),
+    email: normalizedEmail,
+    password: hashedPassword,
+    role,
+    emailVerified: emailVerified ? new Date() : null,
+    isActive: true,
+  });
+
+  await createAuditLog({
+    userId: session.user.id,
+    action: "user_create",
+    entity: "user",
+    entityId: newUser.id,
+    metadata: {
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+    },
+  });
+
+  revalidatePath("/admin/users");
+
+  return {
+    success: true,
+    message: "Пользователь успешно создан",
+    user: {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+    },
+  };
 }
 
 export async function getContentBlocks() {

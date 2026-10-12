@@ -85,7 +85,10 @@ export async function updateUser(
 export async function createUser(data: {
   name: string;
   email: string;
-  password: string;
+  password?: string;
+  role?: "super_admin" | "admin" | "moderator" | "user";
+  emailVerified?: Date | null;
+  isActive?: boolean;
 }) {
   return db.user.create({ data });
 }

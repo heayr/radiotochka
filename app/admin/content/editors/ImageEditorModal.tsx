@@ -28,22 +28,16 @@ export function ImageEditorModal({
   const isDraggingRef = useRef(false);
   const lastMousePosRef = useRef({ x: 0, y: 0 });
 
-  // Загрузка исходного изображения
+  // Escape key handler
   useEffect(() => {
-    if (!isOpen || !imageUrl) return;
-
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      imageObjRef.current = img;
-      setZoom(1);
-      setPanX(0);
-      setPanY(0);
-      setRotation(0);
-      renderCanvas();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
     };
-    img.src = imageUrl;
-  }, [isOpen, imageUrl]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Отрисовка на canvas
   const renderCanvas = useCallback(() => {
@@ -71,8 +65,8 @@ export function ImageEditorModal({
       const ratio = img.width / (img.height || 1);
       width = 600;
       height = Math.round(width / ratio);
-      if (height > 500) {
-        height = 500;
+      if (height > 450) {
+        height = 450;
         width = Math.round(height * ratio);
       }
     }
@@ -98,6 +92,23 @@ export function ImageEditorModal({
     ctx.restore();
   }, [aspectRatio, panX, panY, rotation, zoom]);
 
+  // Загрузка исходного изображения
+  useEffect(() => {
+    if (!isOpen || !imageUrl) return;
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      imageObjRef.current = img;
+      setZoom(1);
+      setPanX(0);
+      setPanY(0);
+      setRotation(0);
+      renderCanvas();
+    };
+    img.src = imageUrl;
+  }, [isOpen, imageUrl, renderCanvas]);
+
   useEffect(() => {
     renderCanvas();
   }, [renderCanvas]);
@@ -119,6 +130,13 @@ export function ImageEditorModal({
 
   const handleMouseUp = () => {
     isDraggingRef.current = false;
+  };
+
+  // Колёсико мыши для зума
+  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.08 : -0.08;
+    setZoom((prev) => Math.min(3, Math.max(0.3, parseFloat((prev + delta).toFixed(2)))));
   };
 
   // Удаление белого фона (Сделать белый фон прозрачным)
@@ -201,7 +219,7 @@ export function ImageEditorModal({
         return;
       }
 
-      // Добавим немного отступа (padding 10px)
+      // Добавим немного отступа (padding 12px)
       const pad = 12;
       minX = Math.max(0, minX - pad);
       minY = Math.max(0, minY - pad);
@@ -260,140 +278,168 @@ export function ImageEditorModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl space-y-5 border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div className="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-gray-100 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
+        {/* Шапка редактора */}
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div>
-            <h3 className="text-lg font-bold text-gray-900">
-              Редактор логотипа и обрезка
+            <h3 className="text-base font-bold text-gray-900">
+              Редактор изображения
             </h3>
             <p className="text-xs text-gray-500">
-              Масштабируйте, перемещайте за холст мышью, удаляйте лишние поля
+              Позиционируйте мышью, настраивайте масштаб и пропорции
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors text-lg"
+            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors text-base"
           >
             ✕
           </button>
         </div>
 
-        {/* Область предпросмотра с шашечками (прозрачность) */}
-        <div className="relative w-full bg-[linear-gradient(45deg,#f0f0f0_25%,transparent_25%),linear-gradient(-45deg,#f0f0f0_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f0f0f0_75%),linear-gradient(-45deg,transparent_75%,#f0f0f0_75%)] bg-[size:16px_16px] bg-[position:0_0,0_8px,8px_-8px,-8px_0] rounded-2xl border-2 border-dashed border-gray-300 overflow-hidden flex items-center justify-center min-h-[220px] max-h-[360px] p-2">
+        {/* Рабочая область Canvas с шахматным фоном */}
+        <div className="relative w-full bg-[linear-gradient(45deg,#f0f0f0_25%,transparent_25%),linear-gradient(-45deg,#f0f0f0_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f0f0f0_75%),linear-gradient(-45deg,transparent_75%,#f0f0f0_75%)] bg-[size:14px_14px] bg-[position:0_0,0_7px,7px_-7px,-7px_0] rounded-2xl border border-gray-200 overflow-hidden flex items-center justify-center min-h-[220px] max-h-[320px] p-2 select-none">
           <canvas
             ref={canvasRef}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            className="cursor-grab active:cursor-grabbing max-w-full max-h-[340px] shadow-sm rounded-lg"
+            onWheel={handleWheel}
+            className="cursor-grab active:cursor-grabbing max-w-full max-h-[300px] shadow-sm rounded-lg"
           />
         </div>
 
-        {/* Панель управления инструментами */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-200">
-          {/* Масштаб */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs font-semibold text-gray-700">
-              <span>Масштаб (Зум)</span>
-              <span>{Math.round(zoom * 100)}%</span>
-            </div>
-            <input
-              type="range"
-              min="0.4"
-              max="2.5"
-              step="0.05"
-              value={zoom}
-              onChange={(e) => setZoom(parseFloat(e.target.value))}
-              className="w-full accent-[#ea5670]"
-            />
-          </div>
-
-          {/* Соотношение сторон холста */}
-          <div className="space-y-1.5">
-            <span className="block text-xs font-semibold text-gray-700">
-              Пропорции карточки
-            </span>
+        {/* Компактная панель настроек (Segmented Controls) */}
+        <div className="bg-gray-50/80 rounded-2xl p-3 border border-gray-200 space-y-3">
+          {/* Верхняя строка: Соотношение сторон и Зум */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* Пропорции */}
             <div className="flex items-center gap-1.5">
-              {(["3:1", "2:1", "1:1", "free"] as const).map((ratio) => (
-                <button
-                  key={ratio}
-                  type="button"
-                  onClick={() => setAspectRatio(ratio)}
-                  className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all ${
-                    aspectRatio === ratio
-                      ? "bg-[#ea5670] border-[#ea5670] text-white"
-                      : "bg-white border-gray-300 text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  {ratio === "free" ? "Авто" : ratio}
-                </button>
-              ))}
+              <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">
+                Пропорции:
+              </span>
+              <div className="inline-flex bg-white rounded-xl p-0.5 border border-gray-200 shadow-2xs">
+                {(["3:1", "2:1", "1:1", "free"] as const).map((ratio) => (
+                  <button
+                    key={ratio}
+                    type="button"
+                    onClick={() => setAspectRatio(ratio)}
+                    className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-all ${
+                      aspectRatio === ratio
+                        ? "bg-[#ea5670] text-white shadow-xs"
+                        : "text-gray-600 hover:text-black"
+                    }`}
+                  >
+                    {ratio === "free" ? "Авто" : ratio}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Зум слайдер */}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                Зум:
+              </span>
+              <button
+                type="button"
+                onClick={() => setZoom((z) => Math.max(0.3, parseFloat((z - 0.1).toFixed(2))))}
+                className="w-6 h-6 rounded-lg bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-100 flex items-center justify-center"
+              >
+                −
+              </button>
+              <input
+                type="range"
+                min="0.3"
+                max="2.5"
+                step="0.05"
+                value={zoom}
+                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                className="w-20 accent-[#ea5670] cursor-pointer"
+              />
+              <button
+                type="button"
+                onClick={() => setZoom((z) => Math.min(3, parseFloat((z + 0.1).toFixed(2))))}
+                className="w-6 h-6 rounded-lg bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-100 flex items-center justify-center"
+              >
+                +
+              </button>
+              <span className="text-xs font-medium text-gray-700 w-10 text-right">
+                {Math.round(zoom * 100)}%
+              </span>
             </div>
           </div>
-        </div>
 
-        {/* Быстрые действия */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleRemoveWhiteBg}
-            disabled={isProcessing}
-            title="Превратить белый фоновый цвет в прозрачный"
-          >
-            ✨ Убрать белый фон
-          </Button>
+          {/* Нижняя строка: Быстрые инструменты */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-gray-200/60">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleRemoveWhiteBg}
+              disabled={isProcessing}
+              title="Превратить белый фоновый цвет в прозрачный"
+              className="!px-2.5 !py-1 !text-xs bg-white"
+            >
+              🪄 Убрать фон
+            </Button>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleTrimWhitespace}
-            disabled={isProcessing}
-            title="Обрезать лишние пустые поля вокруг логотипа"
-          >
-            ✂️ Авто-обрезка полей
-          </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleTrimWhitespace}
+              disabled={isProcessing}
+              title="Обрезать лишние пустые поля вокруг"
+              className="!px-2.5 !py-1 !text-xs bg-white"
+            >
+              ✂️ Обрезать поля
+            </Button>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleRotate}
-            disabled={isProcessing}
-          >
-            🔄 Повернуть 90°
-          </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleRotate}
+              disabled={isProcessing}
+              title="Повернуть на 90 градусов"
+              className="!px-2.5 !py-1 !text-xs bg-white"
+            >
+              ↻ 90°
+            </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleReset}
-            className="text-gray-500 ml-auto"
-          >
-            Сброс
-          </Button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs text-gray-500 hover:text-gray-800 px-2 py-1 ml-auto transition-colors font-medium"
+            >
+              ↺ Сбросить
+            </button>
+          </div>
         </div>
 
         {/* Футер модалки */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
-          <Button type="button" variant="outline" size="sm" onClick={onClose}>
-            Отмена
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            onClick={handleSave}
-            disabled={isProcessing}
-          >
-            {isProcessing ? "Обработка..." : "Применить результат"}
-          </Button>
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          <p className="text-[11px] text-gray-400 hidden sm:block">
+            Колёсико мыши: зум • Перетаскивание: позиция
+          </p>
+          <div className="flex items-center gap-2 ml-auto">
+            <Button type="button" variant="outline" size="sm" onClick={onClose}>
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={handleSave}
+              disabled={isProcessing}
+            >
+              {isProcessing ? "Обработка..." : "Применить"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
