@@ -326,7 +326,7 @@ export function NavbarEditor({ block, onSave, onCancel }: EditorProps) {
           <input
             type="range"
             min={24}
-            max={64}
+            max={80}
             step={2}
             value={logoHeight}
             onChange={(e) => setLogoHeight(Number(e.target.value))}
@@ -335,7 +335,7 @@ export function NavbarEditor({ block, onSave, onCancel }: EditorProps) {
           <div className="flex justify-between text-[11px] text-gray-400">
             <span>24px (компактно)</span>
             <span>40px (стандарт)</span>
-            <span>64px (максимум)</span>
+            <span>80px (максимум)</span>
           </div>
         </div>
 

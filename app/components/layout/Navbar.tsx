@@ -37,48 +37,50 @@ function BaseNavbar({ initialData }: NavbarProps) {
 
   return (
     <nav className="w-full bg-[#F3EFE8] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 2xl:px-12 transition-all relative z-40">
-      <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between">
+      <div className="w-full max-w-[1680px] mx-auto grid grid-cols-2 lg:grid-cols-[1fr_auto_1fr] items-center gap-4">
 
-        {/* Логотип слева */}
-        <Link
-          href={href}
-          className="flex items-center gap-2 group select-none py-1"
-          aria-label={logoAlt}
-        >
-          {mode === "image" && logoSrc && (
-            <img
-              src={logoSrc}
-              alt={logoAlt}
-              style={{ height: `${logoHeight}px`, width: "auto" }}
-              className="max-h-16 w-auto transition-opacity group-hover:opacity-90"
-            />
-          )}
+        {/* Левая колонка: Логотип */}
+        <div className="flex items-center justify-start min-w-0">
+          <Link
+            href={href}
+            className="flex items-center gap-2 group select-none py-1 min-w-0"
+            aria-label={logoAlt}
+          >
+            {mode === "image" && logoSrc && (
+              <img
+                src={logoSrc}
+                alt={logoAlt}
+                style={{ height: `${logoHeight}px`, width: "auto" }}
+                className="max-h-24 w-auto max-w-full object-contain transition-opacity group-hover:opacity-90"
+              />
+            )}
 
-          {mode === "split" && (
-            <>
-              {logoSrc && (
-                <img
-                  src={logoSrc}
-                  alt={logoAlt}
-                  style={{ height: `${logoHeight}px`, width: "auto" }}
-                  className="max-h-16 w-auto transition-opacity group-hover:opacity-90"
-                />
-              )}
-              <span className="font-bold text-xl xs:text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none">
+            {mode === "split" && (
+              <>
+                {logoSrc && (
+                  <img
+                    src={logoSrc}
+                    alt={logoAlt}
+                    style={{ height: `${logoHeight}px`, width: "auto" }}
+                    className="max-h-24 w-auto max-w-full object-contain transition-opacity group-hover:opacity-90"
+                  />
+                )}
+                <span className="font-bold text-xl xs:text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none truncate">
+                  {text}
+                </span>
+              </>
+            )}
+
+            {mode === "text" && (
+              <span className="font-bold text-xl xs:text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none truncate">
                 {text}
               </span>
-            </>
-          )}
+            )}
+          </Link>
+        </div>
 
-          {mode === "text" && (
-            <span className="font-bold text-xl xs:text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none">
-              {text}
-            </span>
-          )}
-        </Link>
-
-        {/* Центр: Утонченные ссылки на Google Font Onest (как на референсе Framer) */}
-        <div className="hidden lg:flex items-center gap-6 xl:gap-7 text-[15px] xl:text-[16px] font-medium text-[#262626]">
+        {/* Центральная колонка: Навигационные ссылки (СТРОГО ПО ЦЕНТРУ ЭКРАНА) */}
+        <div className="hidden lg:flex items-center justify-center gap-5 xl:gap-7 text-[14px] xl:text-[16px] font-medium text-[#262626] whitespace-nowrap justify-self-center">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -105,34 +107,36 @@ function BaseNavbar({ initialData }: NavbarProps) {
           })}
         </div>
 
-        {/* Правая часть: Капсульная кнопка Связаться ↗ (стабильный хитбокс без дергания на ховере) */}
-        <div className="hidden sm:flex items-center">
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2.5 px-6 2xl:px-7 py-3 rounded-full bg-brand-pink hover:bg-brand-pink-hover text-white font-semibold text-[15px] 2xl:text-[16px] shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200"
-          >
-            <span>Связаться</span>
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-            </svg>
-          </a>
-        </div>
+        {/* Правая колонка: Кнопка Связаться и мобильный гамбургер */}
+        <div className="flex items-center justify-end gap-3 justify-self-end">
+          <div className="hidden sm:flex items-center">
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2.5 px-6 2xl:px-7 py-3 rounded-full bg-brand-pink hover:bg-brand-pink-hover text-white font-semibold text-[15px] 2xl:text-[16px] shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 whitespace-nowrap"
+            >
+              <span>Связаться</span>
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+              </svg>
+            </a>
+          </div>
 
-        {/* Гамбургер для мобильных с удобным тач-таргетом 44x44px */}
-        <button
-          type="button"
-          onClick={handleToggleMenu}
-          className="lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-xl text-gray-800 hover:bg-black/5 active:scale-95 transition-all"
-          aria-label="Открыть меню"
-        >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            {isMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+          {/* Гамбургер для мобильных с удобным тач-таргетом 44x44px */}
+          <button
+            type="button"
+            onClick={handleToggleMenu}
+            className="lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-xl text-gray-800 hover:bg-black/5 active:scale-95 transition-all"
+            aria-label="Открыть меню"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {isMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
 
       </div>
 
