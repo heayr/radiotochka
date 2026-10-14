@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сравнение масштабов логотипа для Навбара</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #121218;
+      color: #E2E8F0;
+      padding: 40px 20px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { font-size: 28px; margin-bottom: 8px; color: #FFF; }
+    p.subtitle { color: #94A3B8; margin-bottom: 32px; font-size: 15px; }
+
+    .nav-mockup {
+      background: #F3EFE8; /* реальный цвет навбара сайта */
+      border-radius: 12px;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .nav-mockup-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #A5B4FC;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .nav-links-fake {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .btn-fake {
+      background: #FA387F;
+      color: #FFF;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 9999px;
+    }
+
+    /* Высота как в реальном навбаре: 40px */
+    .logo-sample {
+      height: 40px;
+      width: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Сравнение пропорций логотипа в реальной высоте навигации (40px)</h1>
+    <p class="subtitle">Фон блоков — точный цвет вашего навбара (<code>#F3EFE8</code>). Оцените читаемость шрифта с расстояния экрана:</p>
+
+    <!-- 1. Исходный вариант 1 -->
+    <div class="nav-mockup-label">
+      <span>1. Исходный горизонтальный (текст мелкий)</span>
+      <span style="color:#94A3B8;">файл: Radiotochka logo horizontal.svg</span>
+    </div>
+    <div class="nav-mockup">
+      <img src="/images/Radiotochka logo horizontal.svg" class="logo-sample" alt="Вариант 1">
+      <div class="nav-links-fake">
+        <span>Услуги</span>
+        <span>Радиостанции</span>
+        <span>Кейсы</span>
+        <span>О нас</span>
+      </div>
+      <div class="btn-fake">Связаться ↗</div>
+    </div>
+
+    <!-- 2. Вариант BIG пользователя -->
+    <div class="nav-mockup-label">
+      <span>2. Ваш вариант (BIG — шрифт чуть увеличен)</span>
+      <span style="color:#94A3B8;">файл: Radiotochka logo horizontal BIG.svg</span>
+    </div>
+    <div class="nav-mockup">
+      <img src="/images/Radiotochka logo horizontal BIG.svg" class="logo-sample" alt="Вариант 2 BIG">
+      <div class="nav-links-fake">
+        <span>Услуги</span>
+        <span>Радиостанции</span>
+        <span>Кейсы</span>
+        <span>О нас</span>
+      </div>
+      <div class="btn-fake">Связаться ↗</div>
+    </div>
+
+    <!-- 3. Вариант A: Текст еще крупнее (+32%) с дескриптором -->
+    <div class="nav-mockup-label">
+      <span style="color: #F472B6;">3. Мой Вариант A: Шрифт РАДИОТОЧКА увеличен еще на +32% + крупнее дескриптор</span>
+      <span style="color:#94A3B8;">файл: Radiotochka logo horizontal BIGGER descriptor.svg</span>
+    </div>
+    <div class="nav-mockup">
+      <img src="/images/Radiotochka logo horizontal BIGGER descriptor.svg" class="logo-sample" alt="Вариант 3 BIGGER">
+      <div class="nav-links-fake">
+        <span>Услуги</span>
+        <span>Радиостанции</span>
+        <span>Кейсы</span>
+        <span>О нас</span>
+      </div>
+      <div class="btn-fake">Связаться ↗</div>
+    </div>
+
+    <!-- 4. Вариант B: Чистый хедер БЕЗ дескриптора (Максимальная читаемость) -->
+    <div class="nav-mockup-label">
+      <span style="color: #34D399;">4. Мой Вариант B: Чистый Хедер — БЕЗ дескриптора, РАДИОТОЧКА на 70% высоты знака (Рекомендую 🔥)</span>
+      <span style="color:#94A3B8;">файл: Radiotochka logo horizontal EXTRA CLEAN.svg</span>
+    </div>
+    <div class="nav-mockup">
+      <img src="/images/Radiotochka logo horizontal EXTRA CLEAN.svg" class="logo-sample" alt="Вариант 4 EXTRA CLEAN">
+      <div class="nav-links-fake">
+        <span>Услуги</span>
+        <span>Радиостанции</span>
+        <span>Кейсы</span>
+        <span>О нас</span>
+      </div>
+      <div class="btn-fake">Связаться ↗</div>
+    </div>
+
+  </div>
+</body>
+</html>

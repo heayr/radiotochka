@@ -6,10 +6,26 @@ import React, { useState, useCallback, memo } from "react";
 import { usePathname } from "next/navigation";
 
 import { MAIN_NAV_LINKS as navLinks } from "@/constants/navigation";
+import {
+  DEFAULT_NAVBAR_DATA,
+  type NavbarSectionData,
+} from "@/types/site-content";
 
-function BaseNavbar() {
+interface NavbarProps {
+  initialData?: NavbarSectionData;
+}
+
+function BaseNavbar({ initialData }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  const config = initialData ?? DEFAULT_NAVBAR_DATA;
+  const mode = config.mode || "image";
+  const logoHeight = config.logoHeight || 40;
+  const logoSrc = config.logoSrc || "/images/Radiotochka logo horizontal EXTRA CLEAN.svg";
+  const logoAlt = config.logoAlt || "Радиоточка — Рекламное агентство";
+  const text = config.text || "Радиоточка";
+  const href = config.href || "/";
 
   const handleToggleMenu = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
@@ -24,15 +40,41 @@ function BaseNavbar() {
       <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between">
 
         {/* Логотип слева */}
-        <Link href="/" className="flex items-center group select-none py-1" aria-label="Радиоточка — на главную">
-          <Image
-            src="/images/Radiotochka%20logo%20horizontal.svg"
-            alt="Радиоточка — Рекламное агентство"
-            width={134}
-            height={44}
-            className="h-8 sm:h-9 lg:h-10 w-auto transition-opacity group-hover:opacity-90"
-            priority
-          />
+        <Link
+          href={href}
+          className="flex items-center gap-2 group select-none py-1"
+          aria-label={logoAlt}
+        >
+          {mode === "image" && logoSrc && (
+            <img
+              src={logoSrc}
+              alt={logoAlt}
+              style={{ height: `${logoHeight}px`, width: "auto" }}
+              className="max-h-16 w-auto transition-opacity group-hover:opacity-90"
+            />
+          )}
+
+          {mode === "split" && (
+            <>
+              {logoSrc && (
+                <img
+                  src={logoSrc}
+                  alt={logoAlt}
+                  style={{ height: `${logoHeight}px`, width: "auto" }}
+                  className="max-h-16 w-auto transition-opacity group-hover:opacity-90"
+                />
+              )}
+              <span className="font-bold text-xl xs:text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none">
+                {text}
+              </span>
+            </>
+          )}
+
+          {mode === "text" && (
+            <span className="font-bold text-xl xs:text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none">
+              {text}
+            </span>
+          )}
         </Link>
 
         {/* Центр: Утонченные ссылки на Google Font Onest (как на референсе Framer) */}

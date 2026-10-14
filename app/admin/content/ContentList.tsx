@@ -21,6 +21,7 @@ import { ProcessEditor } from "./editors/ProcessEditor";
 import { ServicesEditor } from "./editors/ServicesEditor";
 import { WorkEditor } from "./editors/WorkEditor";
 import { FooterEditor } from "./editors/FooterEditor";
+import { NavbarEditor } from "./editors/NavbarEditor";
 import { JsonEditor } from "./editors/JsonEditor";
 import { CreateContentBlock } from "./editors/CreateContentBlock";
 import {
@@ -33,6 +34,7 @@ import {
   DEFAULT_SERVICES_DATA,
   DEFAULT_WORK_DATA,
   DEFAULT_FOOTER_DATA,
+  DEFAULT_NAVBAR_DATA,
 } from "@/types/site-content";
 
 interface ContentListProps {
@@ -41,6 +43,7 @@ interface ContentListProps {
 }
 
 const editorMap: Record<string, React.ComponentType<EditorProps>> = {
+  navbar: NavbarEditor,
   hero: HeroEditor,
   stats: StatsEditor,
   marquee: MarqueeEditor,
@@ -56,6 +59,13 @@ const SECTION_INFO: Record<
   string,
   { icon: string; order: number; sectionName: string; summary: string }
 > = {
+  navbar: {
+    icon: "📻",
+    order: 0,
+    sectionName: "Шапка сайта (Navbar & Логотип)",
+    summary:
+      "Настройка логотипа в шапке: переключение готовых пресетов, загрузка нового логотипа и регулировка высоты.",
+  },
   hero: {
     icon: "🌟",
     order: 1,
@@ -127,6 +137,7 @@ const CANONICAL_SECTIONS: Array<{
   title: string;
   defaultContent: Record<string, unknown>;
 }> = [
+  { slug: "navbar", order: 0, title: "0. Шапка и Логотип (Navbar)", defaultContent: DEFAULT_NAVBAR_DATA as unknown as Record<string, unknown> },
   { slug: "hero", order: 1, title: "1. Главный экран (Hero)", defaultContent: DEFAULT_HERO_DATA as unknown as Record<string, unknown> },
   { slug: "stats", order: 2, title: "2. Цифры и студия (Stats)", defaultContent: DEFAULT_STATS_DATA as unknown as Record<string, unknown> },
   { slug: "marquee", order: 3, title: "3. Бегущая строка (Marquee)", defaultContent: DEFAULT_MARQUEE_DATA as unknown as Record<string, unknown> },

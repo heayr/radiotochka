@@ -362,3 +362,22 @@ export const DEFAULT_LOGO_SECTION_DATA: LogoSectionData = {
   ],
 };
 
+export interface NavbarSectionData {
+  mode: "image" | "split" | "text";
+  logoSrc: string;
+  logoAlt: string;
+  text: string;
+  logoHeight: number;
+  href: string;
+}
+
+export const DEFAULT_NAVBAR_DATA: NavbarSectionData = {
+  mode: "image",
+  logoSrc: "/images/Radiotochka logo horizontal EXTRA CLEAN.svg",
+  logoAlt: "Радиоточка — Рекламное агентство",
+  text: "Радиоточка",
+  logoHeight: 40,
+  href: "/",
+};
+
+

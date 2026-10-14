@@ -23,6 +23,7 @@ import {
   DEFAULT_MARQUEE_DATA,
   DEFAULT_FOOTER_DATA,
   DEFAULT_LOGO_SECTION_DATA,
+  DEFAULT_NAVBAR_DATA,
 } from "@/types/site-content";
 
 export async function getUsers(params: {
@@ -207,6 +208,12 @@ export async function seedDefaultContentBlocks() {
   await requireAdmin();
 
   const blocksToSeed = [
+    {
+      slug: "navbar",
+      title: "0. Шапка и Логотип (Navbar)",
+      content: DEFAULT_NAVBAR_DATA as unknown as Record<string, unknown>,
+      status: "published",
+    },
     {
       slug: "hero",
       title: "1. Главный экран (Hero)",

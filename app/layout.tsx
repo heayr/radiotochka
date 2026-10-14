@@ -4,6 +4,11 @@ import Navbar from "./components/layout/Navbar";
 import SessionProvider from "./components/providers/SessionProvider";
 import { CookieConsent } from "./components/layout/CookieConsent";
 import Toast from "./components/ui/Toast";
+import { getContentBlockSafe } from "@/lib/services/content.service";
+import {
+  DEFAULT_NAVBAR_DATA,
+  type NavbarSectionData,
+} from "@/types/site-content";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -67,11 +72,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const navbarData = await getContentBlockSafe<NavbarSectionData>(
+    "navbar",
+    DEFAULT_NAVBAR_DATA
+  );
+
   return (
     <html lang="ru" className="scroll-smooth">
       <head>
@@ -114,7 +124,7 @@ export default function RootLayout({
           >
             Перейти к основному содержимому
           </a>
-          <Navbar />
+          <Navbar initialData={navbarData} />
           <main id="main-content" className="w-full">
             {children}
           </main>
