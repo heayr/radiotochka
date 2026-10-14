@@ -23,19 +23,16 @@ function BaseNavbar() {
     <nav className="w-full bg-[#F3EFE8] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 2xl:px-12 transition-all relative z-40">
       <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between">
 
-        {/* Логотип слева в точности по левому отступу референса */}
-        <Link href="/" className="flex items-center gap-1.5 group select-none py-1">
+        {/* Логотип слева */}
+        <Link href="/" className="flex items-center group select-none py-1" aria-label="Радиоточка — на главную">
           <Image
-            src="/images/main-logo.svg"
-            alt="Радиоточка"
-            width={34}
-            height={34}
-            className="h-7 w-7 sm:h-[34px] sm:w-[34px] transition-opacity group-hover:opacity-90"
+            src="/images/Radiotochka%20logo%20horizontal.svg"
+            alt="Радиоточка — Рекламное агентство"
+            width={134}
+            height={44}
+            className="h-8 sm:h-9 lg:h-10 w-auto transition-opacity group-hover:opacity-90"
             priority
           />
-          <span className="font-bold text-xl xs:text-2xl sm:text-[26px] text-[#0A0A0A] tracking-tight leading-none">
-            Радиоточка
-          </span>
         </Link>
 
         {/* Центр: Утонченные ссылки на Google Font Onest (как на референсе Framer) */}
