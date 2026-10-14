@@ -37,10 +37,10 @@ function BaseNavbar({ initialData }: NavbarProps) {
 
   return (
     <nav className="w-full bg-[#F3EFE8] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 2xl:px-12 transition-all relative z-40">
-      <div className="w-full max-w-[1680px] mx-auto grid grid-cols-2 lg:grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between relative">
 
-        {/* Левая колонка: Логотип */}
-        <div className="flex items-center justify-start min-w-0">
+        {/* Левая часть: Логотип */}
+        <div className="flex items-center justify-start min-w-0 z-10">
           <Link
             href={href}
             className="flex items-center gap-2 group select-none py-1 min-w-0"
@@ -79,8 +79,8 @@ function BaseNavbar({ initialData }: NavbarProps) {
           </Link>
         </div>
 
-        {/* Центральная колонка: Навигационные ссылки (СТРОГО ПО ЦЕНТРУ ЭКРАНА) */}
-        <div className="hidden lg:flex items-center justify-center gap-5 xl:gap-7 text-[14px] xl:text-[16px] font-medium text-[#262626] whitespace-nowrap justify-self-center">
+        {/* Центральная часть: Меню — ГАРАНТИРОВАННЫЙ АБСОЛЮТНЫЙ ЦЕНТР СТРАНИЦЫ */}
+        <div className="hidden lg:flex items-center justify-center gap-5 xl:gap-7 text-[14px] xl:text-[16px] font-medium text-[#262626] whitespace-nowrap absolute left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -107,8 +107,8 @@ function BaseNavbar({ initialData }: NavbarProps) {
           })}
         </div>
 
-        {/* Правая колонка: Кнопка Связаться и мобильный гамбургер */}
-        <div className="flex items-center justify-end gap-3 justify-self-end">
+        {/* Правая часть: Кнопка Связаться и мобильный гамбургер */}
+        <div className="flex items-center justify-end gap-3 z-10">
           <div className="hidden sm:flex items-center">
             <a
               href="#contact"
