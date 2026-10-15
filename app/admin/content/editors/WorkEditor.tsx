@@ -219,6 +219,171 @@ export function WorkEditor({ block, onSave, onCancel }: EditorProps) {
                 </div>
               </div>
 
+              {/* Выбор типа проекта: Визуальный или Аудио */}
+              <div className="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                <span className="text-xs font-bold text-gray-700 uppercase">Шаблон карточки:</span>
+                <label className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input
+                    type="radio"
+                    name={`projectType-${idx}`}
+                    value="visual"
+                    checked={item.projectType !== "audio" && !item.audioSrc}
+                    onChange={() => {
+                      updateItem(idx, "projectType", "visual");
+                      updateItem(idx, "audioSrc", "");
+                    }}
+                  />
+                  <span>Стандартный кейс (фото)</span>
+                </label>
+                <label className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input
+                    type="radio"
+                    name={`projectType-${idx}`}
+                    value="audio"
+                    checked={item.projectType === "audio" || Boolean(item.audioSrc)}
+                    onChange={() => {
+                      updateItem(idx, "projectType", "audio");
+                      if (!item.audioSrc) {
+                        updateItem(idx, "audioSrc", "/sounds/truboplast-deadpool-glanz.mp3");
+                      }
+                    }}
+                  />
+                  <span className="text-red-600 font-bold">Аудио-проект (радиоэфир / диктор)</span>
+                </label>
+              </div>
+
+              {/* Специфичные поля аудио-шаблона */}
+              {(item.projectType === "audio" || Boolean(item.audioSrc)) && (
+                <div className="bg-red-50/50 border border-red-200 p-4 rounded-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-red-800 uppercase tracking-wider">
+                      Параметры аудиоролика и эфира
+                    </span>
+                    <span className="text-[11px] text-red-600 font-medium">
+                      В карточке отобразится интерактивный аудиоплеер
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        Актёр / Звёздный диктор
+                      </label>
+                      <input
+                        type="text"
+                        value={item.celebrityVoice || ""}
+                        onChange={(e) => updateItem(idx, "celebrityVoice", e.target.value)}
+                        className="w-full px-3 py-2 border rounded-xl text-sm"
+                        placeholder="Пётр Иващенко (Пётр Гланц)"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        Бейдж диктора
+                      </label>
+                      <input
+                        type="text"
+                        value={item.celebrityBadge || ""}
+                        onChange={(e) => updateItem(idx, "celebrityBadge", e.target.value)}
+                        className="w-full px-3 py-2 border rounded-xl text-sm"
+                        placeholder="Официальный голос Дэдпула в РФ"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                      Цитата / Слоган из ролика
+                    </label>
+                    <input
+                      type="text"
+                      value={item.tagline || ""}
+                      onChange={(e) => updateItem(idx, "tagline", e.target.value)}
+                      className="w-full px-3 py-2 border rounded-xl text-sm italic"
+                      placeholder="«Трубы, фитинги, монтаж... Работаем с НДС!»"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        Радиоэфир / Станции
+                      </label>
+                      <input
+                        type="text"
+                        value={item.radioStation || ""}
+                        onChange={(e) => updateItem(idx, "radioStation", e.target.value)}
+                        className="w-full px-3 py-2 border rounded-xl text-sm"
+                        placeholder="Дорожное Радио · НАШЕ Радио"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        Хронометраж и формат
+                      </label>
+                      <input
+                        type="text"
+                        value={item.audioFormat || ""}
+                        onChange={(e) => updateItem(idx, "audioFormat", e.target.value)}
+                        className="w-full px-3 py-2 border rounded-xl text-sm"
+                        placeholder="Эфирный ролик · 25 сек"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                      URL аудиофайла (.mp3)
+                    </label>
+                    <input
+                      type="text"
+                      value={item.audioSrc || ""}
+                      onChange={(e) => updateItem(idx, "audioSrc", e.target.value)}
+                      className="w-full px-3 py-2 border rounded-xl text-sm font-mono text-xs"
+                      placeholder="/sounds/truboplast-deadpool-glanz.mp3"
+                    />
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className="text-[11px] text-gray-500 self-center mr-1">Пресеты звука:</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateItem(idx, "audioSrc", "/sounds/truboplast-deadpool-glanz.mp3");
+                          updateItem(idx, "celebrityVoice", "Пётр Иващенко (Пётр Гланц)");
+                          updateItem(idx, "celebrityBadge", "Официальный голос Дэдпула в РФ");
+                        }}
+                        className="text-[11px] px-2 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded-md font-medium"
+                      >
+                        Дэдпул (Пётр Гланц)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateItem(idx, "audioSrc", "/sounds/dary-armenii-sergey-chonishvili.mp3");
+                          updateItem(idx, "celebrityVoice", "Сергей Чонишвили");
+                          updateItem(idx, "celebrityBadge", "Заслуженный артист РФ · Голос СТС");
+                        }}
+                        className="text-[11px] px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-md font-medium"
+                      >
+                        Сергей Чонишвили
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateItem(idx, "audioSrc", "/sounds/akvadom-hiphop-kuraj-bambey.mp3");
+                          updateItem(idx, "celebrityVoice", "Денис Колесников");
+                          updateItem(idx, "celebrityBadge", "Культовый голос · Кураж-Бамбей");
+                        }}
+                        className="text-[11px] px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-md font-medium"
+                      >
+                        Кураж-Бамбей
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <ImageField
                 label="Изображение кейса"
                 value={item.imageSrc}

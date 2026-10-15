@@ -105,6 +105,8 @@ export const DEFAULT_SERVICES_DATA: ServicesSectionData = {
   ],
 };
 
+export type WorkProjectType = "visual" | "audio";
+
 export interface WorkProjectItem {
   id: string;
   title: string;
@@ -113,6 +115,13 @@ export interface WorkProjectItem {
   services: string[];
   imageSrc: string;
   href: string;
+  projectType?: WorkProjectType;
+  audioSrc?: string;
+  celebrityVoice?: string;
+  celebrityBadge?: string;
+  tagline?: string;
+  radioStation?: string;
+  audioFormat?: string;
 }
 
 export interface WorkSectionData {
@@ -137,11 +146,18 @@ export const DEFAULT_WORK_DATA: WorkSectionData = {
     },
     {
       id: "02",
-      title: "Hypertech",
+      projectType: "audio",
+      title: "«Трубопласт» feat. Пётр Гланц",
       description:
-        "Кросс-канальная рекламная кампания: магистральные щиты 3х6 м в ключевых локациях города, аудио-джинглы в прайм-тайм и оперативная полиграфия.",
-      client: "FitFuel Nutrition",
-      services: ["Наружная реклама", "Аудиопродакшн"],
+        "Для озвучки эфирного радиоролика пригласили Петра Гланца — официальный голос Дэдпула в России. Яркая, брутальная и ироничная подача пробивает баннерную слепоту и держит внимание водителей в автопотоке.",
+      client: "Завод полимерных труб «Трубопласт»",
+      celebrityVoice: "Пётр Иващенко (Пётр Гланц)",
+      celebrityBadge: "Официальный голос Дэдпула в РФ",
+      tagline: "«Трубы, фитинги, монтаж... Работаем с НДС!»",
+      services: ["Аудиопродакшн", "Звёздный голос", "Радиоэфир"],
+      radioStation: "Дорожное Радио · НАШЕ Радио",
+      audioFormat: "Эфирный ролик · 25 сек",
+      audioSrc: "/sounds/truboplast-deadpool-glanz.mp3",
       imageSrc: "/images/work/project-02.png",
       href: "#contact",
     },
