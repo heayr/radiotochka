@@ -147,18 +147,17 @@ export const DEFAULT_WORK_DATA: WorkSectionData = {
     {
       id: "02",
       projectType: "audio",
-      title: "«Трубопласт» feat. Пётр Гланц",
+      title: "«Трубопласт»",
       description:
         "Для озвучки эфирного радиоролика пригласили Петра Гланца — официальный голос Дэдпула в России. Яркая, брутальная и ироничная подача пробивает баннерную слепоту и держит внимание водителей в автопотоке.",
       client: "Завод полимерных труб «Трубопласт»",
-      celebrityVoice: "Пётр Иващенко (Пётр Гланц)",
-      celebrityBadge: "Официальный голос Дэдпула в РФ",
-      tagline: "«Трубы, фитинги, монтаж... Работаем с НДС!»",
+      celebrityVoice: "Пётр Гланц",
+      celebrityBadge: "голос Дэдпула в РФ",
       services: ["Аудиопродакшн", "Звёздный голос", "Радиоэфир"],
       radioStation: "Дорожное Радио · НАШЕ Радио",
       audioFormat: "Эфирный ролик · 25 сек",
       audioSrc: "/sounds/truboplast-deadpool-glanz.mp3",
-      imageSrc: "/images/work/project-02.png",
+      imageSrc: "/images/work/deadpool-truboplast.jpg",
       href: "#contact",
     },
     {

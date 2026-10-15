@@ -204,6 +204,76 @@ class RadioAudioEngine {
     this.stationMasterGain.gain.setTargetAtTime(0, now, 0.16);
   }
 
+  /**
+   * Эффект настройки аналогового FM-радио:
+   * Только настоящий аналоговый шум эфира, потрескивание и затухание при захвате волны (без синтетических писков и свиста).
+   */
+  public playTuningIntro(onDone?: () => void) {
+    this.ensureRunning();
+    if (!this.ctx) {
+      onDone?.();
+      return;
+    }
+
+    try {
+      const now = this.ctx.currentTime;
+      const duration = 0.65; // ~650мс живого эфирного шума
+
+      const sampleRate = this.ctx.sampleRate;
+      const bufferSize = Math.floor(sampleRate * duration);
+      const noiseBuffer = this.ctx.createBuffer(1, bufferSize, sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+
+      let b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        // Мягкий розовый шум
+        b0 = 0.99886 * b0 + white * 0.055;
+        b1 = 0.99332 * b1 + white * 0.075;
+        b2 = 0.96900 * b2 + white * 0.150;
+        let sample = (b0 + b1 + b2 + white * 0.45) * 0.35;
+
+        // Аутентичный микро-треск аналогового эфира
+        if (Math.random() < 0.0035) {
+          sample += (Math.random() - 0.5) * 1.2;
+        }
+        data[i] = sample;
+      }
+
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = noiseBuffer;
+
+      // Полосовой фильтр аналогового радио (сдвиг полосы от 2400 Гц к 1100 Гц)
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(2400, now);
+      filter.frequency.exponentialRampToValueAtTime(1400, now + duration * 0.6);
+      filter.frequency.exponentialRampToValueAtTime(800, now + duration);
+      filter.Q.setValueAtTime(1.4, now);
+
+      const gain = this.ctx.createGain();
+      // Четко слышимый уверенный уровень шума
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.48, now + 0.07);
+      gain.gain.setValueAtTime(0.50, now + duration * 0.5);
+      // Мягкое затухание шума при точном захвате волны (FM quieting)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      noise.start(now);
+      noise.stop(now + duration);
+
+      setTimeout(() => {
+        onDone?.();
+      }, (duration - 0.04) * 1000);
+    } catch {
+      onDone?.();
+    }
+  }
+
   public destroy() {
     if (this.stopTimeout) clearTimeout(this.stopTimeout);
     try {
