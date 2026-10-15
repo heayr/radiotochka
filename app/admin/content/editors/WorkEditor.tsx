@@ -197,6 +197,63 @@ export function WorkEditor({ block, onSave, onCancel }: EditorProps) {
                 </div>
               </div>
 
+              {/* Ссылка на сайт клиента: кнопка «Сайт клиента» отображается в карточке только при наличии ссылки */}
+              <div className="bg-gray-50/80 border border-gray-200 rounded-xl p-3.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-800">
+                      Ссылка на сайт клиента
+                    </span>
+                    {item.clientUrl ? (
+                      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-300 inline-flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                        Кнопка включена в кейсе
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-gray-500 bg-gray-200/60 px-2 py-0.5 rounded-full">
+                        Кнопка скрыта (ссылка не указана)
+                      </span>
+                    )}
+                  </div>
+
+                  {item.clientUrl && (
+                    <button
+                      type="button"
+                      onClick={() => updateItem(idx, "clientUrl", "")}
+                      className="text-xs text-red-600 hover:text-red-800 font-medium cursor-pointer"
+                    >
+                      Убрать ссылку и скрыть кнопку
+                    </button>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={item.clientUrl || ""}
+                    onChange={(e) => updateItem(idx, "clientUrl", e.target.value)}
+                    className="w-full px-3 py-2 border bg-white rounded-xl text-sm pr-9 focus:ring-2 focus:ring-brand-pink/20 focus:border-brand-pink transition-all"
+                    placeholder="https://example.com (вставьте URL, чтобы отобразить кнопку перехода на сайт клиента)"
+                  />
+                  {item.clientUrl && (
+                    <a
+                      href={item.clientUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1"
+                      title="Проверить ссылку в новой вкладке"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+                <p className="text-[11px] text-gray-500">
+                  По дефолту кнопки и заглушки нет. Когда ссылка добавлена, в строке клиента появится аккуратная кнопка «Сайт клиента ↗».
+                </p>
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
                   Описание кейса

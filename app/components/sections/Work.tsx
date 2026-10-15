@@ -56,9 +56,31 @@ const WorkVisualCard = memo(function WorkVisualCard({
                 <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider">
                   Клиент:
                 </span>
-                <span className="text-sm sm:text-base 2xl:text-lg font-bold text-[#0A0A0A]">
-                  {project.client}
-                </span>
+                <div className="flex items-center gap-2 sm:gap-2.5">
+                  <span className="text-sm sm:text-base 2xl:text-lg font-bold text-[#0A0A0A]">
+                    {project.client}
+                  </span>
+                  {Boolean(project.clientUrl) && (
+                    <a
+                      href={project.clientUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/5 hover:bg-[#E22A2A] text-[#404040] hover:text-white text-xs font-semibold transition-all duration-200 border border-black/10 hover:border-transparent group/link shadow-sm active:scale-95"
+                      title={`Перейти на сайт ${project.client}`}
+                    >
+                      <span>Сайт клиента</span>
+                      <svg
+                        className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
               </div>
 
               {/* Разделитель */}
@@ -161,44 +183,189 @@ const EQUALIZER_BARS = [
   { base: 25, speed: 0.50, delay: 0.05 },
 ];
 
+function formatAudioTime(seconds: number): string {
+  if (!seconds || isNaN(seconds) || seconds < 0) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 const SoundwaveEqualizer = memo(function SoundwaveEqualizer({
   isPlaying,
   isTuning,
+  progress = 0,
+  onSeek,
 }: {
   isPlaying: boolean;
   isTuning: boolean;
+  progress?: number;
+  onSeek?: (percent: number) => void;
 }) {
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!onSeek) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percent = Math.max(0, Math.min(1, clickX / rect.width));
+    onSeek(percent);
+  };
+
+  const handleTouch = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!onSeek) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = touch.clientX - rect.left;
+    const percent = Math.max(0, Math.min(1, clickX / rect.width));
+    onSeek(percent);
+  };
+
+  const activeBars = Math.round(progress * EQUALIZER_BARS.length);
+
   return (
-    <div className="w-full flex items-center justify-between gap-[2px] sm:gap-1 h-6 sm:h-8 pt-1 border-t border-white/10 overflow-hidden">
-      {EQUALIZER_BARS.map((bar, idx) => {
-        let style: React.CSSProperties = {
-          height: `${Math.max(14, bar.base * 0.22)}%`,
-          transformOrigin: "center",
-          transition: "height 0.25s ease, opacity 0.25s ease, background-color 0.25s ease",
-        };
-        let className = "flex-1 rounded-full bg-white/25";
-
-        if (isTuning) {
-          style = {
-            height: "100%",
+    <div
+      onClick={handleSeek}
+      onTouchStart={handleTouch}
+      role="slider"
+      aria-label="Перемотка аудиоролика"
+      aria-valuenow={Math.round(progress * 100)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      tabIndex={0}
+      className="group/eq w-full flex items-center py-1.5 cursor-pointer select-none focus:outline-none"
+    >
+      <div className="w-full flex items-center justify-between gap-[2px] sm:gap-1 lg:gap-[3px] h-7 sm:h-8 lg:h-10">
+        {EQUALIZER_BARS.map((bar, idx) => {
+          const isPassed = idx < activeBars;
+          let style: React.CSSProperties = {
+            height: `${Math.max(16, bar.base * 0.24)}%`,
             transformOrigin: "center",
-            animation: `eq-noise-jitter ${0.12 + (idx % 4) * 0.04}s ease-in-out infinite alternate`,
-            animationDelay: `${(idx * 0.015).toFixed(3)}s`,
+            transition: "height 0.25s ease, opacity 0.25s ease, background-color 0.2s ease",
           };
-          className = "flex-1 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]";
-        } else if (isPlaying) {
-          style = {
-            height: "100%",
-            transformOrigin: "center",
-            animation: `eq-live-wave ${bar.speed}s ease-in-out infinite alternate`,
-            animationDelay: `${bar.delay}s`,
-          };
-          className = "flex-1 rounded-full bg-[#E22A2A] shadow-[0_0_8px_rgba(226,42,42,0.6)]";
-        }
+          let className = isPassed ? "flex-1 rounded-full bg-[#E22A2A]/85" : "flex-1 rounded-full bg-white/20";
 
-        return <div key={idx} className={className} style={style} />;
-      })}
+          if (isTuning) {
+            style = {
+              height: "100%",
+              transformOrigin: "center",
+              animation: `eq-noise-jitter ${0.12 + (idx % 4) * 0.04}s ease-in-out infinite alternate`,
+              animationDelay: `${(idx * 0.015).toFixed(3)}s`,
+            };
+            className = "flex-1 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]";
+          } else if (isPlaying) {
+            // Весь эквалайзер активен и шевелится в такт звуку:
+            // Пройденная зона — ярко-красная
+            // Недоигранная зона — белая/полупрозрачная, но ТОЖЕ анимированная!
+            style = {
+              height: "100%",
+              transformOrigin: "center",
+              animation: `eq-live-wave ${bar.speed}s ease-in-out infinite alternate`,
+              animationDelay: `${bar.delay}s`,
+            };
+            className = isPassed
+              ? "flex-1 rounded-full bg-[#E22A2A] shadow-[0_0_8px_rgba(226,42,42,0.7)]"
+              : "flex-1 rounded-full bg-white/35 group-hover/eq:bg-white/50";
+          }
+
+          return <div key={idx} className={className} style={style} />;
+        })}
+      </div>
     </div>
+  );
+});
+
+class AudioProgressManager {
+  private listeners = new Set<(time: number, duration: number) => void>();
+  private _currentTime = 0;
+  private _duration = 25;
+
+  subscribe(callback: (time: number, duration: number) => void) {
+    this.listeners.add(callback);
+    callback(this._currentTime, this._duration);
+    return () => {
+      this.listeners.delete(callback);
+    };
+  }
+
+  update(time: number, duration: number) {
+    this._currentTime = time;
+    this._duration = duration;
+    this.listeners.forEach((cb) => cb(time, duration));
+  }
+
+  reset() {
+    this._currentTime = 0;
+    this.listeners.forEach((cb) => cb(0, this._duration));
+  }
+}
+
+const audioProgressManager = new AudioProgressManager();
+
+/**
+ * Изолированный компонент отображения времени (без перерисовки родительской карточки)
+ */
+const AudioDockTime = memo(function AudioDockTime({
+  isPlaying,
+  isThisTrack,
+}: {
+  isPlaying: boolean;
+  isThisTrack: boolean;
+}) {
+  const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(25);
+
+  useEffect(() => {
+    return audioProgressManager.subscribe((t, d) => {
+      setTime(t);
+      if (d > 0) setDuration(d);
+    });
+  }, []);
+
+  return (
+    <div className="shrink-0 flex items-center gap-1 text-[11px] sm:text-xs lg:text-sm font-mono font-medium tracking-tight tabular-nums select-none">
+      <span className={isPlaying && isThisTrack ? "text-[#FF4D4D] font-bold" : "text-white/90"}>
+        {formatAudioTime(isThisTrack ? time : 0)}
+      </span>
+      <span className="text-white/30">/</span>
+      <span className="text-white/60">
+        {formatAudioTime(isThisTrack && duration > 0 ? duration : 25)}
+      </span>
+    </div>
+  );
+});
+
+/**
+ * Изолированный компонент эквалайзера (получает прогресс напрямую из AudioProgressManager)
+ */
+const AudioDockEqualizer = memo(function AudioDockEqualizer({
+  isPlaying,
+  isTuning,
+  isThisTrack,
+  onSeek,
+}: {
+  isPlaying: boolean;
+  isTuning: boolean;
+  isThisTrack: boolean;
+  onSeek: (percent: number) => void;
+}) {
+  const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(25);
+
+  useEffect(() => {
+    return audioProgressManager.subscribe((t, d) => {
+      setTime(t);
+      if (d > 0) setDuration(d);
+    });
+  }, []);
+
+  const progress = isThisTrack && duration > 0 ? time / duration : 0;
+
+  return (
+    <SoundwaveEqualizer
+      isPlaying={isPlaying}
+      isTuning={isTuning}
+      progress={progress}
+      onSeek={onSeek}
+    />
   );
 });
 
@@ -211,12 +378,14 @@ const WorkAudioCard = memo(function WorkAudioCard({
   activeAudioId,
   isTuning,
   onPlayToggle,
+  onSeek,
 }: {
   project: WorkProjectItem;
   index: number;
   activeAudioId: string | null;
   isTuning: boolean;
   onPlayToggle: (id: string, audioSrc: string) => void;
+  onSeek: (percent: number) => void;
 }) {
   const stickyTop = `calc(90px + ${index * 24}px)`;
   const isThisTrack = activeAudioId === project.id;
@@ -234,100 +403,109 @@ const WorkAudioCard = memo(function WorkAudioCard({
       }
     >
       <div className="w-full bg-[#FBFAF9] rounded-[24px] sm:rounded-[36px] 2xl:rounded-[44px] border-2 border-[#E5DFD5] p-5 sm:p-10 lg:p-12 2xl:p-16 shadow-[0_12px_40px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_rgba(226,42,42,0.08)] transition-all duration-500 overflow-hidden">
-        <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16 2xl:gap-20">
+        <div className="flex flex-col lg:flex-row lg:items-stretch items-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16 2xl:gap-20">
           
           {/* Левая колонка: Описание кейса со звёздным голосом */}
-          <div className="w-full lg:w-1/2 flex flex-col justify-between order-2 lg:order-1">
+          <div className="w-full lg:w-1/2 flex flex-col justify-between order-2 lg:order-1 py-1 lg:py-2">
             <div>
-              {/* Чистый заголовок проекта */}
-              <h3 className="text-2xl sm:text-4xl lg:text-5xl 2xl:text-[50px] font-extrabold text-[#0A0A0A] tracking-tight leading-tight mb-3 sm:mb-4">
+              {/* Редакционный Kicker — только рубрика, без дублирования клиента из заголовка */}
+              <p className="text-[11px] sm:text-xs lg:text-[13px] font-bold tracking-[0.2em] lg:tracking-[0.22em] text-[#8C8C8C] uppercase mb-2 lg:mb-4">
+                Кейс · Радиореклама
+              </p>
+
+              {/* Заголовок проекта */}
+              <h3 className="text-2xl sm:text-4xl lg:text-5xl 2xl:text-[54px] font-extrabold text-[#0A0A0A] tracking-tight leading-tight lg:leading-[1.12] mb-3 sm:mb-4 lg:mb-6">
                 {project.title}
               </h3>
 
-              {/* Описание */}
-              <p className="text-sm sm:text-base 2xl:text-lg text-[#525252] leading-relaxed mb-5 lg:mb-6 font-normal">
+              {/* Живой рассказ — упоминает Гланца и Дэдпула единственный раз через project.description */}
+              <p className="text-sm sm:text-base lg:text-lg 2xl:text-xl text-[#525252] leading-relaxed lg:leading-[1.65] mb-5 lg:mb-8 font-normal">
                 {project.description}
               </p>
 
-              {/* Разделитель */}
-              <div className="w-full h-px bg-[#D4D4D4]/70 mb-3 sm:mb-4" />
-
-              {/* Строка: Клиент */}
-              <div className="flex items-start justify-between py-1.5 gap-3">
-                <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0 pt-0.5">
-                  Клиент:
-                </span>
-                <span className="text-sm sm:text-base 2xl:text-lg font-bold text-[#0A0A0A] text-right">
-                  {project.client}
-                </span>
-              </div>
-
-              <div className="w-full h-px bg-[#D4D4D4]/70 my-2.5 sm:my-3" />
-
-              {/* Строка: Звёздный диктор с монументальным акцентом Дэдпула */}
+              {/* Журнальная выноска (Pull-quote) — только имя и бейдж, без повторов */}
               {project.celebrityVoice && (
-                <>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 gap-1.5 sm:gap-2">
-                    <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0">
-                      Диктор:
+                <div className="relative pl-3.5 sm:pl-4 lg:pl-6 border-l-[3px] lg:border-l-4 border-[#E22A2A] mb-6 lg:mb-8 lg:py-1">
+                  <p className="text-lg sm:text-xl lg:text-2xl xl:text-[26px] font-black text-[#0A0A0A] tracking-tight leading-snug lg:leading-tight">
+                    {project.celebrityVoice}
+                  </p>
+                  {project.celebrityBadge && (
+                    <p className="text-xs sm:text-sm lg:text-base font-semibold text-[#E22A2A] mt-0.5 lg:mt-1.5 tracking-tight">
+                      {project.celebrityBadge}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Выходные данные кейса (Editorial Colophon) */}
+              <div className="border-t border-b border-[#D4D4D4]/70 py-3.5 lg:py-6 mb-6 lg:mb-8 space-y-2.5 lg:space-y-4">
+                {/* Клиент — здесь единственное место, где указан полный бренд */}
+                {project.client && (
+                  <div className="flex items-baseline gap-3 lg:gap-6 text-sm lg:text-[15px] xl:text-base">
+                    <span className="text-[11px] sm:text-xs lg:text-xs font-bold text-[#8C8C8C] uppercase tracking-wider shrink-0 w-[4.5rem] sm:w-20 lg:w-24 xl:w-28">
+                      Клиент
                     </span>
-                    <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-start sm:justify-end">
-                      <span className="text-base sm:text-lg 2xl:text-xl font-black text-[#0A0A0A]">
-                        {project.celebrityVoice}
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      <span className="font-semibold text-[#0A0A0A] leading-snug lg:leading-normal">
+                        {project.client}
                       </span>
-                      {project.celebrityBadge && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#E22A2A]/10 border border-[#E22A2A]/30 text-[#C11212] text-xs sm:text-sm font-extrabold tracking-wide shadow-sm shrink-0">
-                          <svg className="w-3.5 h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
-                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
-                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+                      {Boolean(project.clientUrl) && (
+                        <a
+                          href={project.clientUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/5 hover:bg-[#E22A2A] text-[#404040] hover:text-white text-xs font-semibold transition-all duration-200 border border-black/10 hover:border-transparent group/link shadow-sm active:scale-95"
+                          title={`Перейти на сайт ${project.client}`}
+                        >
+                          <span>Сайт клиента</span>
+                          <svg
+                            className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
                           </svg>
-                          <span>{project.celebrityBadge}</span>
-                        </span>
+                        </a>
                       )}
                     </div>
                   </div>
-                  <div className="w-full h-px bg-[#D4D4D4]/70 my-2.5 sm:my-3" />
-                </>
-              )}
+                )}
 
-              {/* Строка: Ротация на радио */}
-              {project.radioStation && (
-                <>
-                  <div className="flex items-start justify-between py-1.5 gap-3">
-                    <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0 pt-0.5">
-                      Радиоэфир:
+                {project.radioStation && (
+                  <div className="flex items-baseline gap-3 lg:gap-6 text-sm lg:text-[15px] xl:text-base">
+                    <span className="text-[11px] sm:text-xs lg:text-xs font-bold text-[#8C8C8C] uppercase tracking-wider shrink-0 w-[4.5rem] sm:w-20 lg:w-24 xl:w-28">
+                      Эфир
                     </span>
-                    <span className="text-sm sm:text-base 2xl:text-lg font-bold text-[#0A0A0A] text-right">
-                      {project.radioStation}
+                    <span className="font-medium text-[#0A0A0A] leading-snug lg:leading-normal">
+                      {project.radioStation.split("·").map((st) => {
+                        const station = st.trim();
+                        const freq = station.toLowerCase().includes("дорожное") ? "99.2 FM" : "98.8 FM";
+                        return `${station} (${freq})`;
+                      }).join(" · ")}
                     </span>
                   </div>
-                  <div className="w-full h-px bg-[#D4D4D4]/70 my-2.5 sm:my-3" />
-                </>
-              )}
+                )}
 
-              {/* Строка: Услуги */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1 mb-6 sm:mb-8 gap-2">
-                <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0">
-                  Услуги:
-                </span>
-                <div className="flex flex-wrap items-center justify-start sm:justify-end gap-1.5 sm:gap-2">
-                  {(Array.isArray(project.services) ? project.services : []).map((service, sIdx) => (
-                    <span
-                      key={`${service}-${sIdx}`}
-                      className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-[#EAE0CF]/50 text-[#0A0A0A] text-[11px] sm:text-xs font-semibold border border-[#D4C8B5]/60"
-                    >
-                      {service}
+                {Array.isArray(project.services) && project.services.length > 0 && (
+                  <div className="flex items-baseline gap-3 lg:gap-6 text-sm lg:text-[15px] xl:text-base">
+                    <span className="text-[11px] sm:text-xs lg:text-xs font-bold text-[#8C8C8C] uppercase tracking-wider shrink-0 w-[4.5rem] sm:w-20 lg:w-24 xl:w-28">
+                      Формат
                     </span>
-                  ))}
-                </div>
+                    <span className="font-medium text-[#525252] leading-snug lg:leading-normal">
+                      {project.services.join(" · ")}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Кнопка заказа ролика */}
-            <div>
+            <div className="pt-1 lg:pt-2">
               <Link
                 href={project.href || "#contact"}
-                className="group inline-flex items-center justify-center w-full sm:w-auto gap-2.5 px-6 2xl:px-8 py-3.5 2xl:py-4 rounded-full bg-[#0A0A0A] hover:bg-[#E22A2A] text-white font-semibold text-sm 2xl:text-base transition-all duration-200 shadow-md hover:shadow-xl active:scale-[0.98]"
+                className="group inline-flex items-center justify-center w-full sm:w-auto gap-2.5 px-6 sm:px-7 lg:px-8 2xl:px-9 py-3.5 lg:py-4 2xl:py-4.5 rounded-full bg-[#0A0A0A] hover:bg-[#E22A2A] text-white font-semibold text-sm lg:text-base transition-all duration-200 shadow-md hover:shadow-xl active:scale-[0.98]"
               >
                 <span>Заказать аудиоролик с диктором</span>
                 <svg
@@ -348,8 +526,8 @@ const WorkAudioCard = memo(function WorkAudioCard({
           </div>
 
           {/* Правая колонка: Фоновое изображение со сдвинутым вниз компактным плеером */}
-          <div className="w-full lg:w-1/2 order-1 lg:order-2">
-            <div className="relative w-full aspect-[3/4] xs:aspect-[4/5] sm:aspect-[4/3] lg:aspect-[1184/1080] min-h-[460px] xs:min-h-[500px] sm:min-h-0 rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/10 bg-[#141210] p-3 sm:p-6 2xl:p-8 flex flex-col justify-between text-white shadow-2xl group select-none">
+          <div className="w-full lg:w-1/2 order-1 lg:order-2 flex flex-col">
+            <div className="relative w-full h-full aspect-[3/4] xs:aspect-[4/5] sm:aspect-[4/3] lg:aspect-auto min-h-[460px] xs:min-h-[500px] sm:min-h-[480px] lg:min-h-[580px] xl:min-h-[640px] rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/10 bg-[#141210] p-3 sm:p-6 lg:p-7 2xl:p-8 flex flex-col justify-between text-white shadow-2xl group select-none">
               
               {/* Слой фонового изображения кейса (когда картинка задана) */}
               {project.imageSrc && (
@@ -376,10 +554,10 @@ const WorkAudioCard = memo(function WorkAudioCard({
                 </div>
               )}
 
-
-              {/* Верхняя строка: Компактный бейдж статуса эфира и хронометраж с фиксированной высотой и без переносов */}
-              <div className="relative z-10 flex items-center justify-between gap-2 w-full">
-                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 h-7 sm:h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
+              {/* Верхняя строка: Обе радиостанции 99.2 FM и 98.8 FM размещены от левого края */}
+              <div className="relative z-10 flex items-center justify-start gap-2 lg:gap-3 w-full flex-wrap">
+                {/* Станция 1: 99.2 FM («Дорожное Радио») */}
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 lg:px-4 h-7 sm:h-8 lg:h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs lg:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
                   <span className="relative flex h-2 w-2 shrink-0">
                     {(isPlaying || isTuningThis) && (
                       <span
@@ -409,28 +587,31 @@ const WorkAudioCard = memo(function WorkAudioCard({
                   >
                     {isTuningThis ? "99.2 FM · Поиск..." : isPlaying ? "99.2 FM · В эфире" : "99.2 FM"}
                   </span>
-                  <span className="hidden sm:inline text-white/40 font-normal">|</span>
-                  <span className="hidden sm:inline text-white/80">Аудиокейс</span>
+                  <span className="text-white/40 font-normal">|</span>
+                  <span className="text-white/80 font-normal">Дорожное</span>
                 </div>
 
-                <div className="inline-flex items-center px-2.5 sm:px-3 h-7 sm:h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs font-mono font-medium text-white/80 tracking-wider whitespace-nowrap shrink-0">
-                  <span className="sm:hidden">25 сек</span>
-                  <span className="hidden sm:inline">{project.audioFormat || "Эфирный ролик · 25 сек"}</span>
+                {/* Станция 2: 98.8 FM («НАШЕ Радио») */}
+                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 lg:px-4 h-7 sm:h-8 lg:h-9 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs lg:text-[13px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0 text-white/90">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E22A2A]/70 shrink-0" />
+                  <span>98.8 FM</span>
+                  <span className="text-white/40 font-normal">|</span>
+                  <span className="text-white/80 font-normal">НАШЕ</span>
                 </div>
               </div>
 
               {/* Центральная часть: ПОЛНОСТЬЮ ОТКРЫТА, чтобы фоновую картинку было отлично видно */}
-              <div className="flex-1 min-h-[200px]" />
+              <div className="flex-1 min-h-[140px] lg:min-h-[180px]" />
 
-              {/* Нижняя часть: Сдвинутый вниз компактный плеер с центрированной кнопкой и живым эквалайзером */}
-              <div className="relative z-10 w-full p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-black/80 backdrop-blur-xl border border-white/15 shadow-2xl flex flex-col gap-2 sm:gap-2.5">
-                <div className="flex items-center gap-2.5 sm:gap-4">
+              {/* Нижняя часть: Сдвинутый вниз компактный плеер с затемнённым стеклом, живым таймером и эквалайзером */}
+              <div className="relative z-10 w-full p-2.5 sm:p-4 lg:p-5 xl:p-6 rounded-xl sm:rounded-2xl lg:rounded-3xl bg-black/45 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.36)] flex flex-col gap-2.5 sm:gap-3 lg:gap-4">
+                <div className="flex items-center gap-2.5 sm:gap-4 lg:gap-5">
                   {/* Строго центрированная кнопка Play/Pause */}
                   <button
                     type="button"
                     onClick={() => onPlayToggle(project.id, project.audioSrc || "/sounds/truboplast-deadpool-glanz.mp3")}
                     aria-label={isPlaying ? "Поставить на паузу" : "Слушать ролик с Петром Гланцем"}
-                    className={`shrink-0 relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer ${
+                    className={`shrink-0 relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer ${
                       isTuningThis
                         ? "bg-amber-400 text-black shadow-amber-400/40 animate-pulse"
                         : isPlaying
@@ -439,11 +620,11 @@ const WorkAudioCard = memo(function WorkAudioCard({
                     }`}
                   >
                     {isPlaying || isTuningThis ? (
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 fill-current" viewBox="0 0 24 24">
                         <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                       </svg>
                     ) : (
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 fill-current translate-x-0.5" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     )}
@@ -451,10 +632,10 @@ const WorkAudioCard = memo(function WorkAudioCard({
 
                   {/* Текстовая плашка диктора и статус */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-bold text-white tracking-tight truncate">
+                    <p className="text-xs sm:text-sm lg:text-base font-bold text-white tracking-tight truncate">
                       {project.celebrityVoice || "Пётр Гланц"}
                     </p>
-                    <p className="text-[10px] sm:text-xs text-white/60 truncate mt-0.5">
+                    <p className="text-[10px] sm:text-xs lg:text-sm text-white/60 truncate mt-0.5 lg:mt-1">
                       {isTuningThis
                         ? "Поиск частоты 99.2 FM..."
                         : isPlaying
@@ -463,13 +644,17 @@ const WorkAudioCard = memo(function WorkAudioCard({
                     </p>
                   </div>
 
-                  <span className="shrink-0 text-[10px] sm:text-[11px] font-mono font-medium text-white/50 px-1.5 sm:px-2 py-0.5 rounded bg-white/10">
-                    25 сек
-                  </span>
+                  {/* Аккуратный цифровой таймер без рамки */}
+                  <AudioDockTime isPlaying={isPlaying} isThisTrack={isThisTrack} />
                 </div>
 
-                {/* Полноценный анимированный эквалайзер внутри черного окошка */}
-                <SoundwaveEqualizer isPlaying={isPlaying} isTuning={isTuningThis} />
+                {/* Полноценный анимированный эквалайзер с интерактивной перемоткой по тапу/клику */}
+                <AudioDockEqualizer
+                  isPlaying={isPlaying}
+                  isTuning={isTuningThis}
+                  isThisTrack={isThisTrack}
+                  onSeek={onSeek}
+                />
               </div>
 
             </div>
@@ -480,6 +665,7 @@ const WorkAudioCard = memo(function WorkAudioCard({
     </div>
   );
 });
+
 
 interface WorkProps {
   initialData?: Partial<WorkSectionData>;
@@ -509,6 +695,15 @@ export default function Work({ initialData }: WorkProps) {
     };
   }, []);
 
+  const handleSeek = useCallback((percent: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const targetDuration = audio.duration || 25;
+    const newTime = Math.max(0, Math.min(targetDuration, targetDuration * percent));
+    audio.currentTime = newTime;
+    audioProgressManager.update(newTime, targetDuration);
+  }, []);
+
   const handleAudioToggle = useCallback(
     (id: string, audioSrc: string) => {
       const audio = audioRef.current;
@@ -526,6 +721,7 @@ export default function Work({ initialData }: WorkProps) {
       audio.pause();
       setActiveAudioId(id);
       setIsTuning(true);
+      audioProgressManager.reset();
 
       // Запускаем аутентичное шипение эфира и захват волны перед воспроизведением
       radioAudio.playTuningIntro(() => {
@@ -567,17 +763,27 @@ export default function Work({ initialData }: WorkProps) {
 
   return (
     <section id="work" className="w-full bg-[#F3EFE8] pt-14 sm:pt-20 2xl:pt-24 pb-8 sm:pb-12 lg:pb-14 px-4 sm:px-8 lg:px-10 2xl:px-12">
-      {/* Скрытый аудиоплеер для надежного воспроизведения без утечек памяти */}
+      {/* Скрытый аудиоплеер для надежного воспроизведения без лишней перерисовки секции */}
       <audio
         ref={audioRef}
         preload="auto"
+        onTimeUpdate={(e) => {
+          const el = e.currentTarget;
+          audioProgressManager.update(el.currentTime, el.duration || 25);
+        }}
+        onLoadedMetadata={(e) => {
+          const el = e.currentTarget;
+          audioProgressManager.update(el.currentTime, el.duration || 25);
+        }}
         onEnded={() => {
           setActiveAudioId(null);
           setIsTuning(false);
+          audioProgressManager.reset();
         }}
         onError={() => {
           setActiveAudioId(null);
           setIsTuning(false);
+          audioProgressManager.reset();
         }}
       />
 
@@ -614,6 +820,7 @@ export default function Work({ initialData }: WorkProps) {
                 activeAudioId={activeAudioId}
                 isTuning={isTuning}
                 onPlayToggle={handleAudioToggle}
+                onSeek={handleSeek}
               />
             ) : (
               <WorkVisualCard

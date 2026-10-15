@@ -112,6 +112,7 @@ export interface WorkProjectItem {
   title: string;
   description: string;
   client: string;
+  clientUrl?: string;
   services: string[];
   imageSrc: string;
   href: string;
