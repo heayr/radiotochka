@@ -136,21 +136,11 @@ export const DEFAULT_WORK_DATA: WorkSectionData = {
   items: [
     {
       id: "01",
-      title: "Alongside",
-      description:
-        "Комплексный ребрендинг и запуск федеральной рекламной кампании: разработка позиционирования, создание аудиороликов и ротация в эфире радиостанций.",
-      client: "Lumina Legal",
-      services: ["Айдентика", "Радиоэфир"],
-      imageSrc: "/images/work/project-01.png",
-      href: "#contact",
-    },
-    {
-      id: "02",
       projectType: "audio",
       title: "«Трубопласт»",
       description:
         "Для озвучки эфирного радиоролика пригласили Петра Гланца — официальный голос Дэдпула в России. Яркая, брутальная и ироничная подача пробивает баннерную слепоту и держит внимание водителей в автопотоке.",
-      client: "Завод полимерных труб «Трубопласт»",
+      client: "Сеть магазинов сантехники «Трубопласт»",
       celebrityVoice: "Пётр Гланц",
       celebrityBadge: "голос Дэдпула в РФ",
       services: ["Аудиопродакшн", "Звёздный голос", "Радиоэфир"],
@@ -158,26 +148,6 @@ export const DEFAULT_WORK_DATA: WorkSectionData = {
       audioFormat: "Эфирный ролик · 25 сек",
       audioSrc: "/sounds/truboplast-deadpool-glanz.mp3",
       imageSrc: "/images/work/deadpool-truboplast.jpg",
-      href: "#contact",
-    },
-    {
-      id: "03",
-      title: "Redefine Flow",
-      description:
-        "Стратегический медиаплан и брендинг: позиционирование на региональном рынке, сити-форматы с высоким трафиком и спонсорские интеграции.",
-      client: "Verge Consulting",
-      services: ["Медиаплан", "Брендинг"],
-      imageSrc: "/images/work/project-03.png",
-      href: "#contact",
-    },
-    {
-      id: "04",
-      title: "Recap",
-      description:
-        "Пакетное размещение на радиостанциях «Дорожное радио» и «НАШЕ Радио» с охватом всей агломерации и точным попаданием в целевую аудиторию.",
-      client: "Harbor Financial",
-      services: ["Прямой эфир", "Спонсорство"],
-      imageSrc: "/images/work/project-04.png",
       href: "#contact",
     },
   ],

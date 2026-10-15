@@ -12,22 +12,41 @@ import {
 } from "@/types/site-content";
 
 const PRESET_WORK_IMAGES = [
+  { label: "Дэдпул на лоурайдере (Трубопласт)", src: "/images/work/deadpool-truboplast.jpg" },
   { label: "Проект 1", src: "/images/work/project-01.png" },
   { label: "Проект 2", src: "/images/work/project-02.png" },
   { label: "Проект 3", src: "/images/work/project-03.png" },
   { label: "Проект 4", src: "/images/work/project-04.png" },
 ];
 
+const DUMMY_TITLES = new Set(["alongside", "hypertech", "redefine flow", "recap"]);
+const DUMMY_CLIENTS = new Set(["lumina legal", "fitfuel nutrition", "verge consulting", "harbor financial"]);
+
+function isDummySample(item: WorkProjectItem) {
+  const t = (item.title || "").toLowerCase().trim();
+  const c = (item.client || "").toLowerCase().trim();
+  return DUMMY_TITLES.has(t) || DUMMY_CLIENTS.has(c);
+}
+
 export function WorkEditor({ block, onSave, onCancel }: EditorProps) {
   const content = (block.content || {}) as Partial<WorkSectionData>;
 
   const [title, setTitle] = useState(content.title || DEFAULT_WORK_DATA.title || "Избранные проекты");
   const [subtitle, setSubtitle] = useState(content.subtitle || DEFAULT_WORK_DATA.subtitle || "Кейсы агентства");
-  const [items, setItems] = useState<WorkProjectItem[]>(
-    content.items && content.items.length > 0
-      ? content.items
-      : DEFAULT_WORK_DATA.items
-  );
+
+  // Автоматически очищаем устаревшие демонстрационные шаблоны, оставляя реальные проекты студии
+  const rawContentItems = content.items && Array.isArray(content.items) ? content.items : [];
+  const cleanItems = rawContentItems.filter((item) => !isDummySample(item));
+  const hasAudio = cleanItems.some((item) => item.projectType === "audio" || Boolean(item.audioSrc));
+
+  const initialItems: WorkProjectItem[] =
+    cleanItems.length > 0 && hasAudio
+      ? cleanItems
+      : cleanItems.length > 0
+      ? [...cleanItems, ...DEFAULT_WORK_DATA.items]
+      : DEFAULT_WORK_DATA.items;
+
+  const [items, setItems] = useState<WorkProjectItem[]>(initialItems);
 
   const [isLoading, setIsLoading] = useState(false);
 

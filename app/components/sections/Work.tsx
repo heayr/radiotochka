@@ -169,7 +169,7 @@ const SoundwaveEqualizer = memo(function SoundwaveEqualizer({
   isTuning: boolean;
 }) {
   return (
-    <div className="w-full flex items-center justify-between gap-[3px] sm:gap-1 h-8 sm:h-9 pt-1.5 border-t border-white/10 overflow-hidden">
+    <div className="w-full flex items-center justify-between gap-[2px] sm:gap-1 h-6 sm:h-8 pt-1 border-t border-white/10 overflow-hidden">
       {EQUALIZER_BARS.map((bar, idx) => {
         let style: React.CSSProperties = {
           height: `${Math.max(14, bar.base * 0.22)}%`,
@@ -349,7 +349,7 @@ const WorkAudioCard = memo(function WorkAudioCard({
 
           {/* Правая колонка: Фоновое изображение со сдвинутым вниз компактным плеером */}
           <div className="w-full lg:w-1/2 order-1 lg:order-2">
-            <div className="relative w-full aspect-[16/10] sm:aspect-[4/3] lg:aspect-[1184/1080] rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/10 bg-[#141210] p-4 sm:p-6 2xl:p-8 flex flex-col justify-between text-white shadow-2xl group select-none">
+            <div className="relative w-full aspect-[3/4] xs:aspect-[4/5] sm:aspect-[4/3] lg:aspect-[1184/1080] min-h-[460px] xs:min-h-[500px] sm:min-h-0 rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/10 bg-[#141210] p-3 sm:p-6 2xl:p-8 flex flex-col justify-between text-white shadow-2xl group select-none">
               
               {/* Слой фонового изображения кейса (когда картинка задана) */}
               {project.imageSrc && (
@@ -358,7 +358,7 @@ const WorkAudioCard = memo(function WorkAudioCard({
                   alt={project.title}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, (min-width: 1536px) 760px, 580px"
-                  className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="object-cover object-[center_35%] sm:object-center transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               )}
 
@@ -378,8 +378,8 @@ const WorkAudioCard = memo(function WorkAudioCard({
 
 
               {/* Верхняя строка: Компактный бейдж статуса эфира и хронометраж */}
-              <div className="relative z-10 flex items-center justify-between">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+              <div className="relative z-10 flex items-center justify-between gap-2">
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
                   <span className="relative flex h-2 w-2">
                     {(isPlaying || isTuningThis) && (
                       <span
@@ -407,27 +407,27 @@ const WorkAudioCard = memo(function WorkAudioCard({
                         : "text-white/80"
                     }
                   >
-                    {isTuningThis ? "Поиск волны 99.2 FM..." : isPlaying ? "В эфире · 99.2 FM" : "99.2 FM Аудиокейс"}
+                    {isTuningThis ? "Поиск 99.2 FM..." : isPlaying ? "В эфире · 99.2 FM" : "99.2 FM Аудиокейс"}
                   </span>
                 </div>
 
-                <span className="text-[11px] sm:text-xs font-mono font-medium text-white/70 tracking-wider px-2.5 py-1 rounded-full bg-black/30 backdrop-blur-sm border border-white/10">
+                <span className="text-[10px] sm:text-xs font-mono font-medium text-white/70 tracking-wider px-2 sm:px-2.5 py-1 rounded-full bg-black/30 backdrop-blur-sm border border-white/10 shrink-0">
                   {project.audioFormat || "Эфирный ролик · 25 сек"}
                 </span>
               </div>
 
               {/* Центральная часть: ПОЛНОСТЬЮ ОТКРЫТА, чтобы фоновую картинку было отлично видно */}
-              <div className="flex-1" />
+              <div className="flex-1 min-h-[160px]" />
 
               {/* Нижняя часть: Сдвинутый вниз компактный плеер с центрированной кнопкой и живым эквалайзером */}
-              <div className="relative z-10 w-full p-3.5 sm:p-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/15 shadow-2xl flex flex-col gap-2.5">
-                <div className="flex items-center gap-3 sm:gap-4">
+              <div className="relative z-10 w-full p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-black/80 backdrop-blur-xl border border-white/15 shadow-2xl flex flex-col gap-2 sm:gap-2.5">
+                <div className="flex items-center gap-2.5 sm:gap-4">
                   {/* Строго центрированная кнопка Play/Pause */}
                   <button
                     type="button"
                     onClick={() => onPlayToggle(project.id, project.audioSrc || "/sounds/truboplast-deadpool-glanz.mp3")}
                     aria-label={isPlaying ? "Поставить на паузу" : "Слушать ролик с Петром Гланцем"}
-                    className={`shrink-0 relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer ${
+                    className={`shrink-0 relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer ${
                       isTuningThis
                         ? "bg-amber-400 text-black shadow-amber-400/40 animate-pulse"
                         : isPlaying
@@ -436,11 +436,11 @@ const WorkAudioCard = memo(function WorkAudioCard({
                     }`}
                   >
                     {isPlaying || isTuningThis ? (
-                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
                         <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                       </svg>
                     ) : (
-                      <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     )}
@@ -451,16 +451,16 @@ const WorkAudioCard = memo(function WorkAudioCard({
                     <p className="text-xs sm:text-sm font-bold text-white tracking-tight truncate">
                       {project.celebrityVoice || "Пётр Гланц"}
                     </p>
-                    <p className="text-[11px] sm:text-xs text-white/60 truncate mt-0.5">
+                    <p className="text-[10px] sm:text-xs text-white/60 truncate mt-0.5">
                       {isTuningThis
                         ? "Поиск частоты 99.2 FM..."
                         : isPlaying
-                        ? "Звучит в эфире «Дорожного Радио»"
-                        : "Нажмите для прослушивания радиоролика"}
+                        ? "В эфире «Дорожного Радио»"
+                        : "Нажмите для прослушивания"}
                     </p>
                   </div>
 
-                  <span className="shrink-0 text-[11px] font-mono font-medium text-white/50 px-2 py-0.5 rounded bg-white/10">
+                  <span className="shrink-0 text-[10px] sm:text-[11px] font-mono font-medium text-white/50 px-1.5 sm:px-2 py-0.5 rounded bg-white/10">
                     25 сек
                   </span>
                 </div>
@@ -480,6 +480,15 @@ const WorkAudioCard = memo(function WorkAudioCard({
 
 interface WorkProps {
   initialData?: Partial<WorkSectionData>;
+}
+
+const DUMMY_TITLES = new Set(["alongside", "hypertech", "redefine flow", "recap"]);
+const DUMMY_CLIENTS = new Set(["lumina legal", "fitfuel nutrition", "verge consulting", "harbor financial"]);
+
+function isDummySample(item: WorkProjectItem) {
+  const t = (item.title || "").toLowerCase().trim();
+  const c = (item.client || "").toLowerCase().trim();
+  return DUMMY_TITLES.has(t) || DUMMY_CLIENTS.has(c);
 }
 
 export default function Work({ initialData }: WorkProps) {
@@ -545,33 +554,13 @@ export default function Work({ initialData }: WorkProps) {
     [activeAudioId]
   );
 
+  // Очищаем старые демонстрационные шаблоны, оставляя только реальные проекты студии
   const rawItems =
     initialData?.items && Array.isArray(initialData.items) && initialData.items.length > 0
-      ? initialData.items
+      ? initialData.items.filter((item) => !isDummySample(item))
       : [];
 
-  // Проверяем, содержит ли сохраненный в базе данных массив проектов аудио-кейс
-  const hasAudioProject = rawItems.some(
-    (p) => p.projectType === "audio" || Boolean(p.audioSrc)
-  );
-
-  // Если в БД хранится старый снимок без аудио-кейса, гарантированно подмешиваем актуальный аудио-кейс с Дэдпулом
-  const audioCases = DEFAULT_WORK_DATA.items.filter(
-    (p) => p.projectType === "audio" || Boolean(p.audioSrc)
-  );
-
-  const resolvedItems =
-    !hasAudioProject && audioCases.length > 0 && rawItems.length > 0
-      ? [rawItems[0], ...audioCases, ...rawItems.slice(2)]
-      : rawItems;
-
-  const isCompatible =
-    resolvedItems.length > 0 &&
-    resolvedItems.some(
-      (p) => p.client || (Array.isArray(p.services) && p.services.length > 0)
-    );
-
-  const items = isCompatible ? resolvedItems : DEFAULT_WORK_DATA.items;
+  const items = rawItems.length > 0 ? rawItems : DEFAULT_WORK_DATA.items;
 
   return (
     <section id="work" className="w-full bg-[#F3EFE8] pt-14 sm:pt-20 2xl:pt-24 pb-8 sm:pb-12 lg:pb-14 px-4 sm:px-8 lg:px-10 2xl:px-12">
