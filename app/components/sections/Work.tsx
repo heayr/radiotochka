@@ -550,13 +550,28 @@ export default function Work({ initialData }: WorkProps) {
       ? initialData.items
       : [];
 
+  // Проверяем, содержит ли сохраненный в базе данных массив проектов аудио-кейс
+  const hasAudioProject = rawItems.some(
+    (p) => p.projectType === "audio" || Boolean(p.audioSrc)
+  );
+
+  // Если в БД хранится старый снимок без аудио-кейса, гарантированно подмешиваем актуальный аудио-кейс с Дэдпулом
+  const audioCases = DEFAULT_WORK_DATA.items.filter(
+    (p) => p.projectType === "audio" || Boolean(p.audioSrc)
+  );
+
+  const resolvedItems =
+    !hasAudioProject && audioCases.length > 0 && rawItems.length > 0
+      ? [rawItems[0], ...audioCases, ...rawItems.slice(2)]
+      : rawItems;
+
   const isCompatible =
-    rawItems.length > 0 &&
-    rawItems.some(
+    resolvedItems.length > 0 &&
+    resolvedItems.some(
       (p) => p.client || (Array.isArray(p.services) && p.services.length > 0)
     );
 
-  const items = isCompatible ? rawItems : DEFAULT_WORK_DATA.items;
+  const items = isCompatible ? resolvedItems : DEFAULT_WORK_DATA.items;
 
   return (
     <section id="work" className="w-full bg-[#F3EFE8] pt-14 sm:pt-20 2xl:pt-24 pb-8 sm:pb-12 lg:pb-14 px-4 sm:px-8 lg:px-10 2xl:px-12">
