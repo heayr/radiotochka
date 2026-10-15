@@ -130,7 +130,7 @@ const WorkVisualCard = memo(function WorkVisualCard({
 
           {/* Правая колонка: Изображение проекта */}
           <div className="w-full lg:w-1/2 order-1 lg:order-2">
-            <div className="relative w-full aspect-[16/10] sm:aspect-[4/3] lg:aspect-[1184/1080] rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/5 bg-[#EFECE6] group">
+            <div className="relative w-full aspect-[16/10] sm:aspect-[4/3] lg:aspect-[1184/1080] rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden bg-[#EFECE6] group">
               <SafeImage
                 src={project.imageSrc || (project as { image?: string }).image || "/images/work/project-01.png"}
                 alt={project.title}
@@ -527,7 +527,7 @@ const WorkAudioCard = memo(function WorkAudioCard({
 
           {/* Правая колонка: Фоновое изображение со сдвинутым вниз компактным плеером */}
           <div className="w-full lg:w-1/2 order-1 lg:order-2 flex flex-col">
-            <div className="relative w-full h-full aspect-[3/4] xs:aspect-[4/5] sm:aspect-[4/3] lg:aspect-auto min-h-[460px] xs:min-h-[500px] sm:min-h-[480px] lg:min-h-[580px] xl:min-h-[640px] rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/10 bg-[#141210] p-3 sm:p-6 lg:p-7 2xl:p-8 flex flex-col justify-between text-white shadow-2xl group select-none">
+            <div className="relative w-full h-full aspect-[3/4] xs:aspect-[4/5] sm:aspect-[4/3] lg:aspect-auto min-h-[460px] xs:min-h-[500px] sm:min-h-[480px] lg:min-h-[580px] xl:min-h-[640px] rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden bg-[#141210] p-3 sm:p-6 lg:p-7 2xl:p-8 flex flex-col justify-between text-white shadow-2xl group select-none">
               
               {/* Слой фонового изображения кейса (когда картинка задана) */}
               {project.imageSrc && (
