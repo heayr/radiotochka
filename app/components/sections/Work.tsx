@@ -20,7 +20,8 @@ const WorkVisualCard = memo(function WorkVisualCard({
   project: WorkProjectItem;
   index: number;
 }) {
-  const stickyTop = `calc(90px + ${index * 24}px)`;
+  // Интеллектуальный расчет отступа: на ноутбуках (16:10 / 1440x900) отступ компактнее, чтобы нижний край карточки гарантированно помещался во вьюпорт
+  const stickyTop = `calc(clamp(64px, 7.5vh, 88px) + ${index * 16}px)`;
 
   return (
     <div
@@ -32,48 +33,48 @@ const WorkVisualCard = memo(function WorkVisualCard({
         } as React.CSSProperties
       }
     >
-      <div className="w-full bg-[#FBFAF9] rounded-[24px] sm:rounded-[36px] 2xl:rounded-[44px] border border-[#E5DFD5] p-5 sm:p-10 lg:p-12 2xl:p-16 shadow-[0_12px_40px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.09)] transition-shadow duration-500 overflow-hidden">
-        <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16 2xl:gap-20">
+      <div className="w-full bg-[#FBFAF9] rounded-[20px] sm:rounded-[30px] 2xl:rounded-[40px] border border-[#E5DFD5] p-4 xs:p-5 sm:p-7 md:p-8 lg:p-7 xl:p-9 2xl:p-12 shadow-[0_12px_40px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.09)] transition-shadow duration-500 overflow-hidden">
+        <div className="flex flex-col lg:flex-row items-center gap-5 sm:gap-7 lg:gap-8 xl:gap-12 2xl:gap-16">
           
           {/* Левая колонка: Текстовый контент и метаданные проекта */}
           <div className="w-full lg:w-1/2 flex flex-col justify-between order-2 lg:order-1">
             <div>
               {/* Заголовок проекта */}
-              <h3 className="text-2xl sm:text-4xl lg:text-5xl 2xl:text-[52px] font-extrabold text-[#0A0A0A] tracking-tight leading-tight mb-3 sm:mb-4 2xl:mb-6">
+              <h3 className="text-xl xs:text-2xl sm:text-3xl lg:text-[30px] xl:text-[38px] 2xl:text-[46px] font-extrabold text-[#0A0A0A] tracking-tight leading-[1.15] mb-2 sm:mb-3 2xl:mb-5">
                 {project.title}
               </h3>
 
               {/* Описание */}
-              <p className="text-sm sm:text-base 2xl:text-lg text-[#525252] leading-relaxed mb-5 lg:mb-8 font-normal">
+              <p className="text-xs sm:text-sm lg:text-[13px] xl:text-base 2xl:text-lg text-[#525252] leading-relaxed mb-3 sm:mb-4 lg:mb-4 xl:mb-6 font-normal">
                 {project.description}
               </p>
 
               {/* Разделитель */}
-              <div className="w-full h-px bg-[#D4D4D4]/70 mb-4 sm:mb-5 2xl:mb-6" />
+              <div className="w-full h-px bg-[#D4D4D4]/70 mb-2 sm:mb-3 2xl:mb-4" />
 
               {/* Строка: Клиент */}
               <div className="flex items-center justify-between py-1">
-                <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider">
+                <span className="text-[11px] sm:text-xs 2xl:text-sm font-semibold text-[#737373] uppercase tracking-wider">
                   Клиент:
                 </span>
-                <span className="text-sm sm:text-base 2xl:text-lg font-bold text-[#0A0A0A]">
+                <span className="text-xs sm:text-sm lg:text-[13px] xl:text-base 2xl:text-lg font-bold text-[#0A0A0A]">
                   {project.client}
                 </span>
               </div>
 
               {/* Разделитель */}
-              <div className="w-full h-px bg-[#D4D4D4]/70 my-3 sm:my-4 2xl:my-5" />
+              <div className="w-full h-px bg-[#D4D4D4]/70 my-2 sm:my-2.5 2xl:my-3" />
 
               {/* Строка: Услуги */}
-              <div className="flex flex-col xs:flex-row xs:items-center justify-between py-1 mb-6 sm:mb-8 2xl:mb-10 gap-2">
-                <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0">
+              <div className="flex flex-col xs:flex-row xs:items-center justify-between py-1 mb-4 sm:mb-5 lg:mb-5 xl:mb-7 gap-2">
+                <span className="text-[11px] sm:text-xs 2xl:text-sm font-semibold text-[#737373] uppercase tracking-wider shrink-0">
                   Услуги:
                 </span>
-                <div className="flex flex-wrap items-center justify-start xs:justify-end gap-1.5 sm:gap-2 2xl:gap-2.5">
+                <div className="flex flex-wrap items-center justify-start xs:justify-end gap-1.5 sm:gap-2">
                   {(Array.isArray(project.services) ? project.services : []).map((service, sIdx) => (
                     <span
                       key={`${service}-${sIdx}`}
-                      className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 2xl:px-4 2xl:py-2 rounded-full bg-[#EAE0CF]/50 text-[#0A0A0A] text-[11px] sm:text-xs 2xl:text-sm font-semibold border border-[#D4C8B5]/60"
+                      className="px-2.5 py-0.5 sm:px-3 sm:py-1 2xl:px-3.5 2xl:py-1.5 rounded-full bg-[#EAE0CF]/50 text-[#0A0A0A] text-[10px] sm:text-xs 2xl:text-sm font-semibold border border-[#D4C8B5]/60"
                     >
                       {service}
                     </span>
@@ -86,11 +87,11 @@ const WorkVisualCard = memo(function WorkVisualCard({
             <div>
               <Link
                 href={project.href || "#contact"}
-                className="group inline-flex items-center justify-center w-full sm:w-auto gap-2.5 px-6 2xl:px-8 py-3.5 2xl:py-4 rounded-full bg-[#0A0A0A] hover:bg-brand-pink text-white font-semibold text-sm 2xl:text-base transition-all duration-200 shadow-md hover:shadow-xl active:scale-[0.98]"
+                className="group inline-flex items-center justify-center w-full sm:w-auto gap-2 px-5 py-2.5 sm:px-6 sm:py-3 xl:px-7 xl:py-3.5 2xl:px-8 2xl:py-4 rounded-full bg-[#0A0A0A] hover:bg-brand-pink text-white font-semibold text-xs sm:text-sm 2xl:text-base transition-all duration-200 shadow-md hover:shadow-xl active:scale-[0.98]"
               >
                 <span>Обсудить похожий проект</span>
                 <svg
-                  className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -108,7 +109,7 @@ const WorkVisualCard = memo(function WorkVisualCard({
 
           {/* Правая колонка: Изображение проекта */}
           <div className="w-full lg:w-1/2 order-1 lg:order-2">
-            <div className="relative w-full aspect-[16/10] sm:aspect-[4/3] lg:aspect-[1184/1080] rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/5 bg-[#EFECE6] group">
+            <div className="relative w-full aspect-[16/10] sm:aspect-[16/10] lg:aspect-[16/11] xl:aspect-[16/10] rounded-[16px] sm:rounded-[22px] 2xl:rounded-[28px] overflow-hidden border border-black/5 bg-[#EFECE6] group shadow-inner">
               <SafeImage
                 src={project.imageSrc || (project as { image?: string }).image || "/images/work/project-01.png"}
                 alt={project.title}
@@ -169,7 +170,7 @@ const SoundwaveEqualizer = memo(function SoundwaveEqualizer({
   isTuning: boolean;
 }) {
   return (
-    <div className="w-full flex items-center justify-between gap-[2px] sm:gap-1 h-6 sm:h-8 pt-1 border-t border-white/10 overflow-hidden">
+    <div className="w-full flex items-center justify-between gap-[2px] sm:gap-1 h-5 sm:h-7 pt-1 border-t border-white/10 overflow-hidden">
       {EQUALIZER_BARS.map((bar, idx) => {
         let style: React.CSSProperties = {
           height: `${Math.max(14, bar.base * 0.22)}%`,
@@ -218,7 +219,8 @@ const WorkAudioCard = memo(function WorkAudioCard({
   isTuning: boolean;
   onPlayToggle: (id: string, audioSrc: string) => void;
 }) {
-  const stickyTop = `calc(90px + ${index * 24}px)`;
+  // Интеллектуальный расчет отступа: на ноутбуках (16:10 / 1440x900) отступ компактнее, чтобы нижний край карточки гарантированно помещался во вьюпорт
+  const stickyTop = `calc(clamp(64px, 7.5vh, 88px) + ${index * 16}px)`;
   const isThisTrack = activeAudioId === project.id;
   const isTuningThis = isThisTrack && isTuning;
   const isPlaying = isThisTrack && !isTuning;
@@ -233,51 +235,51 @@ const WorkAudioCard = memo(function WorkAudioCard({
         } as React.CSSProperties
       }
     >
-      <div className="w-full bg-[#FBFAF9] rounded-[24px] sm:rounded-[36px] 2xl:rounded-[44px] border-2 border-[#E5DFD5] p-5 sm:p-10 lg:p-12 2xl:p-16 shadow-[0_12px_40px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_rgba(226,42,42,0.08)] transition-all duration-500 overflow-hidden">
-        <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16 2xl:gap-20">
+      <div className="w-full bg-[#FBFAF9] rounded-[20px] sm:rounded-[30px] 2xl:rounded-[40px] border-2 border-[#E5DFD5] p-4 xs:p-5 sm:p-7 md:p-8 lg:p-7 xl:p-9 2xl:p-12 shadow-[0_12px_40px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_rgba(226,42,42,0.08)] transition-all duration-500 overflow-hidden">
+        <div className="flex flex-col lg:flex-row items-center gap-5 sm:gap-7 lg:gap-8 xl:gap-12 2xl:gap-16">
           
           {/* Левая колонка: Описание кейса со звёздным голосом */}
           <div className="w-full lg:w-1/2 flex flex-col justify-between order-2 lg:order-1">
             <div>
               {/* Чистый заголовок проекта */}
-              <h3 className="text-2xl sm:text-4xl lg:text-5xl 2xl:text-[50px] font-extrabold text-[#0A0A0A] tracking-tight leading-tight mb-3 sm:mb-4">
+              <h3 className="text-xl xs:text-2xl sm:text-3xl lg:text-[30px] xl:text-[38px] 2xl:text-[46px] font-extrabold text-[#0A0A0A] tracking-tight leading-[1.15] mb-2 sm:mb-3 2xl:mb-4">
                 {project.title}
               </h3>
 
               {/* Описание */}
-              <p className="text-sm sm:text-base 2xl:text-lg text-[#525252] leading-relaxed mb-5 lg:mb-6 font-normal">
+              <p className="text-xs sm:text-sm lg:text-[13px] xl:text-base 2xl:text-lg text-[#525252] leading-relaxed mb-3 sm:mb-4 lg:mb-4 xl:mb-5 font-normal">
                 {project.description}
               </p>
 
               {/* Разделитель */}
-              <div className="w-full h-px bg-[#D4D4D4]/70 mb-3 sm:mb-4" />
+              <div className="w-full h-px bg-[#D4D4D4]/70 mb-2 sm:mb-2.5 2xl:mb-3" />
 
               {/* Строка: Клиент */}
-              <div className="flex items-start justify-between py-1.5 gap-3">
-                <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0 pt-0.5">
+              <div className="flex items-start justify-between py-1 gap-3">
+                <span className="text-[11px] sm:text-xs 2xl:text-sm font-semibold text-[#737373] uppercase tracking-wider shrink-0 pt-0.5">
                   Клиент:
                 </span>
-                <span className="text-sm sm:text-base 2xl:text-lg font-bold text-[#0A0A0A] text-right">
+                <span className="text-xs sm:text-sm lg:text-[13px] xl:text-base 2xl:text-lg font-bold text-[#0A0A0A] text-right">
                   {project.client}
                 </span>
               </div>
 
-              <div className="w-full h-px bg-[#D4D4D4]/70 my-2.5 sm:my-3" />
+              <div className="w-full h-px bg-[#D4D4D4]/70 my-1.5 sm:my-2 2xl:my-2.5" />
 
               {/* Строка: Звёздный диктор с монументальным акцентом Дэдпула */}
               {project.celebrityVoice && (
                 <>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 gap-1.5 sm:gap-2">
-                    <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1 gap-1.5 sm:gap-2">
+                    <span className="text-[11px] sm:text-xs 2xl:text-sm font-semibold text-[#737373] uppercase tracking-wider shrink-0">
                       Диктор:
                     </span>
-                    <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-start sm:justify-end">
-                      <span className="text-base sm:text-lg 2xl:text-xl font-black text-[#0A0A0A]">
+                    <div className="flex items-center gap-1.5 sm:gap-2.5 flex-wrap justify-start sm:justify-end">
+                      <span className="text-sm sm:text-base lg:text-[15px] xl:text-lg 2xl:text-xl font-black text-[#0A0A0A]">
                         {project.celebrityVoice}
                       </span>
                       {project.celebrityBadge && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#E22A2A]/10 border border-[#E22A2A]/30 text-[#C11212] text-xs sm:text-sm font-extrabold tracking-wide shadow-sm shrink-0">
-                          <svg className="w-3.5 h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full bg-[#E22A2A]/10 border border-[#E22A2A]/30 text-[#C11212] text-[10px] sm:text-xs font-extrabold tracking-wide shadow-sm shrink-0">
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
                             <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
                             <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
                           </svg>
@@ -286,35 +288,35 @@ const WorkAudioCard = memo(function WorkAudioCard({
                       )}
                     </div>
                   </div>
-                  <div className="w-full h-px bg-[#D4D4D4]/70 my-2.5 sm:my-3" />
+                  <div className="w-full h-px bg-[#D4D4D4]/70 my-1.5 sm:my-2 2xl:my-2.5" />
                 </>
               )}
 
               {/* Строка: Ротация на радио */}
               {project.radioStation && (
                 <>
-                  <div className="flex items-start justify-between py-1.5 gap-3">
-                    <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0 pt-0.5">
+                  <div className="flex items-start justify-between py-1 gap-3">
+                    <span className="text-[11px] sm:text-xs 2xl:text-sm font-semibold text-[#737373] uppercase tracking-wider shrink-0 pt-0.5">
                       Радиоэфир:
                     </span>
-                    <span className="text-sm sm:text-base 2xl:text-lg font-bold text-[#0A0A0A] text-right">
+                    <span className="text-xs sm:text-sm lg:text-[13px] xl:text-base 2xl:text-lg font-bold text-[#0A0A0A] text-right">
                       {project.radioStation}
                     </span>
                   </div>
-                  <div className="w-full h-px bg-[#D4D4D4]/70 my-2.5 sm:my-3" />
+                  <div className="w-full h-px bg-[#D4D4D4]/70 my-1.5 sm:my-2 2xl:my-2.5" />
                 </>
               )}
 
               {/* Строка: Услуги */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1 mb-6 sm:mb-8 gap-2">
-                <span className="text-xs sm:text-sm 2xl:text-base font-semibold text-[#737373] uppercase tracking-wider shrink-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1 mb-4 sm:mb-5 lg:mb-5 xl:mb-6 gap-2">
+                <span className="text-[11px] sm:text-xs 2xl:text-sm font-semibold text-[#737373] uppercase tracking-wider shrink-0">
                   Услуги:
                 </span>
                 <div className="flex flex-wrap items-center justify-start sm:justify-end gap-1.5 sm:gap-2">
                   {(Array.isArray(project.services) ? project.services : []).map((service, sIdx) => (
                     <span
                       key={`${service}-${sIdx}`}
-                      className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-[#EAE0CF]/50 text-[#0A0A0A] text-[11px] sm:text-xs font-semibold border border-[#D4C8B5]/60"
+                      className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#EAE0CF]/50 text-[#0A0A0A] text-[10px] sm:text-xs font-semibold border border-[#D4C8B5]/60"
                     >
                       {service}
                     </span>
@@ -327,11 +329,11 @@ const WorkAudioCard = memo(function WorkAudioCard({
             <div>
               <Link
                 href={project.href || "#contact"}
-                className="group inline-flex items-center justify-center w-full sm:w-auto gap-2.5 px-6 2xl:px-8 py-3.5 2xl:py-4 rounded-full bg-[#0A0A0A] hover:bg-[#E22A2A] text-white font-semibold text-sm 2xl:text-base transition-all duration-200 shadow-md hover:shadow-xl active:scale-[0.98]"
+                className="group inline-flex items-center justify-center w-full sm:w-auto gap-2 px-5 py-2.5 sm:px-6 sm:py-3 xl:px-7 xl:py-3.5 2xl:px-8 2xl:py-4 rounded-full bg-[#0A0A0A] hover:bg-[#E22A2A] text-white font-semibold text-xs sm:text-sm 2xl:text-base transition-all duration-200 shadow-md hover:shadow-xl active:scale-[0.98]"
               >
                 <span>Заказать аудиоролик с диктором</span>
                 <svg
-                  className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -349,7 +351,7 @@ const WorkAudioCard = memo(function WorkAudioCard({
 
           {/* Правая колонка: Фоновое изображение со сдвинутым вниз компактным плеером */}
           <div className="w-full lg:w-1/2 order-1 lg:order-2">
-            <div className="relative w-full aspect-[3/4] xs:aspect-[4/5] sm:aspect-[4/3] lg:aspect-[1184/1080] min-h-[460px] xs:min-h-[500px] sm:min-h-0 rounded-[18px] sm:rounded-[24px] 2xl:rounded-[32px] overflow-hidden border border-black/10 bg-[#141210] p-3 sm:p-6 2xl:p-8 flex flex-col justify-between text-white shadow-2xl group select-none">
+            <div className="relative w-full aspect-[16/10] xs:aspect-[16/11] sm:aspect-[16/10] lg:aspect-[16/11] xl:aspect-[16/10] min-h-[290px] xs:min-h-[310px] sm:min-h-[340px] lg:min-h-0 rounded-[16px] sm:rounded-[22px] 2xl:rounded-[28px] overflow-hidden border border-black/10 bg-[#141210] p-3 sm:p-4 2xl:p-6 flex flex-col justify-between text-white shadow-2xl group select-none">
               
               {/* Слой фонового изображения кейса (когда картинка задана) */}
               {project.imageSrc && (
@@ -376,10 +378,9 @@ const WorkAudioCard = memo(function WorkAudioCard({
                 </div>
               )}
 
-
               {/* Верхняя строка: Компактный бейдж статуса эфира и хронометраж с фиксированной высотой и без переносов */}
               <div className="relative z-10 flex items-center justify-between gap-2 w-full">
-                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 h-7 sm:h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
+                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 h-6 sm:h-7 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0">
                   <span className="relative flex h-2 w-2 shrink-0">
                     {(isPlaying || isTuningThis) && (
                       <span
@@ -413,24 +414,24 @@ const WorkAudioCard = memo(function WorkAudioCard({
                   <span className="hidden sm:inline text-white/80">Аудиокейс</span>
                 </div>
 
-                <div className="inline-flex items-center px-2.5 sm:px-3 h-7 sm:h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs font-mono font-medium text-white/80 tracking-wider whitespace-nowrap shrink-0">
+                <div className="inline-flex items-center px-2 sm:px-2.5 h-6 sm:h-7 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs font-mono font-medium text-white/80 tracking-wider whitespace-nowrap shrink-0">
                   <span className="sm:hidden">25 сек</span>
                   <span className="hidden sm:inline">{project.audioFormat || "Эфирный ролик · 25 сек"}</span>
                 </div>
               </div>
 
-              {/* Центральная часть: ПОЛНОСТЬЮ ОТКРЫТА, чтобы фоновую картинку было отлично видно */}
-              <div className="flex-1 min-h-[200px]" />
+              {/* Центральная часть: сбалансированная распорка под визуальный арт кейса */}
+              <div className="flex-1 min-h-[30px] xs:min-h-[50px] sm:min-h-[60px]" />
 
               {/* Нижняя часть: Сдвинутый вниз компактный плеер с центрированной кнопкой и живым эквалайзером */}
-              <div className="relative z-10 w-full p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-black/80 backdrop-blur-xl border border-white/15 shadow-2xl flex flex-col gap-2 sm:gap-2.5">
-                <div className="flex items-center gap-2.5 sm:gap-4">
+              <div className="relative z-10 w-full p-2 sm:p-3 2xl:p-3.5 rounded-xl sm:rounded-2xl bg-black/85 backdrop-blur-xl border border-white/15 shadow-2xl flex flex-col gap-1.5 sm:gap-2">
+                <div className="flex items-center gap-2.5 sm:gap-3.5">
                   {/* Строго центрированная кнопка Play/Pause */}
                   <button
                     type="button"
                     onClick={() => onPlayToggle(project.id, project.audioSrc || "/sounds/truboplast-deadpool-glanz.mp3")}
                     aria-label={isPlaying ? "Поставить на паузу" : "Слушать ролик с Петром Гланцем"}
-                    className={`shrink-0 relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer ${
+                    className={`shrink-0 relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full transition-all duration-300 shadow-xl active:scale-95 cursor-pointer ${
                       isTuningThis
                         ? "bg-amber-400 text-black shadow-amber-400/40 animate-pulse"
                         : isPlaying
@@ -439,11 +440,11 @@ const WorkAudioCard = memo(function WorkAudioCard({
                     }`}
                   >
                     {isPlaying || isTuningThis ? (
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-current" viewBox="0 0 24 24">
                         <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                       </svg>
                     ) : (
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-current" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     )}
@@ -454,7 +455,7 @@ const WorkAudioCard = memo(function WorkAudioCard({
                     <p className="text-xs sm:text-sm font-bold text-white tracking-tight truncate">
                       {project.celebrityVoice || "Пётр Гланц"}
                     </p>
-                    <p className="text-[10px] sm:text-xs text-white/60 truncate mt-0.5">
+                    <p className="text-[10px] sm:text-[11px] text-white/60 truncate mt-0.5">
                       {isTuningThis
                         ? "Поиск частоты 99.2 FM..."
                         : isPlaying
@@ -463,7 +464,7 @@ const WorkAudioCard = memo(function WorkAudioCard({
                     </p>
                   </div>
 
-                  <span className="shrink-0 text-[10px] sm:text-[11px] font-mono font-medium text-white/50 px-1.5 sm:px-2 py-0.5 rounded bg-white/10">
+                  <span className="shrink-0 text-[9px] sm:text-[10px] font-mono font-medium text-white/50 px-1.5 sm:px-2 py-0.5 rounded bg-white/10">
                     25 сек
                   </span>
                 </div>
@@ -566,7 +567,7 @@ export default function Work({ initialData }: WorkProps) {
   const items = rawItems.length > 0 ? rawItems : DEFAULT_WORK_DATA.items;
 
   return (
-    <section id="work" className="w-full bg-[#F3EFE8] pt-14 sm:pt-20 2xl:pt-24 pb-8 sm:pb-12 lg:pb-14 px-4 sm:px-8 lg:px-10 2xl:px-12">
+    <section id="work" className="w-full bg-[#F3EFE8] pt-10 sm:pt-16 lg:pt-20 2xl:pt-24 pb-8 sm:pb-12 lg:pb-14 px-3.5 xs:px-4 sm:px-8 lg:px-10 2xl:px-12">
       {/* Скрытый аудиоплеер для надежного воспроизведения без утечек памяти */}
       <audio
         ref={audioRef}
@@ -581,24 +582,24 @@ export default function Work({ initialData }: WorkProps) {
         }}
       />
 
-      <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto">
+      <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto">
         
         {/* Заголовок секции */}
-        <div className="text-center max-w-3xl 2xl:max-w-4xl mx-auto mb-10 sm:mb-20 2xl:mb-24">
-          <p className="text-xs sm:text-sm 2xl:text-base font-semibold tracking-[0.2em] text-[#737373] uppercase mb-3 flex items-center justify-center gap-2">
+        <div className="text-center max-w-3xl 2xl:max-w-4xl mx-auto mb-8 sm:mb-14 lg:mb-16 2xl:mb-20">
+          <p className="text-[11px] sm:text-xs 2xl:text-sm font-semibold tracking-[0.2em] text-[#737373] uppercase mb-2 sm:mb-2.5 flex items-center justify-center gap-2">
             <span className="w-2 h-2 rounded-full bg-brand-pink" />
             {initialData?.subtitle || "Портфолио / Кейсы"}
           </p>
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl 2xl:text-7xl font-extrabold text-[#0A0A0A] tracking-tight leading-[1.1] mb-4">
+          <h2 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl 2xl:text-6xl font-extrabold text-[#0A0A0A] tracking-tight leading-[1.12] mb-3">
             {initialData?.title || "Проекты, которые приносят результат"}
           </h2>
-          <p className="text-base sm:text-lg 2xl:text-xl text-[#525252] font-normal leading-relaxed">
+          <p className="text-xs sm:text-sm lg:text-base 2xl:text-lg text-[#525252] font-normal leading-relaxed max-w-2xl mx-auto">
             Реальные рекламные кампании на радио, магистральных щитах и в полиграфии для бизнеса в Балаково и Поволжье.
           </p>
         </div>
 
         {/* Стек карточек проектов с динамическим выбором шаблона (Visual / Audio) */}
-        <div className="flex flex-col gap-8 sm:gap-16 pb-2 sm:pb-4">
+        <div className="flex flex-col gap-6 sm:gap-10 lg:gap-12 pb-2 sm:pb-4">
           {items.map((project, index) => {
             const isAudioProject = project.projectType === "audio" || Boolean(project.audioSrc);
 
